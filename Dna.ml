@@ -29,7 +29,7 @@ let eval dna x =
 
 let rec print = function
 	|Const a -> print_float(a)
-	|x -> print_char(`x`)
-	|UnOp (name,_,child) -> print_string name ; print_string("("); print_dna child; print_string(")")
-	|BinOp (name,_,child1, child2) -> print_string("(");  print_dna child1; print_string(")"); print_string name; print_string("("); print_dna child2; print_string(")")
+	|X -> print_char 'X'
+	|UnOp (name,_,child) -> print_string name ; print_string("("); print child; print_string(")")
+	|BinOp (name,_,child1, child2) -> print_string("(");  print child1; print_string(")"); print_string name; print_string("("); print child2; print_string(")")
 ;;
