@@ -33,4 +33,3 @@ let rec print_dna = function
 	|UnOp (name,_,child) -> print_string name ; print_string("("); print_dna child; print_string(")")
 	|BinOp (name,_,child1, child2) -> print_string("(");  print_dna child1; print_string(")"); print_string name; print_string("("); print_dna child2; print_string(")")
 ;;
-;;
