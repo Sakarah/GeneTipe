@@ -1,6 +1,6 @@
-type dna =
-| BinOp of string*(float->float->float)*dna*dna
-| UnOp of string*(float->float)*dna
+type t =
+| BinOp of string*(float->float->float)*t*t
+| UnOp of string*(float->float)*t
 | Const of float
 | X
 ;;
@@ -27,7 +27,7 @@ let eval dna x =
     0.0 (* Skodt *)
 ;;
 
-let rec print_dna = function
+let rec print = function
 	|Const a -> print_float(a)
 	|x -> print_char(`x`)
 	|UnOp (name,_,child) -> print_string name ; print_string("("); print_dna child; print_string(")")
