@@ -14,7 +14,9 @@ val crossover : law:(int -> float) -> max_depth:int -> t -> t -> t
 (** Generate a new individual by modifying an existing individual adding him new randomly generated characteristics **)
 val mutation : law:(int -> float) -> max_depth:int -> t -> t
 
-(** Evaluate the function represented at the point x **)
+(** Evaluate the function represented at the point x.
+    If any exceptions is caught during the mathematical evaluation, the exception IllFormed will be raised.
+    It will have to be caught during the Evolver.tournament function. **)
 val eval : float -> t -> float
 
 (** Give a string representation of the DNA **)
