@@ -3,7 +3,7 @@
     population growth by mutation and crossover. **)
 
 (** Initialize the population with randomly generated individuals **)
-val init_population : size:int -> Dna.t array
+val init_population : size:int -> max_depth:int -> Dna.t array
 
 (** Measure how interesting a function is **)
 val fitness : (float*float) array -> Dna.t -> float
