@@ -14,7 +14,7 @@ val crossover : law:(int -> float) -> max_depth:int -> t -> t -> t
 val mutation : law:(int -> float) -> max_depth:int -> t -> t
 
 (** Evaluate the function represented at the point x **)
-val eval : t -> float -> float
+val eval : float -> t -> float
 
 (** Print the DNA **)
 val print : t -> unit
