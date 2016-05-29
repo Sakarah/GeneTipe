@@ -37,7 +37,7 @@ let rec eval x dna =
 ;;
 
 let rec to_string ?(bracket=false) = function
-    | Const a -> string_of_float a
+    | Const a -> Printf.sprintf "%.2f" a
     | X -> "x"
     | UnOp (name,_,child) -> name ^ "(" ^ (to_string child) ^ ")"
     | BinOp (symb,_,child1, child2) ->
