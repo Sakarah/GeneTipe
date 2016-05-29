@@ -1,5 +1,5 @@
-let init_population ~size max_depth =
-    Array.make size (0. , create_random max_depth)
+let init_population ~size ~max_depth =
+    Array.init size (function _ -> (None, Dna.create_random ~max_depth))
 ;;
 
 let fitness points dna =
@@ -7,7 +7,7 @@ let fitness points dna =
     let difference = ref 0. in
     for i = 0 to n-1 do
         let x,y = points.(i) in
-        difference := !difference +. ( (eval x dna) -. y ) ** 2.
+        difference := !difference +. ( (Dna.eval x dna) -. y ) ** 2.
     done;
     !difference
 ;;
