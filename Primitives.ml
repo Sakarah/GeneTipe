@@ -1,3 +1,5 @@
+exception IllFormed
+
 (*
 ** Binary primitives
 *)
