@@ -12,7 +12,7 @@ let fitness points dna =
             if evaluation = None then raise IllFormed 
             else difference := !difference +. ( evaluation -. y ) ** 2.
         done;
-        !difference
+        Some !difference
     with 
         IllFormed -> None
 ;;
