@@ -17,5 +17,7 @@ val mutation : law:(int -> float) -> max_depth:int -> t -> t
 (** Evaluate the function represented at the point x **)
 val eval : float -> t -> float
 
+(** Give a string representation of the DNA **)
+val to_string : ?bracket:bool -> t -> string
 (** Print the DNA **)
-val print : t -> unit
+val print : Format.formatter -> t -> unit

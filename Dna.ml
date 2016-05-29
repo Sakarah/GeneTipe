@@ -36,9 +36,13 @@ let rec eval x dna =
         _ -> raise IllFormed
 ;;
 
-let rec print = function
-    | Const a -> print_float a
-    | X -> print_char 'x'
-    | UnOp (name,_,child) -> print_string name ; print_string "("; print child; print_string ")"
-    | BinOp (name,_,child1, child2) -> print_string "(" ;  print child1; print_string ")" ; print_string name; print_string "(" ; print child2; print_string ")"
+let rec to_string ?(bracket=false) = function
+    | Const a -> string_of_float a
+    | X -> "x"
+    | UnOp (name,_,child) -> name ^ "(" ^ (to_string child) ^ ")"
+    | BinOp (symb,_,child1, child2) ->
+        if bracket then "(" ^ (to_string ~bracket:true child1) ^ symb ^ (to_string ~bracket:true child2) ^ ")"
+        else (to_string ~bracket:true child1) ^ symb ^ (to_string ~bracket:true child2)
 ;;
+
+let print ppf dna = Format.fprintf ppf "%s" (to_string dna);;
