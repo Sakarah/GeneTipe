@@ -31,7 +31,7 @@ let rec eval x dna =
             | Const a -> a
             | X -> x
     with
-        _ -> None
+        _ -> raise IllFormed
 ;;
 
 let rec print = function
