@@ -3,18 +3,14 @@ let init_population ~size ~max_depth =
 ;;
 
 let fitness points dna =
-    try 
-        let n = Array.length points in
-        let difference = ref 0. in
-        for i = 0 to n-1 do
-            let x,y = points.(i) in
-            let evaluation = Dna.eval x dna in
-            if evaluation = None then raise IllFormed 
-            else difference := !difference +. ( evaluation -. y ) ** 2.
-        done;
-        Some !difference
-    with 
-        IllFormed -> None
+    let n = Array.length points in
+    let difference = ref 0. in
+    for i = 0 to n-1 do
+        let x,y = points.(i) in
+        let evaluation = Dna.eval x dna in
+        else difference := !difference +. ( evaluation -. y ) ** 2.
+    done;
+    Some !difference
 ;;
 
 let tournament initialPopulation =
