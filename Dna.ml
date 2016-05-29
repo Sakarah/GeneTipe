@@ -5,6 +5,8 @@ type t =
     | X
 ;;
 
+exception IllFormed;;
+
 
 let create_random ~max_depth =
     X (* Gabzcr <- A coder en priorité *)

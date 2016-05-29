@@ -8,9 +8,9 @@ let fitness points dna =
     for i = 0 to n-1 do
         let x,y = points.(i) in
         let evaluation = Dna.eval x dna in
-        else difference := !difference +. ( evaluation -. y ) ** 2.
+        difference := !difference +. ( evaluation -. y ) ** 2.
     done;
-    Some !difference
+    !difference
 ;;
 
 let tournament initialPopulation =

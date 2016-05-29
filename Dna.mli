@@ -4,6 +4,7 @@
     All functions directly manipulating DNA should be found in this module. **)
 
 type t
+exception IllFormed
 
 (** Randomly generate a new individual who has a depth below max_depth **)
 val create_random : max_depth:int -> t

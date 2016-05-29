@@ -1,5 +1,3 @@
-exception IllFormed
-
 (*
 ** Binary primitives
 *)
