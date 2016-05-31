@@ -18,6 +18,11 @@ type randomGenParams =
     const_proba:float
 };;
 
+(** Generate a uniform random float value in specified range *)
+let uniform_float (lower_bound,greater_bound) =
+    (Random.float (greater_bound-.lower_bound)) +. lower_bound
+;;
+
 let create_random_grow ~max_depth random_gen_params =
     X (* Skodt *)
 ;;
@@ -44,7 +49,13 @@ let mutation ~depth random_gen_params base =
 ;;
 
 let mutate_constants ~range ~proba base =
-    X (* Sakarah *)
+    let rec mutate = function
+        | BinOp (name,func,child1,child2) -> BinOp (name, func, mutate child1, mutate child2)
+        | UnOp (name,func,child) -> UnOp (name, func, mutate child)
+        | Const a when Random.float 1. < proba -> Const (a +. uniform_float range)
+        | dna -> dna
+    in
+    mutate base
 ;;
 
 let rec eval x dna =
@@ -62,7 +73,7 @@ let rec to_string ?(bracket=false) = function
     | Const a -> Printf.sprintf "%.2f" a
     | X -> "x"
     | UnOp (name,_,child) -> name ^ "(" ^ (to_string child) ^ ")"
-    | BinOp (symb,_,child1, child2) ->
+    | BinOp (symb,_,child1,child2) ->
         if bracket then "(" ^ (to_string ~bracket:true child1) ^ symb ^ (to_string ~bracket:true child2) ^ ")"
         else (to_string ~bracket:true child1) ^ symb ^ (to_string ~bracket:true child2)
 ;;
