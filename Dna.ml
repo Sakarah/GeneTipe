@@ -7,21 +7,43 @@ type t =
 
 exception IllFormed;;
 
+type randomGenParams =
+{
+    fill_proba: float;
+    bin_op:(float * string * (float -> float -> float)) array ;
+    bin_proba:float ;
+    un_op:(float * string * (float -> float)) array ;
+    un_proba:float ;
+    const_range:(float*float) ;
+    const_proba:float
+};;
 
-let create_random ~max_depth =
-    X (* Gabzcr <- A coder en priorité *)
+let create_random_grow ~max_depth random_gen_params =
+    X (* Skodt *)
 ;;
 
+let create_random_fill ~max_depth random_gen_params =
+    X (* Gabzcr *)
+;;
+
+let create_random ~max_depth random_gen_params =
+    if Random.float 1. < random_gen_params.fill_proba then create_random_fill ~max_depth random_gen_params
+    else create_random_grow ~max_depth random_gen_params
+;;
 
 let take_dna max_depth =
     X (* Sakarah *)
 ;;
 
-let crossover ~law ~max_depth base giver =
+let crossover ~depth base giver =
     X (* Sakarah *)
 ;;
 
-let mutation ~law ~max_depth base =
+let mutation ~depth random_gen_params base =
+    X (* Sakarah *)
+;;
+
+let mutate_constants ~range ~proba base =
     X (* Sakarah *)
 ;;
 

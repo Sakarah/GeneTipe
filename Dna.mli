@@ -6,13 +6,32 @@
 type t
 exception IllFormed
 
+(** This type represents the parameters for random generation of an individual **)
+type randomGenParams =
+{
+    fill_proba: float;
+    bin_op:(float * string * (float -> float -> float)) array ;
+    bin_proba:float ;
+    un_op:(float * string * (float -> float)) array ;
+    un_proba:float ;
+    const_range:(float*float) ;
+    const_proba:float
+    (* The rest of the probabilities represent the choice of the variable (x) *)
+}
+
 (** Randomly generate a new individual who has a depth below max_depth **)
-val create_random : max_depth:int -> t
+val create_random_grow : max_depth:int -> randomGenParams -> t
+(** Randomly generate a new individual who has a depth of exactly max_depth **)
+val create_random_fill : max_depth:int -> randomGenParams -> t
+(** Randomly generate a new individual choosing between the grow or the fill method **)
+val create_random : max_depth:int -> randomGenParams -> t
 
 (** Generate a new individual by doing a crossover wich replace some parts of the first dna by elements of the second **)
-val crossover : law:(int -> float) -> max_depth:int -> t -> t -> t
+val crossover : depth:int -> t -> t -> t
 (** Generate a new individual by modifying an existing individual adding him new randomly generated characteristics **)
-val mutation : law:(int -> float) -> max_depth:int -> t -> t
+val mutation : depth:int -> randomGenParams -> t -> t
+(** Generate a new individual by tweaking constants of an already existing one **)
+val mutate_constants : range:(float*float) -> proba:float -> t -> t
 
 (** Evaluate the function represented at the point x.
     If any exceptions is caught during the mathematical evaluation, the exception IllFormed will be raised.
