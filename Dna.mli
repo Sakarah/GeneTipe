@@ -30,11 +30,14 @@ val create_random : max_depth:int -> randomGenParams -> t
 
 
 (** {2 Gene manipulation} *)
-(** Generate a new individual by doing a crossover wich replace some parts of the first dna by elements of the second *)
-val crossover : depth:int -> t -> t -> t
+(** Generate a new individual by doing a crossover wich replace some parts of the first dna by elements of the second.
+    The replacement takes place at the exact depth specified or before if we encounter a terminal node *)
+val crossover : crossover_depth:int -> t -> t -> t
 
-(** Generate a new individual by modifying an existing individual adding him new randomly generated characteristics *)
-val mutation : depth:int -> randomGenParams -> t -> t
+(** Generate a new individual by modifying an existing individual adding him new randomly generated characteristics.
+    The replacement takes place at the exact depth specified or before if we encounter a terminal node.
+    The new genes added are taken in order to ensure that max_depth is never exceeded. *)
+val mutation : mutation_depth:int -> max_depth:int -> randomGenParams -> t -> t
 
 (** Generate a new individual by tweaking constants of an already existing one *)
 val mutate_constants : range:(float*float) -> proba:float -> t -> t

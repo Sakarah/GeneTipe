@@ -36,16 +36,34 @@ let create_random ~max_depth random_gen_params =
     else create_random_grow ~max_depth random_gen_params
 ;;
 
-let take_dna max_depth =
-    X (* Sakarah *)
+let rec take_graft depth = function
+    | dna when depth = 0 -> dna
+    | BinOp (_,_,child1,_) when Random.bool () -> take_graft (depth-1) child1
+    | BinOp (_,_,_,child2) -> take_graft (depth-1) child2
+    | UnOp (_,_,child) -> take_graft (depth-1) child
+    | dna -> dna
 ;;
 
-let crossover ~depth base giver =
-    X (* Sakarah *)
+let crossover ~crossover_depth base giver =
+    let rec crossov depth = function
+        | _ when depth = crossover_depth -> take_graft depth giver
+        | BinOp (n,f,child1,child2) when Random.bool () -> BinOp (n,f,crossov (depth+1) child1,child2)
+        | BinOp (n,f,child1,child2) -> BinOp (n,f,child1,crossov (depth+1) child2)
+        | UnOp (n,f,child) -> UnOp (n,f,crossov (depth+1) child)
+        | _ -> take_graft depth giver
+    in
+    crossov 0 base
 ;;
 
-let mutation ~depth random_gen_params base =
-    X (* Sakarah *)
+let mutation ~mutation_depth ~max_depth random_gen_params base =
+    let rec mutate depth = function
+        | _ when depth = mutation_depth -> create_random ~max_depth:(max_depth-mutation_depth) random_gen_params
+        | BinOp (n,f,child1,child2) when Random.bool () -> BinOp (n,f,mutate (depth+1) child1,child2)
+        | BinOp (n,f,child1,child2) -> BinOp (n,f,child1,mutate (depth+1) child2)
+        | UnOp (n,f,child) -> UnOp (n,f,mutate (depth+1) child)
+        | _ -> create_random ~max_depth:(max_depth-depth) random_gen_params
+    in
+    mutate 0 base
 ;;
 
 let mutate_constants ~range ~proba base =
