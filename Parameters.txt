@@ -1,0 +1,14 @@
+let params =
+Dna.{
+  fill_proba = 0. ;
+  bin_op = [| (0.5,"+",(fun a b -> a +. b)); (0.5,"*",(fun a b -> a *. b)) |] ;
+  bin_proba = 0.25 ;
+  un_op = [| (0.5,"cos",(fun a -> cos a)); (0.5,"exp",(fun a -> exp a)) |] ;
+  un_proba = 0.25 ;
+  const_range = (-5.,5.) ;
+  const_proba = 0.25 ;
+  var_proba = 0.25
+}
+
+
+let str = Dna.to_string (Dna.create_random_grow 10 params);;
