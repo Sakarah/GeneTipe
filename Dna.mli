@@ -15,10 +15,17 @@ type randomGenParams =
     un_op:(float * string * (float -> float)) array ; (** Array of all unary operations with their associated probability knowing that an unary node have been selected *)
     un_proba:float ; (** Probability of choosing an unary node *)
     const_range:(float*float) ; (** Range where constants are randomly taken *)
-    const_proba:float (** Probability of choosing a constant. The rest of the probabilities represent the choice of the variable x *)
+    const_proba:float ; (** Probability of choosing a constant. *)
+    var_proba:float (** Probability of choosing a variable. The sum of the probabilities must be equal to 1 *)
 }
 
 (** {2 Random generation} *)
+(** Randomly chose a binary operation within the randomGenParams **)
+val random_bin_op : randomGenParams -> string * (float -> float -> float)
+
+(** Randomly chose a unary operation within the randomGenParams **)
+val random_un_op : randomGenParams -> string * (float -> float)
+
 (** Randomly generate a new individual who has a depth below max_depth *)
 val create_random_grow : max_depth:int -> randomGenParams -> t
 
