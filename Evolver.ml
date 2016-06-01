@@ -13,38 +13,39 @@ let fitness points dna =
     !difference
 ;;
 
+let compute_fitness points = 
+    Array.map 
+        (function
+            | (None,dna) -> (fitness points dna, dna)
+            | (Some fitness,dna) -> (fitness, dna)
+        )
+;;
+        
 let shuffle initialPopulation =
     let size = Array.length initialPopulation in
     for i=0 to (size-2) do
-    	let invPos = i + 1 + Random.int (size-i-1) in
-    	let switch = initialPopulation.(i) in 
-        initialPopulation.(i) <- initialPopulation.(invPos); initialPopulation.(invPos) <- switch
+        let invPos = i + 1 + Random.int (size-i-1) in
+        let switch = initialPopulation.(i) in 
+        initialPopulation.(i) <- initialPopulation.(invPos);
+        initialPopulation.(invPos) <- switch
     done
 ;;
 
 let tournament initialPopulation =
     let size = Array.length initialPopulation in
     shuffle initialPopulation;
-    let winners = Array.make ((size+1)/2) (0,X) in
-    if size mod 2 = 0 then begin
-    for i = 0 to ((size/2)-1) do
-        if (fst initialPopulation.(2*i)) > (fst initialPopulation.(2*i+1)) then
-	winners.(i) <- initialPopulation.(2*i)
-	else winners.(i) <- initialPopulation.(2*i + 1)
-    done end
-    else begin
-    for i = 0 to (((size -1)/2) -1) do
+    let winners = Array.make ((size+1)/2) initialPopulation.(0) in
+    for i = 0 to (size/2)-1 do
         if (fst initialPopulation.(2*i)) > (fst initialPopulation.(2*i+1)) then
         winners.(i) <- initialPopulation.(2*i)
-	else winners.(i) <- initialPopulation.(2*i + 1)
+        else winners.(i) <- initialPopulation.(2*i + 1)
     done;
-    winners.(size-1) <- initialPopulation.(size-1)
-    end;
+    if size mod 2 = 1 then winners.(size-1) <- initialPopulation.(size-1);
     winners
 ;;
 
 let reproduce initialPopulation =
-    initialPopulation (* Sakarah *)
+    [||] (* Sakarah *)
 ;;
 
 let evolve initialPopulation ~generations =

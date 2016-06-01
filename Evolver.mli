@@ -8,11 +8,14 @@ val init_population : size:int -> max_depth:int -> Dna.randomGenParams -> (float
 (** Measure how interesting a function is *)
 val fitness : (float*float) array -> Dna.t -> float
 
+(** Compute the fitness of all the individuals of a population *)
+val compute_fitness : (float*float) array -> (float option * Dna.t) array -> (float * Dna.t) array
+
 (** Organize a fight between functions to discard some of the weakest *)
-val tournament : (float option * Dna.t) array -> (float option * Dna.t) array
+val tournament : (float * Dna.t) array -> (float * Dna.t) array
 
 (** Recombine existing individuals and make mutations to create new functions *)
-val reproduce : (float option * Dna.t) array -> (float option * Dna.t) array
+val reproduce : (float * Dna.t) array -> (float option * Dna.t) array
 
 (** Evolve the population with the fixed number of generations *)
 val evolve : (float option * Dna.t) array -> generations:int -> (float option * Dna.t) array
