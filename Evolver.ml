@@ -13,8 +13,34 @@ let fitness points dna =
     !difference
 ;;
 
+let shuffle initialPopulation =
+	let size = Array.length initialPopulation in
+	for i=0 to (size-2) do
+		let invPos = i + 1 + Random.int (size-i-1) in
+		let switch = initialPopulation.(i) in 
+		initialPopulation.(i) <- initialPopulation.(invPos); initialPopulation.(invPos) <- switch
+	done
+;;
+
 let tournament initialPopulation =
-    initialPopulation (* Gabzcr *)
+	let size = Array.length initialPopulation in
+	shuffle initialPopulation;
+	let winners = Array.make ((size+1)/2) (0,X) in
+	if size mod 2 = 0 then begin
+	for i = 0 to ((size/2)-1) do
+		if (fst initialPopulation.(2*i)) > (fst initialPopulation.(2*i+1)) then
+		winners.(i) <- initialPopulation.(2*i)
+		else winners.(i) <- initialPopulation.(2*i + 1)
+	done end
+	else begin
+	for i = 0 to (((size -1)/2) -1) do
+		if (fst initialPopulation.(2*i)) > (fst initialPopulation.(2*i+1)) then
+		winners.(i) <- initialPopulation.(2*i)
+		else winners.(i) <- initialPopulation.(2*i + 1)
+	done;
+	winners.(size-1) <- initialPopulation.(size-1)
+	end;
+	winners
 ;;
 
 let reproduce initialPopulation =
