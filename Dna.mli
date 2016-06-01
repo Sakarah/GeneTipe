@@ -20,10 +20,10 @@ type randomGenParams =
 }
 
 (** {2 Random generation} *)
-(** Randomly chose a binary operation within the randomGenParams **)
+(** Randomly chose a binary operation within the randomGenParams *)
 val random_bin_op : randomGenParams -> string * (float -> float -> float)
 
-(** Randomly chose a unary operation within the randomGenParams **)
+(** Randomly chose a unary operation within the randomGenParams *)
 val random_un_op : randomGenParams -> string * (float -> float)
 
 (** Randomly generate a new individual who has a depth below max_depth *)
