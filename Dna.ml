@@ -108,25 +108,25 @@ let rec create_random_grow ~max_depth gen_params =
 
 let rec create_random_fill ~max_depth gen_params =
     if max_depth = 0 then
-	    (
+	(
 	    let p = Random.float (gen_params.const_proba +. gen_params.var_proba) in
 	    if p < gen_params.const_proba then
             Const (uniform_float(gen_params.const_range))
         else
             X
-	    )
+	)
 	else
-	    (
+	(
 	    let distention = 1./.(gen_params.un_proba +. gen_params.bin_proba) in (* to choose between bin_op and un_op without changing the proba *)
 		let p_bin = distention *. gen_params.bin_proba in
 		let p = Random.float 1. in
 		if p < p_bin then
-		    let name, operation = random_bin_op gen_params in
-			BinOp (name, operation, (create_random_fill	(max_depth - 1) gen_params ), (create_random_fill (max_depth - 1) gen_params ) )
+		    let name, operation = random_bin_op gen_params.bin_op in
+			BinOp (name, operation, (create_random_fill	(max_depth - 1) gen_params), (create_random_fill (max_depth - 1) gen_params) )
 		else
-		    let name, operation = random_un_op gen_params in
-            UnOp (name, operation, (create_random_fill (max_depth - 1) gen_params ))
-		)
+		    let name, operation = random_un_op gen_params.bin_op in
+            UnOp (name, operation, (create_random_fill (max_depth - 1) gen_params))
+	)
 ;;
 
 let create_random ~max_depth gen_params =
