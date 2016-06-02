@@ -1,3 +1,5 @@
+exception IllFormed;;
+
 let init_population ~size ~max_depth rand_gen_params =
     Array.init size (function _ -> (None, Dna.create_random ~max_depth rand_gen_params))
 ;;
@@ -15,11 +17,10 @@ let fitness points dna =
 ;;
 
 let compute_fitness points = 
-    Array.map 
-        (function
-            | (None,dna) -> (fitness points dna, dna)
-            | (Some fitness,dna) -> (fitness, dna)
-        )
+    let fillFitness = function
+        | (None,dna) -> (fitness points dna, dna)
+        | (Some fitness,dna) -> (fitness, dna)
+    in Array.map fillFitness
 ;;
         
 let shuffle initialPopulation =

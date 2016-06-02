@@ -4,7 +4,6 @@
     All functions directly manipulating DNA should be found in this module. *)
 
 type t
-exception IllFormed
 
 (** This type represents the parameters for random generation of an individual *)
 type randomGenParams =
@@ -20,12 +19,6 @@ type randomGenParams =
 }
 
 (** {2 Random generation} *)
-(** Randomly chose a binary operation within the randomGenParams *)
-val random_bin_op : randomGenParams -> string * (float -> float -> float)
-
-(** Randomly chose a unary operation within the randomGenParams *)
-val random_un_op : randomGenParams -> string * (float -> float)
-
 (** Randomly generate a new individual who has a depth below max_depth *)
 val create_random_grow : max_depth:int -> randomGenParams -> t
 
