@@ -156,14 +156,11 @@ let mutate_constants ~range ~proba base =
 ;;
 
 let rec eval x dna =
-    try
-        match dna with
-            | UnOp (_,op,t) -> op (eval x t)
-            | BinOp (_,op,t1,t2) -> op (eval x t1) (eval x t2)
-            | Const a -> a
-            | X -> x
-    with
-        _ -> raise IllFormed
+    match dna with
+        | UnOp (_,op,t) -> op (eval x t)
+        | BinOp (_,op,t1,t2) -> op (eval x t1) (eval x t2)
+        | Const a -> a
+        | X -> x
 ;;
 
 let rec to_string ?(bracket=false) = function
