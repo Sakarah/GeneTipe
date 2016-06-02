@@ -5,8 +5,7 @@ type t =
     | X
 ;;
 
-exception IllFormed;;
-exception Found;;
+exception Found of int;;
 
 type randomGenParams =
 {
@@ -25,68 +24,67 @@ let uniform_float (lower_bound,greater_bound) =
     (Random.float (greater_bound-.lower_bound)) +. lower_bound
 ;;
 
-let random_bin_op gen_params =
-    let n = Array.length gen_params.bin_op in
+
+(** Randomly chose a binary operation within the randomGenParams *)
+let random_bin_op bin_op_params =
+    let n = Array.length bin_op_params in
     let probs = Array.make n 0. in
 
     let proba (x,y,z) = x in
     let binop (x,y,z) = (y,z) in
-
-    probs.(0) <- proba gen_params.bin_op.(0) ;
+	
+	probs.(0) <- proba bin_op_params.(0) ;
     for i = 1 to n-2 do
-        probs.(i) <- probs.(i-1) +. proba gen_params.bin_op.(i)
+        probs.(i) <- probs.(i-1) +. proba bin_op_params.(i)
     done;
     probs.(n-1) <- 1. ;
-
-    let chosen_i = ref 0 in
-
+	
     try
         let p = Random.float 1. in
         for i = 0 to n-1 do
-            if p < probs.(i) then (chosen_i := i ; raise Found)
+            if p < probs.(i) then raise (Found i)
         done;
         failwith "The probabilities are not well defined"
     with
-        Found -> binop gen_params.bin_op.(!chosen_i)
+        Found i -> binop bin_op_params.(i)
 ;;
 
-let random_un_op gen_params =
-    let n = Array.length gen_params.un_op in
+(** Randomly chose a unary operation within the randomGenParams *)
+let random_un_op un_op_params =
+    let n = Array.length un_op_params in
     let probs = Array.make n 0. in
 
     let proba (x,y,z) = x in
     let unop (x,y,z) = (y,z) in
 
-    probs.(0) <- proba gen_params.un_op.(0) ;
+    probs.(0) <- proba un_op_params.(0) ;
     for i = 1 to n-2 do
-        probs.(i) <- probs.(i-1) +. proba gen_params.un_op.(i)
+		probs.(i) <- probs.(i-1) +. proba un_op_params.(i)
     done;
     probs.(n-1) <- 1. ;
-
-    let chosen_i = ref 0 in
 
     try
         let p = Random.float 1. in
         for i = 0 to n-1 do
-            if p < probs.(i) then (chosen_i := i ; raise Found)
+            if p < probs.(i) then raise (Found i)
         done;
         failwith "The probabilities are not well defined"
     with
-        Found -> unop gen_params.un_op.(!chosen_i)
+        Found i -> unop un_op_params.(i)
 ;;
 
 let rec create_random_grow ~max_depth gen_params =
     (* If max_depth is reached, then there is a constant or a variable *)
     if max_depth = 0 then
-        (
+    (
         let p = Random.float (gen_params.const_proba +. gen_params.var_proba) in
         if p < gen_params.const_proba then
             Const (uniform_float(gen_params.const_range))
         else
             X
-        )
+    )
     else
-        (
+    (
         let p_bin = gen_params.bin_proba in
         let p_un = p_bin +. gen_params.un_proba in
         let p_const = p_un +. gen_params.const_proba in
@@ -94,17 +92,18 @@ let rec create_random_grow ~max_depth gen_params =
         let p = Random.float 1. in
 
         if p < p_bin then
-            let name, operation = random_bin_op gen_params in
-            BinOp (name, operation, (create_random_grow (max_depth - 1) gen_params ), (create_random_grow (max_depth - 1) gen_params ) )
+            let name, operation = random_bin_op gen_params.bin_op in
+            BinOp (name, operation, (create_random_grow (max_depth - 1) gen_params), (create_random_grow (max_depth - 1) gen_params) )
         else if p < p_un then
-            let name, operation = random_un_op gen_params in
-            UnOp (name, operation, (create_random_grow (max_depth - 1) gen_params ))
+            let name, operation = random_un_op gen_params.un_op in
+            UnOp (name, operation, (create_random_grow (max_depth - 1) gen_params))
         else if p < p_const then
             Const (uniform_float(gen_params.const_range))
         else
             X
-        )
+    )
 ;;
+
 
 let rec create_random_fill ~max_depth gen_params =
     if max_depth = 0 then
@@ -124,7 +123,7 @@ let rec create_random_fill ~max_depth gen_params =
 		    let name, operation = random_bin_op gen_params.bin_op in
 			BinOp (name, operation, (create_random_fill	(max_depth - 1) gen_params), (create_random_fill (max_depth - 1) gen_params) )
 		else
-		    let name, operation = random_un_op gen_params.bin_op in
+		    let name, operation = random_un_op gen_params.un_op in
             UnOp (name, operation, (create_random_fill (max_depth - 1) gen_params))
 	)
 ;;
