@@ -11,8 +11,9 @@ val fitness : (float*float) array -> Dna.t -> float
 (** Compute the fitness of all the individuals of a population *)
 val compute_fitness : (float*float) array -> (float option * Dna.t) array -> (float * Dna.t) array
 
-(** Organize a fight between functions to discard some of the weakest *)
-val tournament : ('a * 'b) array -> target_size:int -> ('a * 'b) array
+(** Organize a fight between functions to discard some of the weakest 
+    target_size is the size of the resulting population, it mustn't be greater than the input population size *)
+val tournament : (float*float) array -> target_size:int -> (float*float) array
 
 (** Recombine existing individuals and make mutations to create new functions *)
 val reproduce : (float * Dna.t) array -> (float option * Dna.t) array
