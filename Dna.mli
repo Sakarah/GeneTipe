@@ -22,7 +22,7 @@ type randomGenParams =
 (** Randomly generate a new individual who has a depth below max_depth *)
 val create_random_grow : max_depth:int -> randomGenParams -> t
 
-(** Randomly generate a new individual who has a depth of exactly max_depth *)
+(** Randomly generate a new individual who has a depth of exactly max_depth (for all branches) *)
 val create_random_fill : max_depth:int -> randomGenParams -> t
 
 (** Randomly generate a new individual choosing between the grow or the fill method *)
