@@ -8,14 +8,14 @@ type t
 (** This type represents the parameters for random generation of an individual *)
 type randomGenParams =
 {
-    fill_proba: float; (** Probability of the full method beeing selected for generation *)
-    bin_op:(float * string * (float -> float -> float)) array ; (** Array of all binary operations with their associated probability knowing that a binary node have been selected *)
-    bin_proba:float ; (** Probability of choosing a binary node *)
-    un_op:(float * string * (float -> float)) array ; (** Array of all unary operations with their associated probability knowing that an unary node have been selected *)
-    un_proba:float ; (** Probability of choosing an unary node *)
-    const_range:(float*float) ; (** Range where constants are randomly taken *)
-    const_proba:float ; (** Probability of choosing a constant. *)
-    var_proba:float (** Probability of choosing a variable. The sum of the probabilities must be equal to 1 *)
+    fill_proba : float; (** Probability of the full method beeing selected for generation *)
+    bin_op : (float * string * (float -> float -> float)) array ; (** Array of all binary operations with their associated probability knowing that a binary node have been selected *)
+    bin_proba : float ; (** Probability of choosing a binary node *)
+    un_op : (float * string * (float -> float)) array ; (** Array of all unary operations with their associated probability knowing that an unary node have been selected *)
+    un_proba : float ; (** Probability of choosing an unary node *)
+    const_range : (float*float) ; (** Range where constants are randomly taken *)
+    const_proba : float ; (** Probability of choosing a constant. *)
+    var_proba : float (** Probability of choosing a variable. The sum of the probabilities must be equal to 1 *)
 }
 
 (** {2 Random generation} *)
