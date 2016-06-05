@@ -4,14 +4,14 @@
 (** Default random generation params *)
 let rand_gen_params =
 { Dna.
-    fill_proba = 0.25 ;
+    fill_proba = 0.5 ;
     bin_op =
         [| (0.25, "+", fun a b -> a +. b);
            (0.20, "-", fun a b -> a -. b);
            (0.25, "*", fun a b -> a *. b);
            (0.20, "/", fun a b -> a /. b);
            (0.10, "^", fun a b -> a ** b) |] ;
-    bin_proba = 0.55 ;
+    bin_proba = 0.80 ;
 
     un_op =
         [| (0.2, "cos", fun a -> cos a);
@@ -22,8 +22,8 @@ let rand_gen_params =
     un_proba = 0.10 ;
 
     const_range = (-5.,5.) ;
-    const_proba = 0.20 ;
-    var_proba = 0.15
+    const_proba = 0.5 ;
+    var_proba = 0.5
 }
 
 let evolution_params =

@@ -7,7 +7,7 @@ type evolutionParams =
 };;
 
 let init_population ~size ~max_depth rand_gen_params =
-    Array.init size (function _ -> (None, Dna.create_random ~max_depth rand_gen_params))
+    Array.init size (function i -> (None, Dna.create_random ~max_depth:((max_depth*i)/size) rand_gen_params))
 ;;
 
 let fitness points dna =

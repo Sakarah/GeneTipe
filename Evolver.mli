@@ -11,7 +11,7 @@ type evolutionParams =
     mutation_ratio : float (** Ratio of the mutations in the reproduction phase. When not choosing mutation, a crossover is performed. *)
 }
 
-(** Initialize the population with randomly generated individuals *)
+(** Initialize the population with randomly generated individuals using Koza's ramped half and half method *)
 val init_population : size:int -> max_depth:int -> Dna.randomGenParams -> (float option * Dna.t) array
 
 (** Measure how interesting a function is. The fitness is between 0 and 1, 1 indicating a good individual. *)
