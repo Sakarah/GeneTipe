@@ -48,7 +48,7 @@ let tournament initial_population ~target_size =
         winners.(i) <- initial_population.(i)
     done;
     for i = 0 to (target_size - n_fill_in - 1) do
-        if (fst initial_population.(n_fill_in + 2*i)) > (fst initial_population.(n_fill_in + 2*i+1)) then
+        if (fst initial_population.(n_fill_in + 2*i)) < (fst initial_population.(n_fill_in + 2*i+1)) then
             winners.(n_fill_in + i) <- initial_population.(n_fill_in + 2*i)
         else winners.(n_fill_in + i) <- initial_population.(n_fill_in + 2*i+1)
     done;
