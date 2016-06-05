@@ -28,4 +28,4 @@ val tournament : (float * Dna.t) array -> target_size:int -> (float * Dna.t) arr
 val reproduce : (float * Dna.t) array -> evolutionParams -> (float option * Dna.t) array
 
 (** Evolve the population with the fixed number of generations *)
-val evolve : (float*float) array -> evolutionParams -> (float option * Dna.t) array -> generations:int -> (float option * Dna.t) array
+val evolve : (float*float) array -> evolutionParams -> (float * Dna.t) array -> (float * Dna.t) array

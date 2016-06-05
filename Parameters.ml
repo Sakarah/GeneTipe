@@ -26,10 +26,10 @@ let rand_gen_params =
     var_proba = 0.5
 }
 
-let evolution_params =
+let evolution_params max_depth random_gen_params =
 { Evolver.
-    max_depth = 10 ;
-    random_gen_params = rand_gen_params ;
+    max_depth = max_depth ;
+    random_gen_params = random_gen_params ;
     growth_factor = 2.0 ;
     mutation_ratio = 0.1
 }

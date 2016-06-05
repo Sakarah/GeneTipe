@@ -99,13 +99,9 @@ let reproduce initial_population evolution_params =
     target_population
 ;;
 
-let evolve points evolution_params initial_population ~generations =
+let evolve points evolution_params initial_population =
     let pop_size = Array.length initial_population in
-    let population = ref initial_population in
-    for i = 1 to generations do
-        let evaluated_population = compute_fitness points !population in
-        let selected_population = tournament evaluated_population ~target_size:pop_size in
-        population := reproduce selected_population evolution_params
-    done;
-    !population
+    let child_population = reproduce initial_population evolution_params in
+    let evaluated_population = compute_fitness points child_population in
+    tournament evaluated_population ~target_size:pop_size
 ;;
