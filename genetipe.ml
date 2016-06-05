@@ -42,6 +42,6 @@ let () =
         Stats.print_stats !pop
     done;
 
-    Printf.printf "= End of evolution =\nLast generation :\n";
+    Printf.printf "= End of evolution =\n";
     Stats.print_population !pop
 ;;

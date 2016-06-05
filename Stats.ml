@@ -15,5 +15,5 @@ let print_stats population =
 ;;
 
 let print_population =
-    Array.iter (function (fitness, dna) -> Printf.printf "%.5f ~ " fitness; Dna.print Format.std_formatter dna; print_newline ())
+    Array.iter (function (fitness, dna) -> Printf.printf "%.2f%% ~ %s\n" (fitness *. 100.) (Dna.to_string dna))
 ;;
