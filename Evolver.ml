@@ -68,7 +68,7 @@ let tournament_by_packs population ~target_size =
 			(
 				selected_index := index + j
 			)
-	done;
+		done;
 		selected_dna.(i) <- population.(!selected_index)
 	done;
 	let index = pack_size * (target_size - 1) in
