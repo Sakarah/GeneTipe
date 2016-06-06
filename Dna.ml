@@ -165,6 +165,26 @@ let rec eval x dna =
         | X -> x
 ;;
 
+let rec simplify = function
+    | UnOp (name,op,child) -> 
+        (
+        let new_child = simplify child in 
+        match new_child with 
+            | Const(a) -> Const(op a)
+            | _ -> UnOp (name,op,new_child)
+        )
+    | BinOp (name,op,child1,child2) -> 
+        (
+        let t1 = simplify child1 in
+        let t2 = simplify child2 in 
+        match t1,t2 with 
+            | Const(a), Const(b) -> Const(op a b)
+            | _ -> BinOp (name,op,t1,t2)
+        )   
+    | X -> X
+    | Const(a) -> Const(a)
+    ;;  
+
 let rec to_string ?(bracket=false) = function
     | Const a -> Printf.sprintf "%.2f" a
     | X -> "x"
