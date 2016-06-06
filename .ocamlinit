@@ -1,5 +1,4 @@
 #directory "_build";;
-#load "GeneTipe.cma";;
 #load "graphics.cma";;
+#load "GeneTipe.cma";;
 #install_printer Dna.print;;
-
