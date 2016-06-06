@@ -55,6 +55,25 @@ let tournament initial_population ~target_size =
     winners
 ;;
 
+let tournament_by_packs population ~target_size =
+	let pop_size = Array.length population in
+	let pack_size = int_of_float(ceil (float_of_int(pop_size)/.float_of_int(target_size))) in
+	let selected_dna = Array.make target_size population.(0) in
+	shuffle population;
+	for i = 0 to target_size do
+		let index = pack_size * i in
+		let selected_index = ref index in
+		for j = 1 to pack_size do
+			if fst population.(index + j) > fst population.(!selected_index) then
+			(
+				selected_index := index + j
+			)
+		done;
+		selected_dna.(i) <- population.(!selected_index)
+	done;
+	selected_dna
+;;
+
 let reproduce initial_population evolution_params =
     let pop_size = Array.length initial_population in
     let fitness_total = ref 0. in
