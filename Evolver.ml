@@ -60,7 +60,7 @@ let tournament_by_packs population ~target_size =
 	let pack_size = int_of_float(ceil (float_of_int(pop_size)/.float_of_int(target_size))) in
 	let selected_dna = Array.make target_size population.(0) in
 	shuffle population;
-	for i = 0 to target_size do
+	for i = 0 to (target_size - 1) do
 		let index = pack_size * i in
 		let selected_index = ref index in
 		for j = 1 to pack_size do
