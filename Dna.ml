@@ -25,17 +25,26 @@ let uniform_float (lower_bound,greater_bound) =
 ;;
 
 
-(** Randomly chose a binary operation within the randomGenParams *)
-let random_bin_op bin_op_params =
-    let n = Array.length bin_op_params in
+(** Generate a random affin function *)
+let random_affin const_range =
+    BinOp ("+", (fun a b -> a +. b),
+        BinOp ("*", (fun a b -> a *. b),
+            Const (uniform_float const_range),
+            X),
+        Const (uniform_float const_range))
+;;
+
+(** Randomly chose an operation within the randomGenParams *)
+let random_op op_params =
+    let n = Array.length op_params in
     let probs = Array.make n 0. in
 
     let proba (x,y,z) = x in
-    let binop (x,y,z) = (y,z) in
+    let op (x,y,z) = (y,z) in
     
-    probs.(0) <- proba bin_op_params.(0) ;
+    probs.(0) <- proba op_params.(0) ;
     for i = 1 to n-2 do
-        probs.(i) <- probs.(i-1) +. proba bin_op_params.(i)
+        probs.(i) <- probs.(i-1) +. proba op_params.(i)
     done;
     probs.(n-1) <- 1. ;
     
@@ -46,32 +55,9 @@ let random_bin_op bin_op_params =
         done;
         failwith "The probabilities are not well defined"
     with
-        Found i -> binop bin_op_params.(i)
+        Found i -> op op_params.(i)
 ;;
 
-(** Randomly chose a unary operation within the randomGenParams *)
-let random_un_op un_op_params =
-    let n = Array.length un_op_params in
-    let probs = Array.make n 0. in
-
-    let proba (x,y,z) = x in
-    let unop (x,y,z) = (y,z) in
-
-    probs.(0) <- proba un_op_params.(0) ;
-    for i = 1 to n-2 do
-        probs.(i) <- probs.(i-1) +. proba un_op_params.(i)
-    done;
-    probs.(n-1) <- 1. ;
-
-    try
-        let p = Random.float 1. in
-        for i = 0 to n-1 do
-            if p < probs.(i) then raise (Found i)
-        done;
-        failwith "The probabilities are not well defined"
-    with
-        Found i -> unop un_op_params.(i)
-;;
 
 let rec create_random_grow ~max_depth gen_params =
     (* If max_depth is reached, then there is a constant or a variable *)
@@ -92,10 +78,10 @@ let rec create_random_grow ~max_depth gen_params =
         let p = Random.float 1. in
 
         if p < p_bin then
-            let name, operation = random_bin_op gen_params.bin_op in
+            let name, operation = random_op gen_params.bin_op in
             BinOp (name, operation, (create_random_grow (max_depth - 1) gen_params), (create_random_grow (max_depth - 1) gen_params) )
         else if p < p_un then
-            let name, operation = random_un_op gen_params.un_op in
+            let name, operation = random_op gen_params.un_op in
             UnOp (name, operation, (create_random_grow (max_depth - 1) gen_params))
         else if p < p_const then
             Const (uniform_float(gen_params.const_range))
@@ -118,10 +104,10 @@ let rec create_random_fill ~max_depth gen_params =
     (
         let p = Random.float (gen_params.un_proba +. gen_params.bin_proba) in
         if p < gen_params.bin_proba then
-            let name, operation = random_bin_op gen_params.bin_op in
+            let name, operation = random_op gen_params.bin_op in
             BinOp (name, operation, (create_random_fill    (max_depth - 1) gen_params), (create_random_fill (max_depth - 1) gen_params) )
         else
-            let name, operation = random_un_op gen_params.un_op in
+            let name, operation = random_op gen_params.un_op in
             UnOp (name, operation, (create_random_fill (max_depth - 1) gen_params))
     )
 ;;

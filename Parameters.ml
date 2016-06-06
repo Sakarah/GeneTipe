@@ -22,8 +22,8 @@ let rand_gen_params =
     un_proba = 0.10 ;
 
     const_range = (-5.,5.) ;
-    const_proba = 0.5 ;
-    var_proba = 0.5
+    const_proba = 0.05 ;
+    var_proba = 0.05
 }
 
 let evolution_params max_depth random_gen_params =
