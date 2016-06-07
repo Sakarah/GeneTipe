@@ -45,5 +45,7 @@ let () =
     with Sys.Break -> ());
 
     Printf.printf "= End of evolution =\n";
+    Stats.print_population !pop;
+    pop := Evolver.simplify_individuals !pop;
     Stats.print_population !pop
 ;;

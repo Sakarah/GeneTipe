@@ -49,7 +49,7 @@ val mutate_constants : range:(float*float) -> proba:float -> t -> t
     It will have to be caught during the Evolver.tournament function. *)
 val eval : float -> t -> float
 
-(** Simplifies a function for showing. 
+(** Simplifies a function evaluating all constants. 
     e.g. cos(3.14) -> 1.00 *)
 val simplify : t -> t 
 

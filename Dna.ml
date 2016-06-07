@@ -160,13 +160,13 @@ let mutate_constants ~range ~proba base =
 let rec eval x dna =
     match dna with
         | UnOp (_,op,t) -> 
-			let result = op (eval x t) in
-			if classify_float result = FP_infinite then nan
-			else result
+            let result = op (eval x t) in
+            if classify_float result = FP_infinite then nan
+            else result
         | BinOp (_,op,t1,t2) -> 
-			let result = op (eval x t1) (eval x t2) in
-			if classify_float result = FP_infinite then nan
-			else result
+            let result = op (eval x t1) (eval x t2) in
+            if classify_float result = FP_infinite then nan
+            else result
         | Const a -> a
         | X -> x
 ;;
