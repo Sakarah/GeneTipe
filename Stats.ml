@@ -11,14 +11,16 @@ let best_individual population =
 ;;
 
 
-let average_fitness population =
+let pop_average val_func population =
     let size = Array.length population in
-    let sum_fitness = ref 0. in
+    let sum = ref 0. in
     for i = 0 to (size - 1) do
-        sum_fitness := !sum_fitness +. (fst population.(i))
+        sum := !sum +. val_func (population.(i))
     done;
-    !sum_fitness /. float_of_int size
+    !sum /. float_of_int size
 ;;
+
+let average_fitness = pop_average fst;;
 
 
 let rec branch_number = function 
@@ -28,14 +30,16 @@ let rec branch_number = function
 ;;
 
 
-let rec avg_depth = function
+let rec individual_avg_depth = function
     | Dna.BinOp (_,_,child1,child2) -> 
         let n1 = float_of_int (branch_number child1) in
         let n2 = float_of_int (branch_number child2) in
-        1. +. (n1 *. (avg_depth child1) +. n2 *. (avg_depth child2)) /. (n1 +. n2)
-    | Dna.UnOp (_,_,child) -> 1. +. avg_depth child
+        1. +. (n1 *. (individual_avg_depth child1) +. n2 *. (individual_avg_depth child2)) /. (n1 +. n2)
+    | Dna.UnOp (_,_,child) -> 1. +. individual_avg_depth child
     | _ -> 1.
 ;;
+
+let average_depth = pop_average (function (fit,dna) -> individual_avg_depth dna);;
 
 
 let genetic_diversity population bin_op un_op =
@@ -79,7 +83,7 @@ let genetic_diversity population bin_op un_op =
         )
         done;
 
-        let d = avg_depth (snd population.(i)) in
+        let d = individual_avg_depth (snd population.(i)) in
         sum_depth := !sum_depth +. d;
         sum_depth_square := !sum_depth_square +. d *. d
     )
@@ -110,6 +114,11 @@ let print_stats population =
     Printf.printf "Average fitness : %e\n" (average_fitness population);
     Printf.printf "Best individual :\n";
     print_individual (best_individual population);
+;;
+
+let print_advanced_stats population bin_op un_op =
+    Printf.printf "Average depth : %f\n" (average_depth population);
+    Printf.printf "Genetic diversity : %f\n" (genetic_diversity population bin_op un_op);
 ;;
 
 let print_population = Array.iter print_individual;;

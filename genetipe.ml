@@ -49,7 +49,8 @@ let () =
         for g = 1 to !generations do
             if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" g;
             pop := Evolver.evolve points evo_params !pop;
-            if !verbosity >= 2 then Stats.print_stats !pop
+            if !verbosity >= 2 then Stats.print_stats !pop;
+            if !verbosity >= 3 then Stats.print_advanced_stats !pop gen_params.Dna.bin_op gen_params.Dna.un_op
         done
     with Sys.Break -> ());
 
@@ -59,7 +60,8 @@ let () =
         Printf.printf "= End of evolution =\n";
         Stats.print_population !pop;
         Printf.printf "= Final stats =\n";
-        Stats.print_stats !pop
+        Stats.print_stats !pop;
+        Stats.print_advanced_stats !pop gen_params.Dna.bin_op gen_params.Dna.un_op
     )
     else
     (
