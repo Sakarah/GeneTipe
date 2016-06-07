@@ -159,31 +159,37 @@ let mutate_constants ~range ~proba base =
 
 let rec eval x dna =
     match dna with
-        | UnOp (_,op,t) -> op (eval x t)
-        | BinOp (_,op,t1,t2) -> op (eval x t1) (eval x t2)
+        | UnOp (_,op,t) -> 
+			let result = op (eval x t) in
+			if classify_float result = FP_infinite then nan
+			else result
+        | BinOp (_,op,t1,t2) -> 
+			let result = op (eval x t1) (eval x t2) in
+			if classify_float result = FP_infinite then nan
+			else result
         | Const a -> a
         | X -> x
 ;;
 
 let rec simplify = function
     | UnOp (name,op,child) -> 
-        (
+    (
         let new_child = simplify child in 
         match new_child with 
             | Const(a) -> Const(op a)
             | _ -> UnOp (name,op,new_child)
-        )
+    )
     | BinOp (name,op,child1,child2) -> 
-        (
+    (
         let t1 = simplify child1 in
         let t2 = simplify child2 in 
         match t1,t2 with 
             | Const(a), Const(b) -> Const(op a b)
             | _ -> BinOp (name,op,t1,t2)
-        )   
+    )
     | X -> X
     | Const(a) -> Const(a)
-    ;;  
+;;  
 
 let rec to_string ?(bracket=false) = function
     | Const a -> Printf.sprintf "%.2f" a
