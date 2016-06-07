@@ -3,7 +3,11 @@
     like random generation, crossover or evaluation of the underlying function.
     All functions directly manipulating DNA should be found in this module. *)
 
-type t
+type t =
+    | BinOp of string*(float->float->float)*t*t
+    | UnOp of string*(float->float)*t
+    | Const of float
+    | X
 
 (** This type represents the parameters for random generation of an individual *)
 type randomGenParams =
