@@ -17,37 +17,26 @@ let average_fitness population =
     for i = 0 to (size - 1) do
         sum_fitness := !sum_fitness +. (fst population.(i))
     done;
-    let avg = !sum_fitness /. float_of_int(size) in
-    avg
+    !sum_fitness /. float_of_int size
 ;;
 
 
 let rec branch_number = function 
-    | Dna.BinOp (_,_,child1,child2) -> branch_number child1 +. branch_number child2
+    | Dna.BinOp (_,_,child1,child2) -> branch_number child1 + branch_number child2
     | Dna.UnOp (_,_,child) -> branch_number child
-    | _ -> 1.
+    | _ -> 1
 ;;
 
 
 let rec avg_depth = function
     | Dna.BinOp (_,_,child1,child2) -> 
-        let n1 = branch_number child1 and n2 = branch_number child2 in
-        1. +. (n1 *. (avg_depth child1) +. n2 *. (avg_depth child2))/. (n1 +. n2)
+        let n1 = float_of_int (branch_number child1) in
+        let n2 = float_of_int (branch_number child2) in
+        1. +. (n1 *. (avg_depth child1) +. n2 *. (avg_depth child2)) /. (n1 +. n2)
     | Dna.UnOp (_,_,child) -> 1. +. avg_depth child
     | _ -> 1.
 ;;
 
-
-let search_index op_table element = (* get the index corresponding to the operator in the array *)
-    try
-        let size = Array.length op_table in
-        for i = 0 to (size - 1) do
-            let (proba,name,f) = op_table.(i) in
-            if name = element then raise (Found i)
-        done;
-        (-1);
-    with Found i -> i
-;;
 
 let genetic_diversity population bin_op un_op =
     let pop_size = Array.length population in
@@ -64,7 +53,7 @@ let genetic_diversity population bin_op un_op =
                 let (proba,name,f) = op_table.(i) in
                 if name = element then raise (Found i)
             done;
-            (-1);
+            failwith (element^" not found")
         with Found i -> i
     in 
     
@@ -99,26 +88,28 @@ let genetic_diversity population bin_op un_op =
     let sum_variance = ref 0. in
     for i = 0 to (operator_number - 1) do
     (
-        let expectation = (sum_operator.(i))/. float_of_int(operator_number)
-        and expectation_square = (sum_operator_square.(i))/. float_of_int(operator_number) in
+        let expectation = (sum_operator.(i))/. float_of_int(operator_number) in
+        let expectation_square = (sum_operator_square.(i))/. float_of_int(operator_number) in
         let op_variance = expectation_square -. expectation *. expectation in
         sum_variance := !sum_variance +. op_variance
     )
     done;
     
-    let depth_expectation = !sum_depth /. float_of_int(operator_number)
-    and depth_expectation_square = !sum_depth_square /. float_of_int(operator_number) in
+    let depth_expectation = !sum_depth /. float_of_int(operator_number) in
+    let depth_expectation_square = !sum_depth_square /. float_of_int(operator_number) in
     let depth_variance = depth_expectation_square -. depth_expectation *. depth_expectation in
     sum_variance := !sum_variance +. depth_variance;
     sqrt (!sum_variance)
 ;;
 
-let print_stats population =
-    print_float (fst (best_individual population));
-    print_string (Dna.to_string (snd (best_individual population)));
-    print_float (average_fitness population);
+let print_individual (fitness, dna) =
+    Printf.printf "%e ~ %s\n" fitness (Dna.to_string dna)
 ;;
 
-let print_population =
-    Array.iter (function (fitness, dna) -> Printf.printf "%.2f%% ~ %s\n" (fitness *. 100.) (Dna.to_string dna))
+let print_stats population =
+    Printf.printf "Average fitness : %e\n" (average_fitness population);
+    Printf.printf "Best individual :\n";
+    print_individual (best_individual population);
 ;;
+
+let print_population = Array.iter print_individual;;

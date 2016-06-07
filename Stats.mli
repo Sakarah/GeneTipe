@@ -7,7 +7,7 @@ val best_individual : (float * Dna.t) array -> (float * Dna.t)
 val average_fitness : (float * Dna.t) array -> float
 
 (** Return the number of branches of the individual *)
-val branch_number : Dna.t -> float
+val branch_number : Dna.t -> int
 
 (** Return the average depth of the individual*)
 val avg_depth : Dna.t -> float
