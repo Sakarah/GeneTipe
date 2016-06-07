@@ -13,8 +13,8 @@ val branch_number : Dna.t -> float
 val avg_depth : Dna.t -> float
 
 (** Return a measurement of the genetic diversity of the population 
-	computes the variance of number of each operator in the population as well as the variance of depth and add them
-	Return the standard deviation *)
+    computes the variance of number of each operator in the population as well as the variance of depth and add them
+    Return the standard deviation *)
 val genetic_diversity : (float * Dna.t) array -> (float * string * (float -> float -> float)) array -> (float * string * (float -> float)) array -> float
 
 (** Print statistics about the given population *)
