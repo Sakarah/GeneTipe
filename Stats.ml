@@ -78,8 +78,8 @@ let genetic_diversity population bin_op un_op =
         for j = 0 to (operator_number - 1) do
         (
             let add_number = count_operator.(j) in
-            sum_operator.(i) <- sum_operator.(i) +. add_number;
-            sum_operator_square.(i) <- sum_operator_square.(i) +. add_number *. add_number;
+            sum_operator.(j) <- sum_operator.(j) +. add_number;
+            sum_operator_square.(j) <- sum_operator_square.(j) +. add_number *. add_number;
         )
         done;
 
