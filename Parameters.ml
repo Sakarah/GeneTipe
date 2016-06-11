@@ -1,35 +1,85 @@
-(** This module contains some default parameters for random generation
-    Feel free to tweak them and experiment *)
+type randomGen =
+{
+    fill_proba: float;
+    bin_op:(float * string * (float -> float -> float)) array ;
+    bin_proba:float ;
+    un_op:(float * string * (float -> float)) array ;
+    un_proba:float ;
+    const_range:(float*float) ;
+    const_proba:float ;
+    var_proba:float
+};;
 
-(** Default random generation params *)
-let rand_gen_params =
-{ Dna.
-    fill_proba = 0.5 ;
-    bin_op =
-        [| (0.25, "+", fun a b -> a +. b);
-           (0.20, "-", fun a b -> a -. b);
-           (0.25, "*", fun a b -> a *. b);
-           (0.20, "/", fun a b -> a /. b);
-           (0.10, "^", fun a b -> a ** b) |] ;
-    bin_proba = 0.80 ;
+type evolution =
+{
+    pop_size : int ;
+    max_depth : int ;
+    random_gen_params : randomGen ;
+    growth_factor : float ;
+    mutation_ratio : float
+};;
 
-    un_op =
-        [| (0.2, "cos", fun a -> cos a);
-           (0.2, "sin", fun a -> sin a);
-           (0.2, "tan", fun a -> tan a);
-           (0.2, "ln", fun a -> log a);
-           (0.2, "exp", fun a -> exp a) |];
-    un_proba = 0.10 ;
+exception Error of string;;
 
-    const_range = (-5.,5.) ;
-    const_proba = 0.05 ;
-    var_proba = 0.05
-}
 
-let evolution_params max_depth random_gen_params =
-{ Evolver.
-    max_depth = max_depth ;
-    random_gen_params = random_gen_params ;
-    growth_factor = 2.0 ;
-    mutation_ratio = 0.1
-}
+open Yojson.Basic.Util;;
+
+let to_op parse_func json =
+    let proba = json |> member "proba" |> to_float in
+    let name = json |> member "name" |> to_string in
+    let op = json |> member "fun" |> to_string |> parse_func in
+    (proba,name,op)
+;;
+let to_bin_op = to_op MathParser.parse_xy;;
+let to_un_op = to_op MathParser.parse_x;;
+
+let to_range json = ( json |> member "min" |> to_number, json |> member "max" |> to_number );;
+
+let to_random_gen_params json =
+    {
+        fill_proba = json |> member "fill_proba" |> to_float;
+
+        bin_op = json |> member "bin_op" |> convert_each to_bin_op |> Array.of_list;
+        bin_proba = json |> member "bin_proba" |> to_float;
+
+        un_op = json |> member "un_op" |> convert_each to_un_op |> Array.of_list;
+        un_proba = json |> member "un_proba" |> to_float;
+
+        const_range = json |> member "const_range" |> to_range;
+        const_proba = json |> member "const_proba" |> to_float;
+
+        var_proba = json |> member "var_proba" |> to_float
+    }
+;;
+
+let to_evolution_params json =
+    {
+        pop_size = json |> member "pop_size" |> to_int;
+        max_depth = json |> member "max_depth" |> to_int;
+        random_gen_params = json |> member "random_gen" |> to_random_gen_params;
+        growth_factor = json |> member "growth_factor" |> to_number;
+        mutation_ratio = json |> member "growth_factor" |> to_float
+    }
+;;
+
+let read_params ?pop_size ?max_depth ~filename =
+    try
+        let params = Yojson.Basic.from_file filename |> to_evolution_params in
+        {
+            pop_size =
+            ( match pop_size with
+                | None -> params.pop_size
+                | Some n -> n
+            );
+            max_depth =
+            ( match max_depth with
+                | None -> params.max_depth
+                | Some d -> d
+            );
+            random_gen_params = params.random_gen_params;
+            growth_factor = params.growth_factor;
+            mutation_ratio = params.mutation_ratio
+        }
+    with Yojson.Basic.Util.Type_error (str,json) ->
+        raise (Error ("Unable to load configuration from "^filename^" : "^str^" ("^(Yojson.Basic.to_string json)^")"))
+;;

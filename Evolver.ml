@@ -1,10 +1,4 @@
-type evolutionParams =
-{
-    max_depth : int ;
-    random_gen_params : Dna.randomGenParams ;
-    growth_factor : float ;
-    mutation_ratio : float
-};;
+open Parameters;;
 
 let init_population ~size ~max_depth rand_gen_params =
     Array.init size (function i -> (None, Dna.create_random ~max_depth:((max_depth*i)/size) rand_gen_params))

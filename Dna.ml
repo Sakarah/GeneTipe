@@ -7,17 +7,7 @@ type t =
 
 exception Found of int;;
 
-type randomGenParams =
-{
-    fill_proba: float;
-    bin_op:(float * string * (float -> float -> float)) array ;
-    bin_proba:float ;
-    un_op:(float * string * (float -> float)) array ;
-    un_proba:float ;
-    const_range:(float*float) ;
-    const_proba:float ;
-    var_proba:float
-};;
+open Parameters;;
 
 (** Generate a uniform random float value in specified range *)
 let uniform_float (lower_bound,greater_bound) =

@@ -9,28 +9,15 @@ type t =
     | Const of float
     | X
 
-(** This type represents the parameters for random generation of an individual *)
-type randomGenParams =
-{
-    fill_proba : float; (** Probability of the full method beeing selected for generation *)
-    bin_op : (float * string * (float -> float -> float)) array ; (** Array of all binary operations with their associated probability knowing that a binary node have been selected *)
-    bin_proba : float ; (** Probability of choosing a binary node *)
-    un_op : (float * string * (float -> float)) array ; (** Array of all unary operations with their associated probability knowing that an unary node have been selected *)
-    un_proba : float ; (** Probability of choosing an unary node *)
-    const_range : (float*float) ; (** Range where constants are randomly taken *)
-    const_proba : float ; (** Probability of choosing a constant. *)
-    var_proba : float (** Probability of choosing a variable. The sum of the probabilities must be equal to 1 *)
-}
-
 (** {2 Random generation} *)
 (** Randomly generate a new individual who has a depth below max_depth *)
-val create_random_grow : max_depth:int -> randomGenParams -> t
+val create_random_grow : max_depth:int -> Parameters.randomGen -> t
 
 (** Randomly generate a new individual who has a depth of exactly max_depth (for all branches) *)
-val create_random_fill : max_depth:int -> randomGenParams -> t
+val create_random_fill : max_depth:int -> Parameters.randomGen -> t
 
 (** Randomly generate a new individual choosing between the grow or the fill method *)
-val create_random : max_depth:int -> randomGenParams -> t
+val create_random : max_depth:int -> Parameters.randomGen -> t
 
 
 (** {2 Gene manipulation} *)
@@ -41,7 +28,7 @@ val crossover : crossover_depth:int -> t -> t -> t
 (** Generate a new individual by modifying an existing individual adding him new randomly generated characteristics.
     The replacement takes place at the exact depth specified or before if we encounter a terminal node.
     The new genes added are taken in order to ensure that max_depth is never exceeded. *)
-val mutation : mutation_depth:int -> max_depth:int -> randomGenParams -> t -> t
+val mutation : mutation_depth:int -> max_depth:int -> Parameters.randomGen -> t -> t
 
 (** Generate a new individual by tweaking constants of an already existing one *)
 val mutate_constants : range:(float*float) -> proba:float -> t -> t
