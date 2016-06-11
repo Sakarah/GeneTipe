@@ -24,22 +24,33 @@ let binary_primitives =
     ("^", fun a b -> a ** b) ]
 ;;
 
-let lexer = Genlex.make_lexer ["(";")";"x"];;
+exception Found of int;;
 
-let parse_tokens stream =
+let parse_tokens var_array stream =
+    let get_var_index var =
+        try
+            for i = 0 to Array.length var_array - 1 do
+                if var_array.(i) = var then raise (Found i)
+            done;
+            raise (Error (var^" is not a variable"))
+        with Found i -> i
+    in
     let rec parse_expr () = 
         let first_part = parse_atom () in
         parse_remainder first_part
     and parse_atom () =
         match Stream.next stream with
-            | Genlex.Float const -> (function x -> const)
-            | Genlex.Int const -> (function x -> float_of_int const)
-            | Genlex.Kwd "x" -> (function x -> x)
-            | Genlex.Kwd "(" -> 
+            | Genlex.Float const -> (fun _ -> const)
+            | Genlex.Int const -> (fun _ -> float_of_int const)
+            | Genlex.Kwd "(" ->
                 let result = parse_expr () in
                 let closing_bracket = Stream.next stream in
                 if closing_bracket <> Genlex.Kwd ")" then raise (Error "Not matching parenthesis")
                 else result
+            | Genlex.Kwd ")" -> raise (Error "Not matching parenthesis")
+            | Genlex.Kwd var ->
+                let var_index = get_var_index var in
+                (fun vars_val -> vars_val.(var_index))
             | Genlex.Ident f -> 
             (
                 try
@@ -68,11 +79,19 @@ let parse_tokens stream =
     with Stream.Failure -> raise (Error "Unexpected end of stream")
 ;;
 
-let parse_stream input = parse_tokens (lexer input);;
-
-let parse str =
+let parse ~var_array str =
+    let lexer = Genlex.make_lexer (["(";")"]@(Array.to_list var_array)) in
     let stream = lexer (Stream.of_string str) in
-    let result = parse_tokens stream in
+    let result = parse_tokens var_array stream in
     if Stream.peek stream <> None then raise (Error "Too much characters in the string")
     else result
 ;;
+
+let parse_stream ~var_array input =
+    let stream = Genlex.make_lexer (["(";")"]@(Array.to_list var_array)) input in
+    parse_tokens var_array stream
+;;
+
+let parse_x str x = parse ~var_array:[|"x"|] str [|x|];;
+
+let parse_xy str x y = parse ~var_array:[|"x";"y"|] str [|x;y|];;

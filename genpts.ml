@@ -6,8 +6,10 @@ let () =
     
     let spec_list =
     [
-        ("-r", Arg.Tuple [Arg.Set_float minX ; Arg.Set_float maxX], "Set the range of the generated points (default is [0,10])");
-        ("-n", Arg.Set_int nb_points, "Set the number of points to generate (deafult is 101)")
+        ("--range", Arg.Tuple [Arg.Set_float minX ; Arg.Set_float maxX], "Set the range of the generated points (default is [0,10])");
+        ("-r", Arg.Tuple [Arg.Set_float minX ; Arg.Set_float maxX], "Shorthand for --range");
+        ("--nb-pts", Arg.Set_int nb_points, "Set the number of points to generate (deafult is 101)");
+        ("-n", Arg.Set_int nb_points, "Shorthand for --nb-pts")
     ]
     in
 
@@ -20,7 +22,7 @@ let () =
 
     Arg.parse spec_list (fun anon -> funcStr := anon) usage_msg;
 
-    let func = MathParser.parse !funcStr in
+    let func = MathParser.parse_x !funcStr in
     
     Printf.printf "%d\n" !nb_points;
     let step = ((!maxX)-.(!minX))/.(float_of_int (!nb_points-1)) in
