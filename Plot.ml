@@ -1,31 +1,31 @@
 type graph =
 {
-    mutable height : int;
-    mutable width : int;
+    height : int;
+    width : int;
+    border : int;
+    title : string;
     mutable x_min : float;
     mutable x_max : float;
     mutable y_min : float;
     mutable y_max : float;
     mutable nb_curves : int;
-    mutable curves : (int * bool * float array * float array) list
+    mutable curves : (Graphics.color * bool * float array * float array) list
 };;
 
-
-(* Predefined colors. *)
-let colors = [| Graphics.blue ; Graphics.red ; Graphics.green ; Graphics.magenta |];;
-
 (** Init returns an empty graphic *)
-let init h w =
+let init ~size ~border ~title =
     {
-        height = h ;
-        width = w ;
+        height = fst size ;
+        width = snd size ;
+        border = border ;
+        title = title ;
         x_min = infinity ;
         x_max = neg_infinity ;
         y_min = infinity ;
         y_max = neg_infinity ;
         nb_curves = 0 ;
-         curves = []
-     }
+        curves = []
+    }
 ;;
 
 (* set_range returns the min and the max of the x array. *)
@@ -43,8 +43,7 @@ let set_range x =
 
 
 (* Plot called to plot a new set of points during the next show() *)
-
-let plot ?(link=true) ?(color=0) x y graphic =
+let plot ?(link=true) ?(color=Graphics.black) x y graphic =
     if Array.length x != Array.length y then
         failwith "Not matching arrays."
     else
@@ -60,60 +59,45 @@ let plot ?(link=true) ?(color=0) x y graphic =
 
         (* Add the current set to the graphic. *)
         graphic.nb_curves <- graphic.nb_curves + 1;
-        let color = ref color in
-        if !color = 0 then color := colors.( graphic.nb_curves - 1 mod Array.length colors );
-        graphic.curves <- (!color, link, x, y) :: graphic.curves
+        graphic.curves <- (color, link, x, y)::graphic.curves
     )
 ;;
 
 let draw_point x y = Graphics.fill_circle x y 3;;
 
+let plot_fun ?link ?color ?range ~nb_pts func graphic =
+    let x_min, x_max = match range with
+        | None -> graphic.x_min, graphic.x_max
+        | Some range -> range
+    in
+
+    let step = (x_max-.x_min)/.(float_of_int (nb_pts-1)) in
+    let x_array = Array.init nb_pts (fun n -> x_min +. step *. (float_of_int n)) in
+    let y_array = Array.map func x_array in
+
+    plot ?link ?color x_array y_array graphic
+;;
+
 let show graphic =
-    Graphics.open_graph (" "^string_of_int (graphic.width+50) ^"x"^string_of_int (graphic.height+50));
+    Graphics.close_graph ();
+    Graphics.open_graph (" "^string_of_int (graphic.width+2*graphic.border) ^"x"^string_of_int (graphic.height+2*graphic.border));
+    Graphics.set_window_title graphic.title;
     let show_one_curve (color, link, x, y) =
         Graphics.set_color color;
         Graphics.set_line_width 2;
-        Graphics.moveto (25 + int_of_float x.(0)) (25 + int_of_float y.(0));
         let n = Array.length x in
         for i = 0 to n - 1 do
         (
-            let xi = 25 + int_of_float ( x.(i) *. (float_of_int graphic.height) /. (graphic.x_max -. graphic.x_min) ) in
-            let yi = 25 + int_of_float ( y.(i) *. (float_of_int graphic.height) /. (graphic.y_max -. graphic.y_min) ) in
-            if link then Graphics.lineto xi yi
-            else 
-            ( 
-                Graphics.moveto xi yi;
-                draw_point xi yi
+            let xi = graphic.border + int_of_float ( (x.(i) -. graphic.x_min) *. (float_of_int graphic.height) /. (graphic.x_max -. graphic.x_min) ) in
+            let yi = graphic.border + int_of_float ( (y.(i) -. graphic.y_min) *. (float_of_int graphic.height) /. (graphic.y_max -. graphic.y_min) ) in
+            if link then
+            (
+                if i = 0 then Graphics.moveto xi yi
+                else Graphics.lineto xi yi
             )
+            else draw_point xi yi
         )
         done;
     in
-    List.iter (fun curve -> show_one_curve curve) graphic.curves;
+    List.iter show_one_curve graphic.curves;
 ;;
-
-
-(*
-
-** Example of some code. 
-
-let () =
-(
-let graphic = Plot.init 500 500 in
-let x = Array.make 10 0. in
-let y = Array.make 10 0. in
-let z = Array.make 10 0. in
-let w = Array.make 10 0. in
-for i = 0 to 9 do
-    x.(i) <- float_of_int (i) ;
-    y.(i) <- float_of_int (i*i);
-    z.(i) <- float_of_int (i);
-    w.(i) <- log((float_of_int i)+.1.)
-done;
-Plot.plot ~link:false x y graphic ;
-Plot.plot x z graphic;
-Plot.plot x w graphic;
-Plot.show graphic;
-)
-;;
-
-*)
