@@ -3,6 +3,7 @@ let () =
     let max_depth = ref None in
     let generations = ref 100 in
     let verbosity = ref 2 in
+    let show_graph = ref false in
     let config_filename = ref "" in
 
     let spec_list =
@@ -18,7 +19,8 @@ let () =
         ("--quiet", Arg.Unit (fun () -> verbosity := 0), "Do not show anything else than the result (equivalent to -v 0)");
         ("--no-stats", Arg.Unit (fun () -> verbosity := 1), "No intermediate statistics about the currently generated population (equivalent to -v 1)");
         ("--full-stats", Arg.Unit (fun () -> verbosity := 3), "Print full statistics about the currently generated population (equivalent to -v 3)");
-        ("-v", Arg.Set_int verbosity, "Set the verbosity level (default is 2). Lower values speed up the process")
+        ("-v", Arg.Set_int verbosity, "Set the verbosity level (default is 2). Lower values speed up the process");
+        ("--graph", Arg.Set show_graph, "Show a graph with the point set and the best computed function at the end")
     ]
     in
 
@@ -73,5 +75,18 @@ let () =
     (
         let bestFitness, bestDna = Stats.best_individual !pop in
         Printf.printf "%f\n%s" bestFitness (Dna.to_string bestDna)
+    );
+
+    if !show_graph then
+    (
+        Printf.printf "%!";
+
+        try
+            let graph = Plot.init ~size:(600,600) ~border:25 ~title:"GeneTipe" in
+            Plot.plot ~color:Graphics.red ~link:false (Array.map fst points) (Array.map snd points) graph;
+            Plot.plot_fun ~color:Graphics.blue ~nb_pts:(nb_points*10) (!pop |> Stats.best_individual |> snd |> Dna.eval) graph;
+            Plot.show graph;
+            Graphics.loop_at_exit [] (fun _ -> ())
+        with Graphics.Graphic_failure _ -> ()
     )
 ;;
