@@ -147,14 +147,14 @@ let mutate_constants ~range ~proba base =
     mutate base
 ;;
 
-let rec eval x dna =
+let rec eval dna x =
     match dna with
         | UnOp (_,op,t) -> 
-            let result = op (eval x t) in
+            let result = op (eval t x) in
             if classify_float result = FP_infinite then nan
             else result
         | BinOp (_,op,t1,t2) -> 
-            let result = op (eval x t1) (eval x t2) in
+            let result = op (eval t1 x) (eval t2 x) in
             if classify_float result = FP_infinite then nan
             else result
         | Const a -> a

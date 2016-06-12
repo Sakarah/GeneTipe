@@ -35,10 +35,10 @@ val mutate_constants : range:(float*float) -> proba:float -> t -> t
 
 
 (** {2 Evaluation and printing} *)
-(** Evaluate the function represented at the point x.
-    If any exceptions is caught during the mathematical evaluation, the exception IllFormed will be raised.
-    It will have to be caught during the Evolver.tournament function. *)
-val eval : float -> t -> float
+(** Evaluate the function represented by the DNA on the point x.
+    By using curryfication, you can get the function without doing the evaluation.
+    This function return nan if the function cannot be evaluated on the point x. *)
+val eval : t -> float -> float
 
 (** Simplifies a function evaluating all constants. 
     e.g. cos(3.14) -> 1.00 *)

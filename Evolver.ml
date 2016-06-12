@@ -9,7 +9,7 @@ let fitness points dna =
     let difference = ref 0. in
     for i = 0 to n-1 do
         let x,y = points.(i) in
-        let evaluation = Dna.eval x dna in
+        let evaluation = Dna.eval dna x in
         difference := !difference +. ( evaluation -. y ) ** 2.
     done;
     if classify_float !difference = FP_nan then 0. (* nan is not equal itself... *)
