@@ -92,6 +92,12 @@ let parse_stream ~var_array input =
     parse_tokens var_array stream
 ;;
 
-let parse_x str x = parse ~var_array:[|"x"|] str [|x|];;
+let parse_x str = 
+    let func = parse ~var_array:[|"x"|] str in
+    (fun x -> func [|x|])
+;;
 
-let parse_xy str x y = parse ~var_array:[|"x";"y"|] str [|x;y|];;
+let parse_xy str = 
+    let func = parse ~var_array:[|"x";"y"|] str in
+    (fun x y -> func [|x;y|])
+;;
