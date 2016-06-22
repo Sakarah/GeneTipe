@@ -45,8 +45,8 @@ let average_depth = pop_average (function (fit,dna) -> individual_avg_depth dna)
 let operator_diversity population bin_op un_op =
     let pop_size = Array.length population in
     let operator_number = Array.length bin_op + Array.length un_op in
-    let sum_operator = Array.make operator_number 0.
-    and sum_operator_square = Array.make operator_number 0. in
+    let sum_operator = Array.make operator_number 0
+    and sum_operator_square = Array.make operator_number 0 in
     
     let search_index op_table element = (* get the index corresponding to the operator in the array *)
         try
@@ -61,14 +61,14 @@ let operator_diversity population bin_op un_op =
     
     for i = 0 to (pop_size - 1) do
     (
-        let count_operator = Array.make operator_number 0. in
+        let count_operator = Array.make operator_number 0 in
         
         let rec counter dna = match dna with (* get the number of each operator in the individual *)
             | Dna.BinOp (name,_, child1, child2) -> let index = search_index bin_op name in
-                count_operator.(index) <- count_operator.(index) +. 1.;
+                count_operator.(index) <- count_operator.(index) + 1;
                 counter child1; counter child2
             | Dna.UnOp (name,_,child1) -> let index = search_index un_op name in
-                count_operator.(index) <- count_operator.(index) +. 1.
+                count_operator.(index) <- count_operator.(index) + 1
             | _ -> ()
         in 
 
@@ -76,8 +76,8 @@ let operator_diversity population bin_op un_op =
         for j = 0 to (operator_number - 1) do
         (
             let add_number = count_operator.(j) in
-            sum_operator.(j) <- sum_operator.(j) +. add_number;
-            sum_operator_square.(j) <- sum_operator_square.(j) +. add_number *. add_number;
+            sum_operator.(j) <- sum_operator.(j) + add_number;
+            sum_operator_square.(j) <- sum_operator_square.(j) + add_number * add_number;
         )
         done;
     )
@@ -86,8 +86,9 @@ let operator_diversity population bin_op un_op =
     let sum_variance = ref 0. in
     for i = 0 to (operator_number - 1) do
     (
-        let expectation = (sum_operator.(i))/. float_of_int(pop_size) in
-        let expectation_square = (sum_operator_square.(i))/. float_of_int(pop_size) in
+		let pop_size_float = float_of_int(pop_size) in
+        let expectation = float_of_int(sum_operator.(i))/. pop_size_float in
+        let expectation_square = float_of_int(sum_operator_square.(i))/. pop_size_float in
         let op_variance = expectation_square -. expectation *. expectation in
         sum_variance := !sum_variance +. op_variance
     )
