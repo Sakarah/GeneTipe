@@ -92,15 +92,15 @@ let genetic_diversity population bin_op un_op =
     let sum_variance = ref 0. in
     for i = 0 to (operator_number - 1) do
     (
-        let expectation = (sum_operator.(i))/. float_of_int(operator_number) in
-        let expectation_square = (sum_operator_square.(i))/. float_of_int(operator_number) in
+        let expectation = (sum_operator.(i))/. float_of_int(pop_size) in
+        let expectation_square = (sum_operator_square.(i))/. float_of_int(pop_size) in
         let op_variance = expectation_square -. expectation *. expectation in
         sum_variance := !sum_variance +. op_variance
     )
     done;
     
-    let depth_expectation = !sum_depth /. float_of_int(operator_number) in
-    let depth_expectation_square = !sum_depth_square /. float_of_int(operator_number) in
+    let depth_expectation = !sum_depth /. float_of_int(pop_size) in
+    let depth_expectation_square = !sum_depth_square /. float_of_int(pop_size) in
     let depth_variance = depth_expectation_square -. depth_expectation *. depth_expectation in
     sum_variance := !sum_variance +. depth_variance;
     sqrt (!sum_variance)
