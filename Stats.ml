@@ -42,13 +42,11 @@ let rec individual_avg_depth = function
 let average_depth = pop_average (function (fit,dna) -> individual_avg_depth dna);;
 
 
-let genetic_diversity population bin_op un_op =
+let operator_diversity population bin_op un_op =
     let pop_size = Array.length population in
     let operator_number = Array.length bin_op + Array.length un_op in
     let sum_operator = Array.make operator_number 0.
-    and sum_operator_square = Array.make operator_number 0.
-    and sum_depth = ref 0. 
-    and sum_depth_square = ref 0. in
+    and sum_operator_square = Array.make operator_number 0. in
     
     let search_index op_table element = (* get the index corresponding to the operator in the array *)
         try
@@ -82,10 +80,6 @@ let genetic_diversity population bin_op un_op =
             sum_operator_square.(j) <- sum_operator_square.(j) +. add_number *. add_number;
         )
         done;
-
-        let d = individual_avg_depth (snd population.(i)) in
-        sum_depth := !sum_depth +. d;
-        sum_depth_square := !sum_depth_square +. d *. d
     )
     done;
 
@@ -98,12 +92,27 @@ let genetic_diversity population bin_op un_op =
         sum_variance := !sum_variance +. op_variance
     )
     done;
-    
-    let depth_expectation = !sum_depth /. float_of_int(pop_size) in
+	
+    1. -. 1./.(1. +. !sum_variance)
+;;
+
+let depth_diversity population =
+	let pop_size = Array.length population in
+	let sum_depth = ref 0. 
+    and sum_depth_square = ref 0. in
+	
+	for i = 0 to (pop_size - 1) do
+    (
+		let d = individual_avg_depth (snd population.(i)) in
+        sum_depth := !sum_depth +. d;
+        sum_depth_square := !sum_depth_square +. d *. d
+	)
+	done;
+	
+	let depth_expectation = !sum_depth /. float_of_int(pop_size) in
     let depth_expectation_square = !sum_depth_square /. float_of_int(pop_size) in
     let depth_variance = depth_expectation_square -. depth_expectation *. depth_expectation in
-    sum_variance := !sum_variance +. depth_variance;
-    sqrt (!sum_variance)
+	1. -. 1./.(1. +. depth_variance)
 ;;
 
 let print_individual (fitness, dna) =
@@ -118,7 +127,8 @@ let print_stats population =
 
 let print_advanced_stats population bin_op un_op =
     Printf.printf "Average depth : %f\n" (average_depth population);
-    Printf.printf "Genetic diversity : %f\n" (genetic_diversity population bin_op un_op);
+    Printf.printf "Genetic structure diversity : %f\n" (operator_diversity population bin_op un_op);
+	Printf.printf "Depth diversity : %f\n" (depth_diversity population)
 ;;
 
 let print_population = Array.iter print_individual;;

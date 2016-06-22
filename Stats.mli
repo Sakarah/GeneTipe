@@ -10,9 +10,12 @@ val average_fitness : (float * Dna.t) array -> float
 val average_depth : (float * Dna.t) array -> float
 
 (** Return a measurement of the genetic diversity of the population 
-    computes the variance of number of each operator in the population as well as the variance of depth and add them
-    Return the standard deviation *)
-val genetic_diversity : (float * Dna.t) array -> (float * string * (float -> float -> float)) array -> (float * string * (float -> float)) array -> float
+    computes the variance of number of each operator in the population and add them
+    Return a percentage *)
+val operator_diversity : (float * Dna.t) array -> (float * string * (float -> float -> float)) array -> (float * string * (float -> float)) array -> float
+
+(** Return the diversity of depth in the population and return a percentage *)
+val depth_diversity : (float * Dna.t) array -> float
 
 (** Print statistics about the given population *)
 val print_stats : (float * Dna.t) array -> unit
