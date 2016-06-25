@@ -86,34 +86,34 @@ let operator_diversity population bin_op un_op =
     let sum_variance = ref 0. in
     for i = 0 to (operator_number - 1) do
     (
-		let pop_size_float = float_of_int(pop_size) in
+        let pop_size_float = float_of_int(pop_size) in
         let expectation = float_of_int(sum_operator.(i))/. pop_size_float in
         let expectation_square = float_of_int(sum_operator_square.(i))/. pop_size_float in
         let op_variance = expectation_square -. expectation *. expectation in
         sum_variance := !sum_variance +. op_variance
     )
     done;
-	
+
     1. -. 1./.(1. +. !sum_variance)
 ;;
 
 let depth_diversity population =
-	let pop_size = Array.length population in
-	let sum_depth = ref 0. 
+    let pop_size = Array.length population in
+    let sum_depth = ref 0.
     and sum_depth_square = ref 0. in
-	
-	for i = 0 to (pop_size - 1) do
+
+    for i = 0 to (pop_size - 1) do
     (
-		let d = individual_avg_depth (snd population.(i)) in
+        let d = individual_avg_depth (snd population.(i)) in
         sum_depth := !sum_depth +. d;
         sum_depth_square := !sum_depth_square +. d *. d
-	)
-	done;
-	
-	let depth_expectation = !sum_depth /. float_of_int(pop_size) in
+    )
+    done;
+
+    let depth_expectation = !sum_depth /. float_of_int(pop_size) in
     let depth_expectation_square = !sum_depth_square /. float_of_int(pop_size) in
     let depth_variance = depth_expectation_square -. depth_expectation *. depth_expectation in
-	1. -. 1./.(1. +. depth_variance)
+    1. -. 1./.(1. +. depth_variance)
 ;;
 
 let print_individual (fitness, dna) =
@@ -129,7 +129,7 @@ let print_stats population =
 let print_advanced_stats population bin_op un_op =
     Printf.printf "Average depth : %f\n" (average_depth population);
     Printf.printf "Genetic structure diversity : %f\n" (operator_diversity population bin_op un_op);
-	Printf.printf "Depth diversity : %f\n" (depth_diversity population)
+    Printf.printf "Depth diversity : %f\n" (depth_diversity population)
 ;;
 
 let print_population = Array.iter print_individual;;
