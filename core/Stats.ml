@@ -41,18 +41,40 @@ let rec individual_avg_depth = function
 
 let average_depth = pop_average (function (fit,dna) -> individual_avg_depth dna);;
 
-
-let operator_diversity population bin_op un_op =
+let operator_diversity population =
     let pop_size = Array.length population in
-    let operator_number = Array.length bin_op + Array.length un_op in
+    let operators_list = ref [] in
+    
+    let build_op population =
+        let rec find_op dna l = match dna with
+            | Dna.BinOp (name,_,child1,child2) -> if not(List.mem name l) then name::(find_op child1 (name::l)) @ (find_op child2 (name::l))
+                else (find_op child1 (name::l)) @ (find_op child2 (name::l))
+            | Dna.UnOp (name,_,child) -> if not(List.mem name l) then name::(find_op child (name::l))
+                else (find_op child (name::l))
+            | _ -> []
+        in
+        for i = 0 to (pop_size - 1) do
+            operators_list := (!operators_list)@(find_op (snd population.(i)) [])
+        done;
+    in
+    build_op population;
+    
+    let operator_number = List.length !operators_list in
     let sum_operator = Array.make operator_number 0
     and sum_operator_square = Array.make operator_number 0 in
+    let operators = Array.make operator_number "" in
+    
+    let rec make_op_array index = function
+        [] -> ()
+        |op::t -> operators.(index) <- op; make_op_array (index + 1) t
+    in
+    make_op_array 0 !operators_list;
     
     let search_index op_table element = (* get the index corresponding to the operator in the array *)
         try
             let size = Array.length op_table in
             for i = 0 to (size - 1) do
-                let (proba,name,f) = op_table.(i) in
+                let name = op_table.(i) in
                 if name = element then raise (Found i)
             done;
             failwith (element^" not found")
@@ -64,10 +86,10 @@ let operator_diversity population bin_op un_op =
         let count_operator = Array.make operator_number 0 in
         
         let rec counter dna = match dna with (* get the number of each operator in the individual *)
-            | Dna.BinOp (name,_, child1, child2) -> let index = search_index bin_op name in
+            | Dna.BinOp (name,_, child1, child2) -> let index = (search_index operators name) in
                 count_operator.(index) <- count_operator.(index) + 1;
                 counter child1; counter child2
-            | Dna.UnOp (name,_,child1) -> let index = search_index un_op name in
+            | Dna.UnOp (name,_,child1) -> let index = search_index operators name in
                 count_operator.(index) <- count_operator.(index) + 1
             | _ -> ()
         in 
@@ -82,7 +104,7 @@ let operator_diversity population bin_op un_op =
         done;
     )
     done;
-
+    
     let sum_variance = ref 0. in
     for i = 0 to (operator_number - 1) do
     (
@@ -128,7 +150,7 @@ let print_stats population =
 
 let print_advanced_stats population =
     Printf.printf "Average depth : %f\n" (average_depth population);
-    (* Printf.printf "Operator diversity : %f\n" (operator_diversity population bin_op un_op); *)
+    Printf.printf "Operator diversity : %f\n" (operator_diversity population);
     Printf.printf "Depth diversity : %f\n" (depth_diversity population)
 ;;
 
