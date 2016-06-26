@@ -21,7 +21,7 @@ val depth_diversity : (float * Dna.t) array -> float
 val print_stats : (float * Dna.t) array -> unit
 
 (** Print more statistics about the given population *)
-val print_advanced_stats : (float * Dna.t) array -> (float * string * (float -> float -> float)) array -> (float * string * (float -> float)) array -> unit
+val print_advanced_stats : (float * Dna.t) array -> unit
 
 (** Print the entire population *)
 val print_population : (float * Dna.t) array -> unit

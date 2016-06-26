@@ -126,9 +126,9 @@ let print_stats population =
     print_individual (best_individual population);
 ;;
 
-let print_advanced_stats population bin_op un_op =
+let print_advanced_stats population =
     Printf.printf "Average depth : %f\n" (average_depth population);
-    Printf.printf "Genetic structure diversity : %f\n" (operator_diversity population bin_op un_op);
+    (* Printf.printf "Operator diversity : %f\n" (operator_diversity population bin_op un_op); *)
     Printf.printf "Depth diversity : %f\n" (depth_diversity population)
 ;;
 

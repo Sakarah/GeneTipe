@@ -35,20 +35,16 @@ let () =
     Arg.parse spec_list (fun cfg_file -> config_filename := cfg_file) usage_msg;
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
-    let evo_params = Parameters.read_params ?pop_size:!pop_size ?max_depth:!max_depth ~filename:!config_filename in
-    let gen_params = evo_params.Parameters.random_gen_params in
-    let pop_size = evo_params.Parameters.pop_size in
-    let max_depth = evo_params.Parameters.max_depth in
+    Parameters.read ?pop_size:!pop_size ?max_depth:!max_depth ~filename:!config_filename;
 
     let nb_points = Scanf.scanf "%d\n" (function n -> n) in
-
     let points = Array.make nb_points (0.,0.) in
     for i = 0 to nb_points-1 do
         points.(i) <- Scanf.scanf "%f %f\n" (fun x y -> (x,y))
     done;
 
-    if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" pop_size;
-    let init_pop = Evolver.init_population ~size:pop_size ~max_depth gen_params in
+    if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" (Parameters.get ()).Parameters.pop_size;
+    let init_pop = Evolver.init_population () in
     let pop = ref (Evolver.compute_fitness points init_pop) in
     if !verbosity >= 1 then Stats.print_population !pop;
 
@@ -56,9 +52,9 @@ let () =
     (try
         for g = 1 to !generations do
             if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" g;
-            pop := Evolver.evolve points evo_params !pop;
+            pop := Evolver.evolve points !pop;
             if !verbosity >= 2 then Stats.print_stats !pop;
-            if !verbosity >= 3 then Stats.print_advanced_stats !pop gen_params.Parameters.bin_op gen_params.Parameters.un_op
+            if !verbosity >= 3 then Stats.print_advanced_stats !pop
         done
     with Sys.Break -> ());
 
@@ -69,7 +65,7 @@ let () =
         Stats.print_population !pop;
         Printf.printf "= Final stats =\n";
         Stats.print_stats !pop;
-        Stats.print_advanced_stats !pop gen_params.Parameters.bin_op gen_params.Parameters.un_op
+        Stats.print_advanced_stats !pop
     )
     else
     (
@@ -90,3 +86,6 @@ let () =
         with Graphics.Graphic_failure _ -> ()
     )
 ;;
+
+(* FIXME : Find a cleaner way to do that *)
+Genlex.make_lexer;; (* Workaround for forcing inclusion of this standard function in the core program in order to use it with plugins *)

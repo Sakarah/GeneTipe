@@ -1,22 +1,15 @@
-type randomGen =
-{
-    fill_proba: float;
-    bin_op:(float * string * (float -> float -> float)) array ;
-    bin_proba:float ;
-    un_op:(float * string * (float -> float)) array ;
-    un_proba:float ;
-    const_range:(float*float) ;
-    const_proba:float ;
-    var_proba:float
-};;
-
-type evolution =
+type t =
 {
     pop_size : int ;
     max_depth : int ;
-    random_gen_params : randomGen ;
     growth_factor : float ;
-    mutation_ratio : float
+    mutation_ratio : float ;
+
+    creation : (float * (max_depth:int -> Dna.t)) list ;
+    mutation : (float * (max_depth:int -> Dna.t -> Dna.t)) list ;
+    crossover : (float * (Dna.t -> Dna.t -> Dna.t)) list ;
+    fitness : (float*float) array -> Dna.t -> float ;
+    simplifications : (int * (Dna.t -> Dna.t)) list
 };;
 
 exception Error of string;;
@@ -24,62 +17,98 @@ exception Error of string;;
 
 open Yojson.Basic.Util;;
 
-let to_op parse_func json =
-    let proba = json |> member "proba" |> to_float in
-    let name = json |> member "name" |> to_string in
-    let op = json |> member "fun" |> to_string |> parse_func in
-    (proba,name,op)
-;;
-let to_bin_op = to_op MathParser.parse_xy;;
-let to_un_op = to_op MathParser.parse_x;;
-
-let to_range json = ( json |> member "min" |> to_number, json |> member "max" |> to_number );;
-
-let to_random_gen_params json =
-    {
-        fill_proba = json |> member "fill_proba" |> to_float;
-
-        bin_op = json |> member "bin_op" |> convert_each to_bin_op |> Array.of_list;
-        bin_proba = json |> member "bin_proba" |> to_float;
-
-        un_op = json |> member "un_op" |> convert_each to_un_op |> Array.of_list;
-        un_proba = json |> member "un_proba" |> to_float;
-
-        const_range = json |> member "const_range" |> to_range;
-        const_proba = json |> member "const_proba" |> to_float;
-
-        var_proba = json |> member "var_proba" |> to_float
-    }
+let get_params global_json = function
+    | `String name -> member name global_json
+    | json -> json
 ;;
 
-let to_evolution_params json =
-    {
-        pop_size = json |> member "pop_size" |> to_int;
-        max_depth = json |> member "max_depth" |> to_int;
-        random_gen_params = json |> member "random_gen" |> to_random_gen_params;
-        growth_factor = json |> member "growth_factor" |> to_number;
-        mutation_ratio = json |> member "growth_factor" |> to_float
-    }
-;;
-
-let read_params ?pop_size ?max_depth ~filename =
+let get_standard_pattern_list type_name method_getter json =
     try
-        let params = Yojson.Basic.from_file filename |> to_evolution_params in
+        let get_pattern pattern_json =
+            let proba = pattern_json |> member "proba" |> to_float in
+            let method_name = pattern_json |> member "method" |> to_string in
+            let params = pattern_json |> member "params" |> get_params json in
+            (proba, method_getter method_name params)
+        in
+        json |> member type_name |> to_list |> List.map get_pattern
+    with Yojson.Basic.Util.Type_error (str,json) ->
+        raise (Error (type_name^": "^str^" ("^(Yojson.Basic.to_string json)^")"))
+;;
+
+let get_creation_patterns = get_standard_pattern_list "creation" Plugin.Creation.get;;
+let get_mutation_patterns = get_standard_pattern_list "mutation" Plugin.Mutation.get;;
+let get_crossover_patterns = get_standard_pattern_list "crossover" Plugin.Crossover.get;;
+
+let get_fitness_evaluator json =
+    try
+        let fitness_json = json |> member "fitness" in
+        let fitness_method_name = fitness_json |> member "method" |> to_string in
+        let params = fitness_json |> member "params" |> get_params json in
+        Plugin.Fitness.get fitness_method_name params
+    with Yojson.Basic.Util.Type_error (str,json) ->
+        raise (Error ("fitness: "^str^" ("^(Yojson.Basic.to_string json)^")"))
+;;
+
+let get_simplification_patterns json =
+    try
+        let get_pattern pattern_json =
+            let schedule = pattern_json |> member "schedule" |> to_int in
+            let method_name = pattern_json |> member "method" |> to_string in
+            let params = pattern_json |> member "params" |> get_params json in
+            (schedule, Plugin.Simplification.get method_name params)
+        in
+        json |> member "simplifications" |> to_list |> List.map get_pattern
+    with Yojson.Basic.Util.Type_error (str,json) ->
+        raise (Error ("simplifications: "^str^" ("^(Yojson.Basic.to_string json)^")"))
+;;
+
+let to_evolution_params ?pop_size ?max_depth json =
+    try
         {
             pop_size =
             ( match pop_size with
-                | None -> params.pop_size
+                | None -> json |> member "pop_size" |> to_int
                 | Some n -> n
             );
             max_depth =
             ( match max_depth with
-                | None -> params.max_depth
+                | None -> json |> member "max_depth" |> to_int
                 | Some d -> d
             );
-            random_gen_params = params.random_gen_params;
-            growth_factor = params.growth_factor;
-            mutation_ratio = params.mutation_ratio
+            growth_factor = json |> member "growth_factor" |> to_number;
+            mutation_ratio = json |> member "mutation_ratio" |> to_float;
+
+            creation = get_creation_patterns json;
+            mutation = get_mutation_patterns json;
+            crossover = get_crossover_patterns json;
+            fitness =  get_fitness_evaluator json;
+            simplifications = get_simplification_patterns json
         }
     with Yojson.Basic.Util.Type_error (str,json) ->
-        raise (Error ("Unable to load configuration from "^filename^" : "^str^" ("^(Yojson.Basic.to_string json)^")"))
+        raise (Error ("evolution: "^str^" ("^(Yojson.Basic.to_string json)^")"))
+;;
+
+let load_plugins json =
+    try
+        let plugin_dir = json |> member "plugin_dir" |> to_string in
+        let plugin_list = json |> member "plugins" |> to_list |> filter_string in
+        List.iter (fun plugin -> Plugin.load (plugin_dir^plugin)) plugin_list
+    with Yojson.Basic.Util.Type_error (str,json) ->
+        raise (Error ("plugins: "^str^" ("^(Yojson.Basic.to_string json)^")"))
+;;
+
+let params = ref None;;
+
+let read ?pop_size ?max_depth ~filename =
+    try
+        let json = Yojson.Basic.from_file filename in
+        load_plugins json;
+        params := Some (to_evolution_params ?pop_size ?max_depth json)
+    with Error str ->
+        raise (Error ("Unable to load configuration from "^filename^": "^str))
+;;
+
+let get () = match !params with
+    | Some p -> p
+    | None -> raise (Error "Not loaded configuration file")
 ;;

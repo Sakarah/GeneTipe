@@ -1,34 +1,68 @@
 {
     "pop_size": 100,
     "max_depth": 5,
+    "growth_factor": 2.0,
+    "mutation_ratio": 0.1,
+
+    "plugin_dir":"_build/plugins/",
+    "plugins":
+    [
+        "primitives/MathExpr.cmxs",
+        "creation/FillGrow.cmxs",
+        "mutation/MutateConst.cmxs",
+        "mutation/RebuildSubtree.cmxs",
+        "crossover/TakeSubtree.cmxs",
+        "fitness/DiffSquare.cmxs",
+        "simplification/EvalConst.cmxs"
+    ],
+
+    "creation":
+    [
+        { "proba":0.5, "method":"fill", "params":"random_gen" },
+        { "proba":0.5, "method":"grow", "params":"random_gen" }
+    ],
+    "mutation":
+    [
+        { "proba":0.1, "method":"rebuild_subtree" },
+        {
+            "proba":0.9, "method":"mutate_const",
+            "params": { "const_range":{"min":-5.0, "max":5.0}, "mutation_proba":0.2 }
+        }
+    ],
+    "crossover":
+    [
+        { "proba":1.0, "method":"take_subtree" }
+    ],
+    "fitness": { "method":"diff2" },
+    "simplifications":
+    [
+        { "schedule":10, "method":"eval_const" }
+    ],
+
     "random_gen":
     {
-        "fill_proba": 0.5,
-
         "bin_op":
         [
-            { "proba":0.25, "name":"+", "fun":"x+y" },
-            { "proba":0.20, "name":"-", "fun":"x-y" },
-            { "proba":0.25, "name":"*", "fun":"x*y" },
-            { "proba":0.20, "name":"/", "fun":"x/y" },
-            { "proba":0.10, "name":"^", "fun":"x^y" }
+            { "proba":0.25, "name":"+", "op":"math", "params":{"fun":"x+y"} },
+            { "proba":0.20, "name":"-", "op":"math", "params":{"fun":"x-y"} },
+            { "proba":0.25, "name":"*", "op":"math", "params":{"fun":"x*y"} },
+            { "proba":0.20, "name":"/", "op":"math", "params":{"fun":"x/y"} },
+            { "proba":0.10, "name":"^", "op":"math", "params":{"fun":"x^y"} }
         ],
         "bin_proba": 0.80,
 
         "un_op":
         [
-            { "proba":0.2, "name":"cos", "fun":"cos(x)" },
-            { "proba":0.2, "name":"sin", "fun":"sin(x)" },
-            { "proba":0.2, "name":"tan", "fun":"tan(x)" },
-            { "proba":0.2, "name":"ln", "fun":"ln(x)" },
-            { "proba":0.2, "name":"exp", "fun":"exp(x)" }
+            { "proba":0.2, "name":"cos", "op":"math", "params":{"fun":"cos(x)"} },
+            { "proba":0.2, "name":"sin", "op":"math", "params":{"fun":"sin(x)"} },
+            { "proba":0.2, "name":"tan", "op":"math", "params":{"fun":"tan(x)"} },
+            { "proba":0.2, "name":"ln", "op":"math", "params":{"fun":"ln(x)"} },
+            { "proba":0.2, "name":"exp", "op":"math", "params":{"fun":"exp(x)"} }
         ],
         "un_proba": 0.10,
 
         "const_range": { "min":-5.0, "max":5.0 },
         "const_proba": 0.05,
         "var_proba": 0.05
-    },
-    "growth_factor": 2.0,
-    "mutation_ratio": 0.1
+    }
 }
