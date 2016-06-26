@@ -3,11 +3,11 @@ PLUGINS = creation/FillGrow.cmxs crossover/TakeSubtree.cmxs fitness/DiffSquare.c
 	simplification/EvalConst.cmxs
 REQ_PACKAGES = "yojson"
 INCLUDE_DIR = "core,lib"
-OCAMLBUILD = ocamlbuild -Is $(INCLUDE_DIR) -pkgs $(REQ_PACKAGES)
+OCAMLBUILD = ocamlbuild -use-ocamlfind -Is $(INCLUDE_DIR) -pkgs $(REQ_PACKAGES)
 
 all: $(PLUGINS)
 
-$(PLUGINS): %.cmxs:
+$(PLUGINS):: %.cmxs:
 	cd .. && $(OCAMLBUILD) plugins/$@
 
 .PHONY: all $(PLUGINS)

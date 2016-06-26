@@ -1,7 +1,6 @@
 TOOLS = genpts
-REQ_PACKAGES = ""
 INCLUDE_DIR = "lib"
-OCAMLBUILD = ocamlbuild -Is $(INCLUDE_DIR) -pkgs $(REQ_PACKAGES)
+OCAMLBUILD = ocamlbuild -Is $(INCLUDE_DIR)
 
 all: $(TOOLS)
 

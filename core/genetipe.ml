@@ -86,6 +86,3 @@ let () =
         with Graphics.Graphic_failure _ -> ()
     )
 ;;
-
-(* FIXME : Find a cleaner way to do that *)
-Genlex.make_lexer;; (* Workaround for forcing inclusion of this standard function in the core program in order to use it with plugins *)
