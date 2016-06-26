@@ -1,35 +1,11 @@
-all: genetipe genpts plugins
+SUBDIRS = core plugins tools
 
-genetipe:
-	ocamlbuild -pkgs graphics,yojson,dynlink genetipe.native
-	mv genetipe.native genetipe
+all: $(SUBDIRS)
 
-genpts:
-	ocamlbuild genpts.native
-	mv genpts.native genpts
+$(SUBDIRS): %:
+	$(MAKE) -C $@
 
-plugins:
-	$(MAKE) -C plugins
-
-cma:
-	ocamlbuild -pkgs graphics,yojson,dynlink GeneTipe.cma
-
-doc:
-	ocamlbuild GeneTipe.docdir/index.html
-	mv GeneTipe.docdir doc
-
-debug: genetipe.debug genpts.debug
-
-genetipe.debug:
-	ocamlbuild -pkgs graphics,yojson,dynlink -cflag -g -lflag -g genetipe.byte
-	mv genetipe.byte genetipe.debug
-
-genpts.debug:
-	ocamlbuild -cflag -g -lflag -g genpts.byte
-	mv genpts.byte genpts.debug
-    
 clean:
 	-ocamlbuild -clean
 
-.PHONY: all genetipe genpts plugins cma doc debug genetipe.debug genpts.debug clean
-
+.PHONY: all $(SUBDIRS) clean
