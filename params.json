@@ -7,6 +7,8 @@
     "plugin_dir":"_build/plugins/",
     "plugins":
     [
+        "random/UniformGen.cmxs",
+        "random/NormalGen.cmxs",
         "primitives/MathExpr.cmxs",
         "creation/FillGrow.cmxs",
         "mutation/MutateConst.cmxs",
@@ -26,7 +28,7 @@
         { "proba":0.1, "method":"rebuild_subtree" },
         {
             "proba":0.9, "method":"mutate_const",
-            "params": { "const_range":{"min":-5.0, "max":5.0}, "mutation_proba":0.2 }
+            "params": { "mutation_proba":0.2, "const_generator": { "distrib":"normal", "params":{"mean":0.0, "deviation":1.0} } }
         }
     ],
     "crossover":
@@ -61,7 +63,7 @@
         ],
         "un_proba": 0.10,
 
-        "const_range": { "min":-5.0, "max":5.0 },
+        "const_generator": { "distrib":"uniform", "params":{"min":-5.0, "max":5.0} },
         "const_proba": 0.05,
         "var_proba": 0.05
     }

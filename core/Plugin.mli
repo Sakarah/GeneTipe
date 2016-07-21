@@ -26,6 +26,7 @@ end
 module MakeHookClass (Type : HookType) : HookClass with type t = Type.t
 
 (** {2 Standard hook classes } *)
+module RandomGen : HookClass with type t = (Yojson.Basic.json -> unit -> float)
 module BinOp : HookClass with type t = (Yojson.Basic.json -> float -> float -> float)
 module UnOp : HookClass with type t = (Yojson.Basic.json -> float -> float)
 module Creation : HookClass with type t = (Yojson.Basic.json -> max_depth:int -> Dna.t)

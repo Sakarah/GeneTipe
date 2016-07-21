@@ -43,7 +43,7 @@ let rec create_random_grow gen_params ~max_depth =
     (
         let p = Random.float (gen_params.const_proba +. gen_params.var_proba) in
         if p < gen_params.const_proba then
-            Dna.Const (RandUtil.uniform_float(gen_params.const_range))
+            Dna.Const (gen_params.const_generator ())
         else
             Dna.X
     )
@@ -62,7 +62,7 @@ let rec create_random_grow gen_params ~max_depth =
             let name, operation = random_op gen_params.un_op in
             Dna.UnOp (name, operation, (create_random_grow gen_params (max_depth - 1)))
         else if p < p_const then
-            Dna.Const (RandUtil.uniform_float(gen_params.const_range))
+            Dna.Const (gen_params.const_generator ())
         else
             Dna.X
     )
@@ -75,7 +75,7 @@ let rec create_random_fill gen_params ~max_depth =
     (
         let p = Random.float (gen_params.const_proba +. gen_params.var_proba) in
         if p < gen_params.const_proba then
-            Dna.Const (RandUtil.uniform_float(gen_params.const_range))
+            Dna.Const (gen_params.const_generator ())
         else
             Dna.X
     )

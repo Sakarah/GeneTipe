@@ -7,7 +7,7 @@ type t =
     bin_proba : float ; (** Probability of choosing a binary node *)
     un_op : (float * string * (float -> float)) array ; (** Array of all unary operations with their associated probability knowing that an unary node have been selected *)
     un_proba : float ; (** Probability of choosing an unary node *)
-    const_range : (float*float) ; (** Range where constants are randomly taken *)
+    const_generator : unit -> float ; (** Function called for generating a random constant *)
     const_proba : float ; (** Probability of choosing a constant. *)
     var_proba : float (** Probability of choosing a variable. The sum of the probabilities must be equal to 1 *)
 }

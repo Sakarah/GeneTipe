@@ -27,6 +27,7 @@ module MakeHookClass (Type : HookType) : (HookClass with type t = Type.t) = stru
 end;;
 
 
+module RandomGen = MakeHookClass (struct type t = (Yojson.Basic.json -> unit -> float) end);;
 module BinOp = MakeHookClass (struct type t = (Yojson.Basic.json -> float -> float -> float) end);;
 module UnOp = MakeHookClass (struct type t = (Yojson.Basic.json -> float -> float) end);;
 module Creation = MakeHookClass (struct type t = (Yojson.Basic.json -> max_depth:int -> Dna.t) end);;
