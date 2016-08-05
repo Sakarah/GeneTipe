@@ -1,19 +1,4 @@
-type t =
-{
-    pop_size : int ;
-    max_depth : int ;
-    growth_factor : float ;
-    mutation_ratio : float ;
-
-    creation : (float * (max_depth:int -> Dna.t)) list ;
-    mutation : (float * (max_depth:int -> Dna.t -> Dna.t)) list ;
-    crossover : (float * (Dna.t -> Dna.t -> Dna.t)) list ;
-    fitness : (float*float) array -> Dna.t -> float ;
-    simplifications : (int * (Dna.t -> Dna.t)) list
-};;
-
 exception Error of string;;
-
 
 open Yojson.Basic.Util;;
 
@@ -64,26 +49,28 @@ let get_simplification_patterns json =
 
 let to_evolution_params ?pop_size ?max_depth json =
     try
-        {
-            pop_size =
+        (module struct
+            module Individual = Dna
+        
+            let pop_size =
             ( match pop_size with
                 | None -> json |> member "pop_size" |> to_int
                 | Some n -> n
-            );
-            max_depth =
+            );;
+            let max_depth =
             ( match max_depth with
                 | None -> json |> member "max_depth" |> to_int
                 | Some d -> d
-            );
-            growth_factor = json |> member "growth_factor" |> to_number;
-            mutation_ratio = json |> member "mutation_ratio" |> to_float;
+            );;
+            let growth_factor = json |> member "growth_factor" |> to_number;;
+            let mutation_ratio = json |> member "mutation_ratio" |> to_float;;
 
-            creation = get_creation_patterns json;
-            mutation = get_mutation_patterns json;
-            crossover = get_crossover_patterns json;
-            fitness =  get_fitness_evaluator json;
-            simplifications = get_simplification_patterns json
-        }
+            let creation = get_creation_patterns json;;
+            let mutation = get_mutation_patterns json;;
+            let crossover = get_crossover_patterns json;;
+            let fitness =  get_fitness_evaluator json;;
+            let simplifications = get_simplification_patterns json;;
+        end : EvolParams.S)
     with Yojson.Basic.Util.Type_error (str,json) ->
         raise (Error ("evolution: "^str^" ("^(Yojson.Basic.to_string json)^")"))
 ;;
@@ -97,18 +84,23 @@ let load_plugins json =
         raise (Error ("plugins: "^str^" ("^(Yojson.Basic.to_string json)^")"))
 ;;
 
-let params = ref None;;
+let json_tree = ref None;;
+let evol_params = ref None;;
 
 let read ?pop_size ?max_depth ~filename =
     try
         let json = Yojson.Basic.from_file filename in
+        json_tree := Some json;
         load_plugins json;
-        params := Some (to_evolution_params ?pop_size ?max_depth json)
+        evol_params := Some (to_evolution_params ?pop_size ?max_depth json)
     with Error str ->
         raise (Error ("Unable to load configuration from "^filename^": "^str))
 ;;
 
-let get () = match !params with
-    | Some p -> p
+let get_ref v = match !v with
+    | Some var -> var
     | None -> raise (Error "Not loaded configuration file")
 ;;
+
+let get_json () = get_ref json_tree;;
+let get_evolution_params () = get_ref evol_params;;

@@ -35,7 +35,10 @@ let () =
     Arg.parse spec_list (fun cfg_file -> config_filename := cfg_file) usage_msg;
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
-    Parameters.read ?pop_size:!pop_size ?max_depth:!max_depth ~filename:!config_filename;
+    ParamReader.read ?pop_size:!pop_size ?max_depth:!max_depth ~filename:!config_filename;
+    let module Parameters = (val ParamReader.get_evolution_params ()) in
+    let module CurrentEvolver = Evolver.Make (Parameters) in
+    let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
 
     let nb_points = Scanf.scanf "%d\n" (function n -> n) in
     let points = Array.make nb_points (0.,0.) in
@@ -43,37 +46,37 @@ let () =
         points.(i) <- Scanf.scanf "%f %f\n" (fun x y -> (x,y))
     done;
 
-    if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" (Parameters.get ()).Parameters.pop_size;
-    let init_pop = Evolver.init_population () in
-    let pop = ref (Evolver.compute_fitness points init_pop) in
-    if !verbosity >= 1 then Stats.print_population !pop;
+    if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;
+    let init_pop = CurrentEvolver.init_population () in
+    let pop = ref (CurrentEvolver.compute_fitness points init_pop) in
+    if !verbosity >= 1 then StatsPrinter.print_population !pop;
 
     Sys.catch_break true; (* If you do a Ctrl+C you still have the results *)
     (try
         for g = 1 to !generations do
             if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" g;
-            pop := Evolver.evolve points !pop;
-            if !verbosity >= 2 then Stats.print_stats !pop;
-            if !verbosity >= 3 then Stats.print_advanced_stats !pop
+            pop := CurrentEvolver.evolve points !pop;
+            if !verbosity >= 2 then StatsPrinter.print_stats !pop;
+            (*if !verbosity >= 3 then StatsPrinter.print_advanced_stats !pop*)
         done
     with Sys.Break -> ());
 
-    pop := Evolver.simplify_individuals !pop;
+    pop := CurrentEvolver.simplify_individuals !pop;
     if !verbosity >= 1 then
     (
         Printf.printf "= End of evolution =\n";
-        Stats.print_population !pop;
+        StatsPrinter.print_population !pop;
         Printf.printf "= Final stats =\n";
-        Stats.print_stats !pop;
-        Stats.print_advanced_stats !pop
+        StatsPrinter.print_stats !pop;
+        (*StatsPrinter.print_advanced_stats !pop*)
     )
     else
     (
         let bestFitness, bestDna = Stats.best_individual !pop in
-        Printf.printf "%f\n%s" bestFitness (Dna.to_string bestDna)
+        Printf.printf "%f\n%s" bestFitness (Parameters.Individual.to_string bestDna)
     );
 
-    if !show_graph then
+    (*if !show_graph then
     (
         Printf.printf "%!";
 
@@ -84,5 +87,5 @@ let () =
             Plot.show graph;
             Graphics.loop_at_exit [] (fun _ -> ())
         with Graphics.Graphic_failure _ -> ()
-    )
+    )*)
 ;;

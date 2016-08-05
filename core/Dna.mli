@@ -8,18 +8,6 @@ type t =
     | Const of float
     | X
 
-(** {2 Random generation} *)
-(** Randomly generate a new individual using the provided patterns *)
-val create_random : (float * (max_depth:int -> t)) list -> max_depth:int -> t
-
-
-(** {2 Gene manipulation} *)
-(** Generate a new individual by modifying an existing individual adding him new characteristics using provided patterns *)
-val mutation : (float * (max_depth:int -> t -> t)) list -> max_depth:int -> t -> t
-
-(** Generate a new individual by taking characteristics of another individual using the provided patterns *)
-val crossover : (float * (t -> t -> t)) list -> t -> t -> t
-
 
 (** {2 Evaluation and printing} *)
 (** Evaluate the function represented by the DNA on the point x.
@@ -31,7 +19,7 @@ val eval : t -> float -> float
 val depth : t -> int
 
 (** Give a string representation of the DNA *)
-val to_string : ?bracket:bool -> t -> string
+val to_string : t -> string
 
 (** Print the DNA *)
 val print : Format.formatter -> t -> unit

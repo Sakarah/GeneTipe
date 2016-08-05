@@ -1,6 +1,3 @@
-exception Found of int;;
-
-
 let best_individual population =
     let size = Array.length population in
     let max = ref 0 in
@@ -20,8 +17,41 @@ let pop_average val_func population =
     !sum /. float_of_int size
 ;;
 
-let average_fitness = pop_average fst;;
+let average_fitness population = pop_average fst population;;
 
+module type StringConvertible =
+sig
+    type t
+    val to_string : t -> string
+end;;
+
+module type Printer =
+sig
+    type individual
+    
+    (** Print statistics about the given population *)
+    val print_stats : (float * individual) array -> unit
+
+    (** Print the entire population *)
+    val print_population : (float * individual) array -> unit
+end;;
+
+module MakePrinter (Individual : StringConvertible) : (Printer with type individual := Individual.t) =
+struct
+    let print_individual (fitness, individual) =
+        Printf.printf "%e ~ %s\n" fitness (Individual.to_string individual)
+    ;;
+
+    let print_stats population =
+        Printf.printf "Average fitness : %e\n" (average_fitness population);
+        Printf.printf "Best individual :\n";
+        print_individual (best_individual population);
+    ;;
+
+    let print_population = Array.iter print_individual;;
+end
+
+(*exception Found of int;;
 
 let rec branch_number = function 
     | Dna.BinOp (_,_,child1,child2) -> branch_number child1 + branch_number child2
@@ -138,20 +168,8 @@ let depth_diversity population =
     1. -. 1./.(1. +. depth_variance)
 ;;
 
-let print_individual (fitness, dna) =
-    Printf.printf "%e ~ %s\n" fitness (Dna.to_string dna)
-;;
-
-let print_stats population =
-    Printf.printf "Average fitness : %e\n" (average_fitness population);
-    Printf.printf "Best individual :\n";
-    print_individual (best_individual population);
-;;
-
 let print_advanced_stats population =
     Printf.printf "Average depth : %f\n" (average_depth population);
     Printf.printf "Operator diversity : %f\n" (operator_diversity population);
     Printf.printf "Depth diversity : %f\n" (depth_diversity population)
-;;
-
-let print_population = Array.iter print_individual;;
+;;*)

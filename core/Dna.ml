@@ -40,13 +40,16 @@ let rec depth = function
     | BinOp (_,_,child1,child2) -> 1+ (max (depth child1) (depth child2))
 ;;
 
-let rec to_string ?(bracket=false) = function
-    | Const a -> Printf.sprintf "%.2f" a
-    | X -> "x"
-    | UnOp (name,_,child) -> name ^ "(" ^ (to_string child) ^ ")"
-    | BinOp (symb,_,child1,child2) ->
-        if bracket then "(" ^ (to_string ~bracket:true child1) ^ symb ^ (to_string ~bracket:true child2) ^ ")"
-        else (to_string ~bracket:true child1) ^ symb ^ (to_string ~bracket:true child2)
+let to_string dna =
+    let rec to_string_impl ~bracket = function
+        | Const a -> Printf.sprintf "%.2f" a
+        | X -> "x"
+        | UnOp (name,_,child) -> name ^ "(" ^ (to_string_impl ~bracket:false child) ^ ")"
+        | BinOp (symb,_,child1,child2) ->
+            if bracket then "(" ^ (to_string_impl ~bracket:true child1) ^ symb ^ (to_string_impl ~bracket:true child2) ^ ")"
+            else (to_string_impl ~bracket:true child1) ^ symb ^ (to_string_impl ~bracket:true child2)
+    in
+    to_string_impl ~bracket:false dna
 ;;
 
 let print ppf dna = Format.fprintf ppf "%s" (to_string dna);;

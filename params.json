@@ -25,7 +25,7 @@
     ],
     "mutation":
     [
-        { "proba":0.1, "method":"rebuild_subtree" },
+        { "proba":0.1, "method":"rebuild_subtree", "params":[ {"proba":1.0, "method":"grow", "params":"random_gen"} ] },
         {
             "proba":0.9, "method":"mutate_const",
             "params": { "mutation_proba":0.2, "const_generator": { "distrib":"normal", "params":{"mean":0.0, "deviation":1.0} } }
