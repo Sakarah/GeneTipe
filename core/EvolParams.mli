@@ -1,22 +1,30 @@
+(** Module type to carry the representation of an individual *)
 module type Individual =
 sig
-    type t (** Type of the genetically modifiable individuals *)
+    type t (** Type of the genetically modifiable individual *)
     val to_string : t -> string (** Function for getting the string representation of an individual. *)
+end
+
+(** Module type to carry the representation of the target data *)
+module type TargetData =
+sig
+    type t (** Type of the target data *)
+    val read : unit -> t (** Read the target data from the given channel *)
 end
 
 (** This module type represents the parameters of a genetic selection process *)
 module type S = 
 sig
-    module Individual : Individual
+    module Individual : Individual (** Individual type used for the evolution *)
+    module TargetData : TargetData (** Target data type *)
     
     val pop_size : int (** Number of individuals in the population *)
-    val max_depth : int (** Maximum depth in the Dna tree of an individual *)
     val growth_factor : float (** Multiplication factor of the population after a reproduction phase *)
     val mutation_ratio : float (** Ratio of the mutations in the reproduction phase. When not choosing mutation, a crossover is performed. *)
 
-    val creation : (float * (max_depth:int -> Individual.t)) list (** List of the creation patterns with their probabilities *)
-    val mutation : (float * (max_depth:int -> Individual.t -> Individual.t)) list (** List of mutations patterns with their associated probabilities *)
+    val creation : (float * (pop_frac:float -> Individual.t)) list (** List of the creation patterns with their probabilities *)
+    val mutation : (float * (Individual.t -> Individual.t)) list (** List of mutations patterns with their associated probabilities *)
     val crossover : (float * (Individual.t -> Individual.t -> Individual.t)) list (** List of crossovers patterns with their associated probabilities *)
     val simplifications : (int * (Individual.t -> Individual.t)) list (** List of the simplifications patterns to apply to the population each n turn *)
-    val fitness : (float*float) array -> Individual.t -> float (** Fitness function to use *)
+    val fitness : TargetData.t -> Individual.t -> float (** Fitness function to use *)
 end

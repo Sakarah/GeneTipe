@@ -47,20 +47,17 @@ let get_simplification_patterns json =
         raise (Error ("simplifications: "^str^" ("^(Yojson.Basic.to_string json)^")"))
 ;;
 
-let to_evolution_params ?pop_size ?max_depth json =
+let to_evolution_params ?pop_size json =
     try
+        let module FitnessEvaluator = (val get_fitness_evaluator json) in
         (module struct
             module Individual = Dna
+            module TargetData = FitnessEvaluator.TargetData
         
             let pop_size =
             ( match pop_size with
                 | None -> json |> member "pop_size" |> to_int
                 | Some n -> n
-            );;
-            let max_depth =
-            ( match max_depth with
-                | None -> json |> member "max_depth" |> to_int
-                | Some d -> d
             );;
             let growth_factor = json |> member "growth_factor" |> to_number;;
             let mutation_ratio = json |> member "mutation_ratio" |> to_float;;
@@ -68,7 +65,7 @@ let to_evolution_params ?pop_size ?max_depth json =
             let creation = get_creation_patterns json;;
             let mutation = get_mutation_patterns json;;
             let crossover = get_crossover_patterns json;;
-            let fitness =  get_fitness_evaluator json;;
+            let fitness = FitnessEvaluator.fitness;;
             let simplifications = get_simplification_patterns json;;
         end : EvolParams.S)
     with Yojson.Basic.Util.Type_error (str,json) ->
@@ -87,12 +84,12 @@ let load_plugins json =
 let json_tree = ref None;;
 let evol_params = ref None;;
 
-let read ?pop_size ?max_depth ~filename =
+let read ?pop_size ~filename =
     try
         let json = Yojson.Basic.from_file filename in
         json_tree := Some json;
         load_plugins json;
-        evol_params := Some (to_evolution_params ?pop_size ?max_depth json)
+        evol_params := Some (to_evolution_params ?pop_size json)
     with Error str ->
         raise (Error ("Unable to load configuration from "^filename^": "^str))
 ;;

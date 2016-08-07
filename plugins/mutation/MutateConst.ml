@@ -1,5 +1,5 @@
 (** Generate a new individual by tweaking constants of an already existing one *)
-let mutate_constants ~const_generator ~proba ~max_depth base =
+let mutate_constants ~const_generator ~proba base =
     let rec mutate = function
         | Dna.BinOp (name,func,child1,child2) -> Dna.BinOp (name, func, mutate child1, mutate child2)
         | Dna.UnOp (name,func,child) -> Dna.UnOp (name, func, mutate child)

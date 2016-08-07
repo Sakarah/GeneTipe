@@ -1,28 +1,29 @@
 module type S =
 sig
     type individual
+    type target_data
     val init_population : unit -> (float option * individual) array
-    val compute_fitness : (float*float) array -> (float option * individual) array -> (float * individual) array
+    val compute_fitness : target_data -> (float option * individual) array -> (float * individual) array
     val simplify_individuals : ?generation:int -> (float * individual) array -> (float * individual) array
     val tournament : (float * individual) array -> target_size:int -> (float * individual) array
     val tournament_by_packs : (float * individual) array -> target_size:int -> (float * individual) array
     val reproduce : (float * individual) array -> (float option * individual) array
-    val evolve : (float*float) array -> (float * individual) array -> (float * individual) array
+    val evolve : target_data -> (float * individual) array -> (float * individual) array
 end;;
 
 module Make (Parameters : EvolParams.S) =
 struct
     let init_population () =
         let create_random i = 
-            let max_depth = (Parameters.max_depth*i)/Parameters.pop_size in 
-            (None, RandUtil.from_proba_list Parameters.creation ~max_depth)
+            let pop_frac = (float_of_int i)/.(float_of_int Parameters.pop_size) in
+            (None, RandUtil.from_proba_list Parameters.creation ~pop_frac)
         in
         Array.init Parameters.pop_size create_random
     ;;
 
-    let compute_fitness points =
+    let compute_fitness target_data =
         let fillFitness = function
-            | (None,dna) -> (Parameters.fitness points dna, dna)
+            | (None,dna) -> (Parameters.fitness target_data dna, dna)
             | (Some fitness,dna) -> (fitness, dna)
         in
         Array.map fillFitness
@@ -126,7 +127,7 @@ struct
         for i = pop_size to target_size - 1 do
             let parent_dna = individual_from_rand (Random.float !fitness_total) in
             if Parameters.mutation_ratio < Random.float 1. then
-                target_population.(i) <- (None, RandUtil.from_proba_list Parameters.mutation ~max_depth:Parameters.max_depth parent_dna)
+                target_population.(i) <- (None, RandUtil.from_proba_list Parameters.mutation parent_dna)
             else
                 let second_parent_dna = individual_from_rand (Random.float !fitness_total) in
                 target_population.(i) <- (None, RandUtil.from_proba_list Parameters.crossover parent_dna second_parent_dna)
@@ -134,10 +135,10 @@ struct
         target_population
     ;;
 
-    let evolve points initial_population =
+    let evolve target_data initial_population =
         let pop_size = Array.length initial_population in
         let child_population = reproduce initial_population in
-        let evaluated_population = compute_fitness points child_population in
+        let evaluated_population = compute_fitness target_data child_population in
         tournament evaluated_population ~target_size:pop_size
     ;;
 end;;

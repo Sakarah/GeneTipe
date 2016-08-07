@@ -45,16 +45,22 @@ module UnOp : HookClass with type t = (Yojson.Basic.json -> float -> float)
 module TermNode : HookClass with type t = (Yojson.Basic.json -> (int*(float list->string)*(float list->float->float)))
 
 (** Hook class for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
-module Creation : HookClass with type t = (Yojson.Basic.json -> max_depth:int -> Dna.t)
+module Creation : HookClass with type t = (Yojson.Basic.json -> pop_frac:float -> Dna.t)
 
 (** Hook class for mutation operations. A mutation operation should modify the given Dna source to create a slightly different individual not exceeding the given max_depth. *)
-module Mutation : HookClass with type t = (Yojson.Basic.json -> max_depth:int -> Dna.t -> Dna.t)
+module Mutation : HookClass with type t = (Yojson.Basic.json -> Dna.t -> Dna.t)
 
 (** Hook class for crossover operators. Crossovers are suppose to mix the two Dna sources given to create a new individual. *)
 module Crossover : HookClass with type t = (Yojson.Basic.json -> Dna.t -> Dna.t -> Dna.t)
 
+module type FitnessEvaluator = 
+sig
+    module TargetData : EvolParams.TargetData
+    val fitness : TargetData.t -> Dna.t -> float
+end
+
 (** Hook class for fitness functions. A fitness function should tell how well the given Dna match the data given. Bigger output mean better individuals. *)
-module Fitness : HookClass with type t = (Yojson.Basic.json -> (float*float) array -> Dna.t -> float)
+module Fitness : HookClass with type t = (Yojson.Basic.json -> (module FitnessEvaluator))
 
 (** Hook class for simplification operations. Simplifications are supposed to reduce the given Dna tree without changing its mathematical meaning. *)
 module Simplification : HookClass with type t = (Yojson.Basic.json -> Dna.t -> Dna.t)

@@ -9,7 +9,7 @@ val get_standard_pattern_list : string -> (string -> Yojson.Basic.json -> 'a) ->
 (** Read the parameters from the specified file.
     Optional pop_size and max_depth override the parameters in the file.
     This function must be called before any get_params execution *)
-val read : ?pop_size:int -> ?max_depth:int -> filename:string -> unit
+val read : ?pop_size:int -> filename:string -> unit
 
 (** Return the parameters JSON tree *)
 val get_json : unit -> Yojson.Basic.json

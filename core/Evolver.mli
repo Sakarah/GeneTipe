@@ -8,12 +8,15 @@ module type S =
 sig
     (** Type of the evolved individuals *)
     type individual
+    
+    (** Type of the target data*)
+    type target_data
 
-    (** Initialize the population with randomly generated individuals using Koza's ramped half and half method *)
+    (** Initialize the population with randomly generated individuals *)
     val init_population : unit -> (float option * individual) array
 
     (** Compute the fitness of all the individuals of a population *)
-    val compute_fitness : (float*float) array -> (float option * individual) array -> (float * individual) array
+    val compute_fitness : target_data -> (float option * individual) array -> (float * individual) array
 
     (** Simplify all the individuals from the given population (see Dna.simplify) *)
     val simplify_individuals : ?generation:int -> (float * individual) array -> (float * individual) array
@@ -31,7 +34,8 @@ sig
     val reproduce : (float * individual) array -> (float option * individual) array
 
     (** Evolve the population with the fixed number of generations *)
-    val evolve : (float*float) array -> (float * individual) array -> (float * individual) array
+    val evolve : target_data -> (float * individual) array -> (float * individual) array
 end
 
-module Make : functor (Parameters : EvolParams.S) -> S with type individual := Parameters.Individual.t
+(** Create a new Evolver from the given parameters *)
+module Make : functor (Parameters : EvolParams.S) -> S with type individual := Parameters.Individual.t and type target_data := Parameters.TargetData.t
