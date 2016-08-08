@@ -1,18 +1,23 @@
 let () =
-    let pop_size = ref None in
     let generations = ref 100 in
+    let config_overrides = ref [] in
+    let next_overriden_key = ref "" in
     let verbosity = ref 2 in
     let show_graph = ref false in
     let config_filename = ref "" in
 
     let spec_list =
     [
-        ("--pop", Arg.Int (function p -> pop_size := Some p), "Set the population size (override the config file)");
-        ("-p", Arg.Int (function p -> pop_size := Some p), "Shorthand for --pop");
+        ("--pop", Arg.String (function p -> config_overrides := ("pop_size",p)::(!config_overrides)), "Set the population size (override the config file)");
+        ("-p", Arg.String (function p -> config_overrides := ("pop_size",p)::(!config_overrides)), "Shorthand for --pop");
         ("--gen", Arg.Set_int generations, "Set the number of generations (default is 100)");
         ("-g", Arg.Set_int generations, "Shorthand for --gen");
         ("--rand", Arg.Int (function r -> Random.init r), "Set the random seed");
         ("-r", Arg.Int (function r -> Random.init r), "Shorthand for --rand");
+        ("--config-override", Arg.Tuple [Arg.Set_string next_overriden_key; Arg.String (function json -> config_overrides := (!next_overriden_key,json)::(!config_overrides))],
+            "Override a configuration value (for accessing a subkey use / separator) by a new given json tree. (Takes 2 parameters)");
+        ("-c", Arg.Tuple [Arg.Set_string next_overriden_key; Arg.String (function json -> config_overrides := (!next_overriden_key,json)::(!config_overrides))],
+            "Shorthand for --config-override");
         ("--quiet", Arg.Unit (fun () -> verbosity := 0), "Do not show anything else than the result (equivalent to -v 0)");
         ("--no-stats", Arg.Unit (fun () -> verbosity := 1), "No intermediate statistics about the currently generated population (equivalent to -v 1)");
         ("--full-stats", Arg.Unit (fun () -> verbosity := 3), "Print full statistics about the currently generated population (equivalent to -v 3)");
@@ -32,7 +37,7 @@ let () =
     Arg.parse spec_list (fun cfg_file -> config_filename := cfg_file) usage_msg;
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
-    ParamReader.read ?pop_size:!pop_size ~filename:!config_filename;
+    ParamReader.read ~config_overrides:!config_overrides ~filename:!config_filename;
     let module Parameters = (val ParamReader.get_evolution_params ()) in
     let module CurrentEvolver = Evolver.Make (Parameters) in
     let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
