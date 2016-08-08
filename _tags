@@ -1,0 +1,6 @@
+"lib": include
+"core": include
+"plugins/creation": include
+
+<core/**>: linkall, package(graphics), package(yojson), package(dynlink), package(str)
+<plugins/**>: package(yojson)
