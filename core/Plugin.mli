@@ -31,36 +31,40 @@ module MakeHookClass (Type : HookType) : HookClass with type t = Type.t
 (** All standard hook class are containing functions taking a JSON tree as their first argument. 
     This is intended to provide constant parameters usually specified in the configuration file to the hooked function. *)
 
-(** Hook class of the random generators. Its functions are taking nothing and must return a random float value. *)
-module RandomGen : HookClass with type t = (Yojson.Basic.json -> unit -> float)
-
-(** Hook class for the binary operations in the DNA tree. *)
-module BinOp : HookClass with type t = (Yojson.Basic.json -> float -> float -> float)
-
-(** Hook class for the unary operations in the DNA tree. *)
-module UnOp : HookClass with type t = (Yojson.Basic.json -> float -> float)
-
-(** Hook class for terminal nodes in the DNA tree. The result of the function is a tuple containing the number of tweakable constant parameters, 
-    the string conversion function and the evaluation function (taking the parameters and the input data) *)
-module TermNode : HookClass with type t = (Yojson.Basic.json -> (int*(float list->string)*(float list->float->float)))
-
-(** Hook class for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
-module Creation : HookClass with type t = (Yojson.Basic.json -> pop_frac:float -> Dna.t)
-
-(** Hook class for mutation operations. A mutation operation should modify the given Dna source to create a slightly different individual not exceeding the given max_depth. *)
-module Mutation : HookClass with type t = (Yojson.Basic.json -> Dna.t -> Dna.t)
-
-(** Hook class for crossover operators. Crossovers are suppose to mix the two Dna sources given to create a new individual. *)
-module Crossover : HookClass with type t = (Yojson.Basic.json -> Dna.t -> Dna.t -> Dna.t)
-
+(** Module type of a fitness evaluator. A fitness evaluator describes how to parse the input data and 
+    provides a fitness function.  The fitness function should tell how well the given individual match the target data. 
+    Bigger output mean better individuals. *)
 module type FitnessEvaluator = 
 sig
+    type individual
     module TargetData : EvolParams.TargetData
-    val fitness : TargetData.t -> Dna.t -> float
+    val fitness : TargetData.t -> individual -> float
 end
 
-(** Hook class for fitness functions. A fitness function should tell how well the given Dna match the data given. Bigger output mean better individuals. *)
-module Fitness : HookClass with type t = (Yojson.Basic.json -> (module FitnessEvaluator))
+(** Module type of a genetic type. A genetic type contains an individual module that describes the type of individuals that can be evolved and 
+    a standard set of hooks for registering genetic operators and functions around this type of individuals. *)
+module type GeneticTypeInterface =
+sig
+    module Individual : EvolParams.Individual
+    
+    (** Hook class for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
+    module Creation : HookClass with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
 
-(** Hook class for simplification operations. Simplifications are supposed to reduce the given Dna tree without changing its mathematical meaning. *)
-module Simplification : HookClass with type t = (Yojson.Basic.json -> Dna.t -> Dna.t)
+    (** Hook class for mutation operations. A mutation operation should modify the given individual to create a slightly different one not exceeding the given max_depth. *)
+    module Mutation : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+
+    (** Hook class for crossover operators. Crossovers are suppose to mix the characteristics of two given individual to create a new one. *)
+    module Crossover : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
+
+    (** Hook class for fitness evaluator. See the documentation for FitnessEvaluator for more informations. *)
+    module Fitness : HookClass with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
+
+    (** Hook class for simplification operations. Simplifications are supposed to reduce the complexity of an individual without changing its behavior. *)
+    module Simplification : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+end
+
+(** Hook class for the genetic types. *)
+module GeneticType : HookClass with type t = (module GeneticTypeInterface)
+
+(** Hook class of the random generators. Its functions are taking nothing and must return a random float value. *)
+module RandomGen : HookClass with type t = (Yojson.Basic.json -> unit -> float)

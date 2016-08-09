@@ -1,5 +1,7 @@
-module DiffSquareFitness =
+module M =
 struct
+    type individual = FunctionDna.t;;
+    
     module TargetData =
     struct
         type t = (float*float) array;;
@@ -12,14 +14,14 @@ struct
             done;
             points
         ;;
-    end
+    end;;
     
     let fitness points dna =
         let n = Array.length points in
         let difference = ref 0. in
         for i = 0 to n-1 do
             let x,y = points.(i) in
-            let evaluation = Dna.eval dna x in
+            let evaluation = FunctionDna.eval dna x in
             difference := !difference +. ( evaluation -. y ) ** 2.
         done;
         if classify_float !difference = FP_nan then 0. (* nan is not equal itself... *)
@@ -28,5 +30,5 @@ struct
 end
 
 let () =
-    Plugin.Fitness.register "diff2" (function _ -> (module DiffSquareFitness))
+    SymbolicRegression.Fitness.register "squared_diff" (function _ -> (module M))
 ;;

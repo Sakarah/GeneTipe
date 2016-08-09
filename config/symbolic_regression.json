@@ -1,20 +1,22 @@
 {
+    "type":"symbolic_regression",
     "pop_size": 100,
     "growth_factor": 2.0,
     "mutation_ratio": 0.1,
 
-    "plugin_dir":"_build/plugins/",
+    "plugin_dir":"_build/plugins/symbolic_regression/",
     "plugins":
     [
-        "random/UniformGen.cmxs",
-        "random/NormalGen.cmxs",
-        "primitives/MathExpr.cmxs",
-        "creation/FillGrow.cmxs",
-        "mutation/MutateConst.cmxs",
-        "mutation/RebuildSubtree.cmxs",
-        "crossover/TakeSubtree.cmxs",
-        "fitness/DiffSquare.cmxs",
-        "simplification/EvalConst.cmxs"
+        "../random/UniformGen.cmxs",
+        "../random/NormalGen.cmxs",
+        "SymbolicRegression.cmxs",
+        "MathPrimitives.cmxs",
+        "FillGrowCreation.cmxs",
+        "ConstMutation.cmxs",
+        "RebuildSubtreeMutation.cmxs",
+        "TakeSubtreeCrossover.cmxs",
+        "SquaredDiffFitness.cmxs",
+        "ConstEvalSimplification.cmxs"
     ],
 
     "creation":
@@ -34,7 +36,7 @@
     [
         { "proba":1.0, "method":"take_subtree" }
     ],
-    "fitness": { "method":"diff2" },
+    "fitness": { "method":"squared_diff" },
     "simplifications":
     [
         { "schedule":10, "method":"eval_const" }

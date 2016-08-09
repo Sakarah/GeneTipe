@@ -5,21 +5,6 @@ type t =
     | X
 ;;
 
-let create_random func_list ~max_depth =
-    let create_func = RandUtil.from_proba_list func_list in
-    create_func ~max_depth
-;;
-
-let mutation func_list ~max_depth base =
-    let mutate_func = RandUtil.from_proba_list func_list in
-    mutate_func ~max_depth base
-;;
-
-let crossover func_list giver base =
-    let crossover_func = RandUtil.from_proba_list func_list in
-    crossover_func giver base
-;;
-
 let rec eval dna x =
     match dna with
         | UnOp (_,op,t) -> 

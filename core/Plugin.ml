@@ -32,16 +32,20 @@ end;;
 
 module type FitnessEvaluator = 
 sig
+    type individual
     module TargetData : EvolParams.TargetData
-    val fitness : TargetData.t -> Dna.t -> float
+    val fitness : TargetData.t -> individual -> float
 end;;
 
+module type GeneticTypeInterface =
+sig
+    module Individual : EvolParams.Individual
+    module Creation : HookClass with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
+    module Mutation : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+    module Crossover : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
+    module Fitness : HookClass with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
+    module Simplification : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+end;;
+
+module GeneticType = MakeHookClass (struct type t = (module GeneticTypeInterface) end);;
 module RandomGen = MakeHookClass (struct type t = (Yojson.Basic.json -> unit -> float) end);;
-module BinOp = MakeHookClass (struct type t = (Yojson.Basic.json -> float -> float -> float) end);;
-module UnOp = MakeHookClass (struct type t = (Yojson.Basic.json -> float -> float) end);;
-module TermNode = MakeHookClass (struct type t = (Yojson.Basic.json -> (int*(float list->string)*(float list->float->float))) end);;
-module Creation = MakeHookClass (struct type t = (Yojson.Basic.json -> pop_frac:float -> Dna.t) end);;
-module Mutation = MakeHookClass (struct type t = (Yojson.Basic.json -> Dna.t -> Dna.t) end);;
-module Crossover = MakeHookClass (struct type t = (Yojson.Basic.json -> Dna.t -> Dna.t -> Dna.t) end);;
-module Fitness = MakeHookClass (struct type t = (Yojson.Basic.json -> (module FitnessEvaluator)) end);;
-module Simplification = MakeHookClass (struct type t = (Yojson.Basic.json -> Dna.t -> Dna.t) end);;

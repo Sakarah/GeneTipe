@@ -4,8 +4,14 @@
 exception ParsingError of string
 exception OverridingError of string
 
-(** Return a pattern list from the given json tree *)
-val get_standard_pattern_list : string -> (string -> Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> (float*'a) list
+(** Return a single method from the given JSON tree *)
+val get_method : string -> (string -> Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> 'a
+
+(** Return a probabilized pattern list from the given JSON tree *)
+val get_proba_pattern_list : string -> (string -> Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> (float*'a) list
+
+(** Return a scheduled pattern list from the given JSON tree*)
+val get_scheduled_pattern_list : string -> (string -> Yojson.Basic.json -> 'a) -> Yojson.Basic.json -> (int*'a) list
 
 (** Read the parameters from the specified file.
     Optional config_overrides is a (key,value) list to override the parameters in the file.

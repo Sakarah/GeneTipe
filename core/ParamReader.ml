@@ -8,7 +8,17 @@ let get_params global_json = function
     | json -> json
 ;;
 
-let get_standard_pattern_list type_name method_getter json =
+let get_method type_name method_getter json =
+    try
+        let method_json = json |> member type_name in
+        let method_name = method_json |> member "method" |> to_string in
+        let params = method_json |> member "params" |> get_params json in
+        method_getter method_name params
+    with Yojson.Basic.Util.Type_error (str,json) ->
+        raise (ParsingError (type_name^": "^str^" ("^(Yojson.Basic.to_string json)^")"))
+;;
+
+let get_proba_pattern_list type_name method_getter json =
     try
         let get_pattern pattern_json =
             let proba = pattern_json |> member "proba" |> to_float in
@@ -21,49 +31,36 @@ let get_standard_pattern_list type_name method_getter json =
         raise (ParsingError (type_name^": "^str^" ("^(Yojson.Basic.to_string json)^")"))
 ;;
 
-let get_creation_patterns = get_standard_pattern_list "creation" Plugin.Creation.get;;
-let get_mutation_patterns = get_standard_pattern_list "mutation" Plugin.Mutation.get;;
-let get_crossover_patterns = get_standard_pattern_list "crossover" Plugin.Crossover.get;;
-
-let get_fitness_evaluator json =
-    try
-        let fitness_json = json |> member "fitness" in
-        let fitness_method_name = fitness_json |> member "method" |> to_string in
-        let params = fitness_json |> member "params" |> get_params json in
-        Plugin.Fitness.get fitness_method_name params
-    with Yojson.Basic.Util.Type_error (str,json) ->
-        raise (ParsingError ("fitness: "^str^" ("^(Yojson.Basic.to_string json)^")"))
-;;
-
-let get_simplification_patterns json =
+let get_scheduled_pattern_list type_name method_getter json =
     try
         let get_pattern pattern_json =
             let schedule = pattern_json |> member "schedule" |> to_int in
             let method_name = pattern_json |> member "method" |> to_string in
             let params = pattern_json |> member "params" |> get_params json in
-            (schedule, Plugin.Simplification.get method_name params)
+            (schedule, method_getter method_name params)
         in
-        json |> member "simplifications" |> to_list |> List.map get_pattern
+        json |> member type_name |> to_list |> List.map get_pattern
     with Yojson.Basic.Util.Type_error (str,json) ->
-        raise (ParsingError ("simplifications: "^str^" ("^(Yojson.Basic.to_string json)^")"))
+        raise (ParsingError (type_name^": "^str^" ("^(Yojson.Basic.to_string json)^")"))
 ;;
 
 let to_evolution_params json =
     try
-        let module FitnessEvaluator = (val get_fitness_evaluator json) in
+        let module GeneticType = (val Plugin.GeneticType.get (json |> member "type" |> to_string)) in
+        let module FitnessEvaluator = (val get_method "fitness" GeneticType.Fitness.get json) in
         (module struct
-            module Individual = Dna
+            module Individual = GeneticType.Individual
             module TargetData = FitnessEvaluator.TargetData
         
             let pop_size = json |> member "pop_size" |> to_int;;
             let growth_factor = json |> member "growth_factor" |> to_number;;
             let mutation_ratio = json |> member "mutation_ratio" |> to_float;;
 
-            let creation = get_creation_patterns json;;
-            let mutation = get_mutation_patterns json;;
-            let crossover = get_crossover_patterns json;;
+            let creation = get_proba_pattern_list "creation" GeneticType.Creation.get json;;
+            let mutation = get_proba_pattern_list "mutation" GeneticType.Mutation.get json;;
+            let crossover = get_proba_pattern_list "crossover" GeneticType.Crossover.get json;;
             let fitness = FitnessEvaluator.fitness;;
-            let simplifications = get_simplification_patterns json;;
+            let simplifications = get_scheduled_pattern_list "simplifications" GeneticType.Simplification.get json;;
         end : EvolParams.S)
     with Yojson.Basic.Util.Type_error (str,json) ->
         raise (ParsingError ("evolution: "^str^" ("^(Yojson.Basic.to_string json)^")"))

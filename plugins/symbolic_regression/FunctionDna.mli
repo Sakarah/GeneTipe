@@ -1,6 +1,5 @@
-(** Dna.t is the type of the genetic characteristics of an individual function
-    internally represented by a tree. It allows diferent kind of genetic manipulation
-    like random generation, crossover or evaluation of the underlying function. *)
+(** FunctionTree.t is the type of the genetic characteristics of a function
+    internally represented by a tree. *)
 
 type t =
     | BinOp of string*(float->float->float)*t*t
@@ -10,7 +9,7 @@ type t =
 
 
 (** {2 Evaluation and printing} *)
-(** Evaluate the function represented by the DNA on the point x.
+(** Evaluate the function represented by the DNA tree on the point x.
     By using curryfication, you can get the function without doing the evaluation.
     This function return nan if the function cannot be evaluated on the point x. *)
 val eval : t -> float -> float
@@ -21,5 +20,5 @@ val depth : t -> int
 (** Give a string representation of the DNA *)
 val to_string : t -> string
 
-(** Print the DNA *)
+(** Print the function *)
 val print : Format.formatter -> t -> unit
