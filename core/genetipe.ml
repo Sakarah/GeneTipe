@@ -8,12 +8,12 @@ let () =
 
     let spec_list =
     [
-        ("--pop", Arg.String (function p -> config_overrides := ("pop_size",p)::(!config_overrides)), "Set the population size (override the config file)");
-        ("-p", Arg.String (function p -> config_overrides := ("pop_size",p)::(!config_overrides)), "Shorthand for --pop");
         ("--gen", Arg.Set_int generations, "Set the number of generations (default is 100)");
         ("-g", Arg.Set_int generations, "Shorthand for --gen");
         ("--rand", Arg.Int (function r -> Random.init r), "Set the random seed");
         ("-r", Arg.Int (function r -> Random.init r), "Shorthand for --rand");
+        ("--pop", Arg.String (function p -> config_overrides := ("pop_size",p)::(!config_overrides)), "Set the population size (override the config file)");
+        ("-p", Arg.String (function p -> config_overrides := ("pop_size",p)::(!config_overrides)), "Shorthand for --pop");
         ("--config-override", Arg.Tuple [Arg.Set_string next_overriden_key; Arg.String (function json -> config_overrides := (!next_overriden_key,json)::(!config_overrides))],
             "Override a configuration value (for accessing a subkey use / separator) by a new given json tree. (Takes 2 parameters)");
         ("-c", Arg.Tuple [Arg.Set_string next_overriden_key; Arg.String (function json -> config_overrides := (!next_overriden_key,json)::(!config_overrides))],
@@ -55,7 +55,7 @@ let () =
             if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" g;
             pop := CurrentEvolver.evolve target_data !pop;
             if !verbosity >= 2 then StatsPrinter.print_stats !pop;
-            (*if !verbosity >= 3 then StatsPrinter.print_advanced_stats !pop*)
+            if !verbosity >= 3 then StatsPrinter.print_advanced_stats !pop
         done
     with Sys.Break -> ());
 
@@ -66,7 +66,7 @@ let () =
         StatsPrinter.print_population !pop;
         Printf.printf "= Final stats =\n";
         StatsPrinter.print_stats !pop;
-        (*StatsPrinter.print_advanced_stats !pop*)
+        StatsPrinter.print_advanced_stats !pop
     )
     else
     (

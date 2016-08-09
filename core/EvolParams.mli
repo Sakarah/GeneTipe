@@ -3,6 +3,7 @@ module type Individual =
 sig
     type t (** Type of the genetically modifiable individual *)
     val to_string : t -> string (** Function for getting the string representation of an individual. *)
+    val advanced_stats : (string * ((float*t) array -> float)) list
 end
 
 (** Module type to carry the representation of the target data *)
