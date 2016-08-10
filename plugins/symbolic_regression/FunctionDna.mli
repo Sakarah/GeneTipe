@@ -1,6 +1,6 @@
-(** FunctionTree.t is the type of the genetic characteristics of a function
-    internally represented by a tree. *)
+(** FunctionDna is the module describing the type of the individuals for the symbolic regression. *)
 
+(** FunctionDna.t is the type of the genetic characteristics of a function internally represented by a tree. *)
 type t =
     | BinOp of string*(float->float->float)*t*t
     | UnOp of string*(float->float)*t

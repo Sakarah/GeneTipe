@@ -1,4 +1,4 @@
-(** This modules give some statistics about a population *)
+(** This module is intended to compute and print some basic statistics about a population. *)
 
 (** Return the best individual from the population *)
 val best_individual : (float * 'i) array -> (float * 'i)
@@ -16,6 +16,7 @@ val variance : ('i -> float) -> 'i array -> float
     The diversity is a value between 0 and 1, 0 meaning identical results, 1 meaning radically different ones. *)
 val diversity : ('i -> float) -> 'i array -> float
 
+(** Output type of {!MakePrinter} *)
 module type Printer =
 sig
     type individual
@@ -30,4 +31,5 @@ sig
     val print_population : (float * individual) array -> unit
 end
 
+(** Create a new Printer around the given Individual type. *)
 module MakePrinter : functor (Individual : EvolParams.Individual) -> Printer with type individual := Individual.t

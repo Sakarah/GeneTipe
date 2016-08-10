@@ -8,13 +8,13 @@ exception Error of string
 val load : string -> unit
 
 
-(** Input type for the MakeHookClass functor *)
+(** Input type for {!MakeHookClass} *)
 module type HookType =
 sig
     type t (** Data type of the hook to create *)
 end
 
-(** Output type for the MakeHookClass functor *)
+(** Output type of {!MakeHookClass} *)
 module type HookClass =
 sig
     type t
@@ -27,12 +27,12 @@ end
     A hook class is associated with the type of the registered hooked values (usually functions). *)
 module MakeHookClass (Type : HookType) : HookClass with type t = Type.t
 
-(** {2 Standard hook classes } *)
-(** All standard hook class are containing functions taking a JSON tree as their first argument. 
+(** {2 Standard hook classes } 
+    Many standard hook class are containing functions taking a JSON tree as their first argument. 
     This is intended to provide constant parameters usually specified in the configuration file to the hooked function. *)
 
 (** Module type of a fitness evaluator. A fitness evaluator describes how to parse the input data and 
-    provides a fitness function.  The fitness function should tell how well the given individual match the target data. 
+    provides a fitness function. The fitness function should tell how well the given individual match the target data. 
     Bigger output mean better individuals. *)
 module type FitnessEvaluator = 
 sig

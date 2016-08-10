@@ -1,9 +1,11 @@
-(** Module type to carry the representation of an individual *)
+(** Module describing the parameter module type for an evolution process ({!S}) and its submodule types *)
+
+(** Module type to carry the representation of an individual. *)
 module type Individual =
 sig
     type t (** Type of the genetically modifiable individual *)
     val to_string : t -> string (** Function for getting the string representation of an individual. *)
-    val advanced_stats : (string * ((float*t) array -> float)) list
+    val advanced_stats : (string * ((float*t) array -> float)) list (** List of the advanced stats functions for a population of individuals *)
 end
 
 (** Module type to carry the representation of the target data *)
@@ -17,7 +19,7 @@ end
 module type S = 
 sig
     module Individual : Individual (** Individual type used for the evolution *)
-    module TargetData : TargetData (** Target data type *)
+    module TargetData : TargetData (** Target data module *)
     
     val pop_size : int (** Number of individuals in the population *)
     val growth_factor : float (** Multiplication factor of the population after a reproduction phase *)

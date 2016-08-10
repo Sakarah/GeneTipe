@@ -119,7 +119,7 @@ let is_alpha = function
 let apply_overrides =
     let apply_override (key,j) =
         let new_json = 
-            if String.length j > 0 && (is_alpha j.[0]) then Yojson.Basic.from_string ~fname:"<command line overriding>" ("\""^j^"\"")
+            if String.length j > 0 && (is_alpha j.[0]) then `String j
             else Yojson.Basic.from_string ~fname:"<command line overriding>" j 
         in
         let path = Str.split (Str.regexp "/") key in
