@@ -8,11 +8,9 @@ type graph =
     mutable x_max : float;
     mutable y_min : float;
     mutable y_max : float;
-    mutable nb_curves : int;
     mutable curves : (Graphics.color * bool * float array * float array) list
 };;
 
-(** Init returns an empty graphic *)
 let init ~size ~border ~title =
     {
         height = fst size ;
@@ -23,7 +21,6 @@ let init ~size ~border ~title =
         x_max = neg_infinity ;
         y_min = infinity ;
         y_max = neg_infinity ;
-        nb_curves = 0 ;
         curves = []
     }
 ;;
@@ -58,19 +55,23 @@ let plot ?(link=true) ?(color=Graphics.black) x y graphic =
         if graphic.y_max < y_max then graphic.y_max <- y_max;
 
         (* Add the current set to the graphic. *)
-        graphic.nb_curves <- graphic.nb_curves + 1;
         graphic.curves <- (color, link, x, y)::graphic.curves
     )
 ;;
 
 let draw_point x y = Graphics.fill_circle x y 3;;
 
-let plot_fun ?link ?color ?range ~nb_pts func graphic =
+let plot_fun ?link ?color ?range ?nb_pts func graphic =
     let x_min, x_max = match range with
         | None -> graphic.x_min, graphic.x_max
         | Some range -> range
     in
 
+    let nb_pts = match nb_pts with
+        | None -> graphic.width
+        | Some n -> n
+    in
+    
     let step = (x_max-.x_min)/.(float_of_int (nb_pts-1)) in
     let x_array = Array.init nb_pts (fun n -> x_min +. step *. (float_of_int n)) in
     let y_array = Array.map func x_array in
@@ -88,7 +89,7 @@ let show graphic =
         let n = Array.length x in
         for i = 0 to n - 1 do
         (
-            let xi = graphic.border + int_of_float ( (x.(i) -. graphic.x_min) *. (float_of_int graphic.height) /. (graphic.x_max -. graphic.x_min) ) in
+            let xi = graphic.border + int_of_float ( (x.(i) -. graphic.x_min) *. (float_of_int graphic.width) /. (graphic.x_max -. graphic.x_min) ) in
             let yi = graphic.border + int_of_float ( (y.(i) -. graphic.y_min) *. (float_of_int graphic.height) /. (graphic.y_max -. graphic.y_min) ) in
             if link then
             (

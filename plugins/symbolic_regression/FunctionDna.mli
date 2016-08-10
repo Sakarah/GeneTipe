@@ -23,6 +23,8 @@ val to_string : t -> string
 (** Print the function *)
 val print : Format.formatter -> t -> unit
 
+(** Plot the undelying function on the graph *)
+val plot : t -> Plot.graph -> unit
 
 (** {2 Advanced stats} *)
 (** Return the average depth of the population *)

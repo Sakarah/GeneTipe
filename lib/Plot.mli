@@ -20,8 +20,8 @@ val plot : ?link:bool -> ?color:int -> float array -> float array -> graph -> un
 
 (** Plot a function to an existing graphic.
     @param range Range of abscissae to compute for the function. Computed points are taken linearly in this range. If unspecified, keep the previous graphic range.
-    @param nb_pts Number of points to compute. For low value the function showed can be highly inaccurate.*)
-val plot_fun : ?link:bool -> ?color:int -> ?range:(float*float) -> nb_pts:int -> (float -> float) -> graph -> unit
+    @param nb_pts Number of points to compute. For low value the function showed can be highly inaccurate. By default this is set to the number of horizontal pixels. *)
+val plot_fun : ?link:bool -> ?color:int -> ?range:(float*float) -> ?nb_pts:int -> (float -> float) -> graph -> unit
 
 (** Displays the graphic. *)
 val show : graph -> unit 

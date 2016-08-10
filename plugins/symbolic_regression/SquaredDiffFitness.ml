@@ -14,6 +14,8 @@ struct
             done;
             points
         ;;
+        
+        let plot points = Plot.plot ~color:Graphics.red ~link:false (Array.map fst points) (Array.map snd points)
     end;;
     
     let fitness points dna =

@@ -74,16 +74,16 @@ let () =
         Printf.printf "%f\n%s" bestFitness (Parameters.Individual.to_string bestDna)
     );
 
-    (*if !show_graph then
+    if !show_graph then
     (
         Printf.printf "%!";
 
         try
             let graph = Plot.init ~size:(600,600) ~border:25 ~title:"GeneTipe" in
-            Plot.plot ~color:Graphics.red ~link:false (Array.map fst points) (Array.map snd points) graph;
-            Plot.plot_fun ~color:Graphics.blue ~nb_pts:(nb_points*10) (!pop |> Stats.best_individual |> snd |> Dna.eval) graph;
+            Parameters.TargetData.plot target_data graph;
+            Parameters.Individual.plot (!pop |> Stats.best_individual |> snd) graph;
             Plot.show graph;
             Graphics.loop_at_exit [] (fun _ -> ())
         with Graphics.Graphic_failure _ -> ()
-    )*)
+    )
 ;;

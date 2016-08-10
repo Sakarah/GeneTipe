@@ -6,6 +6,7 @@ sig
     type t (** Type of the genetically modifiable individual *)
     val to_string : t -> string (** Function for getting the string representation of an individual. *)
     val advanced_stats : (string * ((float*t) array -> float)) list (** List of the advanced stats functions for a population of individuals *)
+    val plot : t -> Plot.graph -> unit (** Plot the individual on the given graph. *)
 end
 
 (** Module type to carry the representation of the target data *)
@@ -13,6 +14,7 @@ module type TargetData =
 sig
     type t (** Type of the target data *)
     val read : unit -> t (** Read the target data from the given channel *)
+    val plot : t -> Plot.graph -> unit (** Plot the target data on the given graph. *)
 end
 
 (** This module type represents the parameters of a genetic selection process *)

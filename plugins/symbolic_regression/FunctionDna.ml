@@ -40,6 +40,7 @@ let to_string dna =
 
 let print ppf dna = Format.fprintf ppf "%s" (to_string dna);;
 
+let plot dna = Plot.plot_fun ~color:Graphics.blue (eval dna)
 
 (* == Advanced stats == *)
 let rec branch_number = function 
