@@ -16,8 +16,11 @@ genetipe:
 $(TOOL_SYMLINK): %:
 	ln -s _build/tools/$@.native $@
 
+doc:
+	$(OCAMLBUILD) GeneTipe.docdir/index.html
+
 clean:
 	-rm -r _build
 	-rm genetipe $(TOOL_SYMLINK)
 
-.PHONY: all build-all $(SUBDIRS) symlinks clean
+.PHONY: all build-all $(SUBDIRS) symlinks doc clean

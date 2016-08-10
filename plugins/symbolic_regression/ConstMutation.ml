@@ -1,9 +1,9 @@
 (** Generate a new individual by tweaking constants of an already existing one *)
-let mutate_constants ~const_generator ~proba ~max_depth base =
+let mutate_constants ~const_generator ~proba base =
     let rec mutate = function
-        | Dna.BinOp (name,func,child1,child2) -> Dna.BinOp (name, func, mutate child1, mutate child2)
-        | Dna.UnOp (name,func,child) -> Dna.UnOp (name, func, mutate child)
-        | Dna.Const a when Random.float 1. < proba -> Dna.Const (a +. const_generator ())
+        | FunctionDna.BinOp (name,func,child1,child2) -> FunctionDna.BinOp (name, func, mutate child1, mutate child2)
+        | FunctionDna.UnOp (name,func,child) -> FunctionDna.UnOp (name, func, mutate child)
+        | FunctionDna.Const a when Random.float 1. < proba -> FunctionDna.Const (a +. const_generator ())
         | dna -> dna
     in
     mutate base
@@ -21,5 +21,5 @@ let mutate_const_pattern json =
 ;;
 
 let () =
-    Plugin.Mutation.register "mutate_const" mutate_const_pattern
+    SymbolicRegression.Mutation.register "mutate_const" mutate_const_pattern
 ;;

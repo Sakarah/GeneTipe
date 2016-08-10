@@ -1,10 +1,10 @@
 (** Generate a random affin function *)
 (*let random_affin const_range =
-    Dna.BinOp ("+", (fun a b -> a +. b),
-        Dna.BinOp ("*", (fun a b -> a *. b),
-            Dna.Const (uniform_float const_range),
-            Dna.X),
-        Dna.Const (uniform_float const_range))
+    FunctionDna.BinOp ("+", (fun a b -> a +. b),
+        FunctionDna.BinOp ("*", (fun a b -> a *. b),
+            FunctionDna.Const (uniform_float const_range),
+            FunctionDna.X),
+        FunctionDna.Const (uniform_float const_range))
 ;;*)
 
 exception Found of int;;
@@ -43,9 +43,9 @@ let rec create_random_grow gen_params ~max_depth =
     (
         let p = Random.float (gen_params.const_proba +. gen_params.var_proba) in
         if p < gen_params.const_proba then
-            Dna.Const (gen_params.const_generator ())
+            FunctionDna.Const (gen_params.const_generator ())
         else
-            Dna.X
+            FunctionDna.X
     )
     else
     (
@@ -57,14 +57,14 @@ let rec create_random_grow gen_params ~max_depth =
 
         if p < p_bin then
             let name, operation = random_op gen_params.bin_op in
-            Dna.BinOp (name, operation, (create_random_grow gen_params (max_depth - 1)), (create_random_grow gen_params (max_depth - 1)) )
+            FunctionDna.BinOp (name, operation, (create_random_grow gen_params (max_depth - 1)), (create_random_grow gen_params (max_depth - 1)) )
         else if p < p_un then
             let name, operation = random_op gen_params.un_op in
-            Dna.UnOp (name, operation, (create_random_grow gen_params (max_depth - 1)))
+            FunctionDna.UnOp (name, operation, (create_random_grow gen_params (max_depth - 1)))
         else if p < p_const then
-            Dna.Const (gen_params.const_generator ())
+            FunctionDna.Const (gen_params.const_generator ())
         else
-            Dna.X
+            FunctionDna.X
     )
 ;;
 
@@ -75,34 +75,37 @@ let rec create_random_fill gen_params ~max_depth =
     (
         let p = Random.float (gen_params.const_proba +. gen_params.var_proba) in
         if p < gen_params.const_proba then
-            Dna.Const (gen_params.const_generator ())
+            FunctionDna.Const (gen_params.const_generator ())
         else
-            Dna.X
+            FunctionDna.X
     )
     else
     (
         let p = Random.float (gen_params.un_proba +. gen_params.bin_proba) in
         if p < gen_params.bin_proba then
             let name, operation = random_op gen_params.bin_op in
-            Dna.BinOp (name, operation, (create_random_fill gen_params (max_depth - 1)), (create_random_fill gen_params (max_depth - 1)) )
+            FunctionDna.BinOp (name, operation, (create_random_fill gen_params (max_depth - 1)), (create_random_fill gen_params (max_depth - 1)) )
         else
             let name, operation = random_op gen_params.un_op in
-            Dna.UnOp (name, operation, (create_random_fill gen_params (max_depth - 1)))
+            FunctionDna.UnOp (name, operation, (create_random_fill gen_params (max_depth - 1)))
     )
 ;;
 
+(** Distribute the max_depth value between min and max across the population *)
+let ramped creation_fun min max ~pop_frac = creation_fun ~max_depth:(min+(int_of_float (pop_frac *. float_of_int (max-min))))
 
-let grow_pattern json =
+let make_pattern creation_fun json =
     let params = RandGenParams.read json in
-    create_random_grow params
+    let open Yojson.Basic.Util in
+    let min_depth = json |> member "min_depth" |> to_int in
+    let max_depth = json |> member "max_depth" |> to_int in
+    ramped (creation_fun params) min_depth max_depth
 ;;
 
-let fill_pattern json =
-    let params = RandGenParams.read json in
-    create_random_fill params
-;;
+let grow_pattern = make_pattern create_random_grow;;
+let fill_pattern = make_pattern create_random_fill;;
 
 let () =
-    Plugin.Creation.register "grow" grow_pattern;
-    Plugin.Creation.register "fill" fill_pattern
+    SymbolicRegression.Creation.register "grow" grow_pattern;
+    SymbolicRegression.Creation.register "fill" fill_pattern
 ;;

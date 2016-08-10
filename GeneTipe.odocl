@@ -1,0 +1,8 @@
+core/EvolParams
+core/Evolver
+core/ParamReader
+core/Plugin
+core/Stats
+lib/MathParser
+lib/Plot
+lib/RandUtil

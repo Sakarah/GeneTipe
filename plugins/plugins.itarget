@@ -1,9 +1,3 @@
-creation/FillGrow.cmxs
-crossover/TakeSubtree.cmxs
-fitness/DiffSquare.cmxs
-mutation/MutateConst.cmxs
-mutation/RebuildSubtree.cmxs
-primitives/MathExpr.cmxs
 random/NormalGen.cmxs
 random/UniformGen.cmxs
-simplification/EvalConst.cmxs
+symbolic_regression/symbolic_regression.otarget
