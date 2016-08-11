@@ -1,6 +1,6 @@
 {
     "type":"symbolic_regression",
-    "pop_size": 100,
+    "pop_size": 1000,
     "growth_factor": 2.0,
     "mutation_ratio": 0.1,
 
@@ -44,7 +44,7 @@
 
     "random_gen":
     {
-        "min_depth": 2,
+        "min_depth": 1,
         "max_depth": 5,
     
         "bin_op":
