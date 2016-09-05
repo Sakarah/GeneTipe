@@ -19,8 +19,7 @@ val get_scheduled_pattern_list : string -> (string -> Yojson.Basic.json -> 'a) -
     This function must be called before any get_* execution.
     @param config_overrides Optional (key,value) list to override the parameters in the file.
     The key correspond to the location of the replacement in as a ["/"] separated path using numbers for browsing into lists.
-    The value is evaluated as a JSON subtree or if it starts with an alpha character is interpreted as a string.
-     *)
+    The value is evaluated as a JSON subtree or if it starts with an alpha character is interpreted as a string *)
 val read : ?config_overrides:(string*string) list -> filename:string -> unit
 
 (** Return the parameters JSON tree *)
