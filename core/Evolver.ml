@@ -26,14 +26,14 @@ struct
             | (None,dna) -> (Parameters.fitness target_data dna, dna)
             | (Some fitness,dna) -> (fitness, dna)
         in
-        Array.map fillFitness
+        ArrayIter.map fillFitness
     ;;
 
     let simplify_individuals ?generation pop =
         let apply_simplification pop (schedule,simpl) =
             match generation with
             | Some g when schedule mod g <> 0 -> pop
-            | _ -> Array.map (function (fit,dna) -> (fit,simpl dna)) pop
+            | _ -> ArrayIter.map (function (fit,dna) -> (fit,simpl dna)) pop
         in
         List.fold_left apply_simplification pop Parameters.simplifications
     ;;

@@ -51,9 +51,10 @@ let () =
 
     Sys.catch_break true; (* If you do a Ctrl+C you still have the results *)
     (try
-        for g = 1 to !generations do
-            if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" g;
+        for generation = 1 to !generations do
+            if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" generation;
             pop := CurrentEvolver.evolve target_data !pop;
+            pop := CurrentEvolver.simplify_individuals ~generation !pop;
             if !verbosity >= 2 then StatsPrinter.print_stats !pop;
             if !verbosity >= 3 then StatsPrinter.print_advanced_stats !pop
         done
@@ -83,7 +84,9 @@ let () =
             Parameters.TargetData.plot target_data graph;
             Parameters.Individual.plot (!pop |> Stats.best_individual |> snd) graph;
             Plot.show graph;
-            Graphics.loop_at_exit [] (fun _ -> ())
+            while true do
+                ignore (Graphics.wait_next_event [])
+            done
         with Graphics.Graphic_failure _ -> ()
     )
 ;;
