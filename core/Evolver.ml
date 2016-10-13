@@ -8,6 +8,7 @@ sig
     val tournament : (float * individual) array -> target_size:int -> (float * individual) array
     val tournament_by_packs : (float * individual) array -> target_size:int -> (float * individual) array
     val reproduce : (float * individual) array -> (float option * individual) array
+    val remove_duplicate : (float option * individual) array -> (float option * individual) array
     val evolve : target_data -> (float * individual) array -> (float * individual) array
 end;;
 
@@ -135,10 +136,27 @@ struct
         target_population
     ;;
 
-    let evolve target_data initial_population =
+    let remove_duplicate initial_population =
         let pop_size = Array.length initial_population in
+        let table = Hashtbl.create pop_size in
+        for i=0 to (pop_size - 1) do
+            let individual = Parameters.Individual.to_string (snd initial_population.(i)) in
+            if not(Hashtbl.mem table individual) then
+                Hashtbl.add table individual ()
+            else
+            (
+                let pop_frac = (Random.float 1.) in
+                initial_population.(i) <- (None,RandUtil.from_proba_list Parameters.creation ~pop_frac)
+            )
+        done;
+        initial_population
+    ;;
+    
+    let evolve target_data initial_population =
+        let pop_size = (Array.length initial_population) in
         let child_population = reproduce initial_population in
-        let evaluated_population = compute_fitness target_data child_population in
-        tournament evaluated_population ~target_size:pop_size
+        let filtered_population = remove_duplicate child_population in
+        let evaluated_population = compute_fitness target_data filtered_population in
+        tournament evaluated_population ~target_size:pop_size;
     ;;
 end;;

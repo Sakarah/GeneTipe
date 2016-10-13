@@ -33,6 +33,9 @@ sig
     (** Recombine existing individuals and make mutations to create new functions *)
     val reproduce : (float * individual) array -> (float option * individual) array
 
+    (** Replace duplicates by new randomly generated individuals *)
+    val remove_duplicate : (float option * individual) array -> (float option * individual) array
+
     (** Evolve the population with the fixed number of generations *)
     val evolve : target_data -> (float * individual) array -> (float * individual) array
 end
