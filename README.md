@@ -1,10 +1,10 @@
 # GeneTipe
 This project is a generic, plugin-based, configurable, open source, genetic evolver written in OCaml by 3 students for the TIPE exam.
 
-Let's explain what does this mean in details:
+Let's explain what this means in details:
 * __Genetic evolver__:
 A genetic evolver is a stochastic program that tries to obtain an acceptable solution to a problem.
-It randomly generates a *population* of *individuals* that represent each a possible solution and then by recombining (*crossover*) or modifying (*mutation*) them and then selecting the best offsprings, it slowly improve the results.
+It randomly generates a *population* of *individuals* that represents each a possible solution. Then, by recombining (*crossover*) or modifying (*mutation*) them and selecting the best offsprings, it slowly improves the results.
 Of course, you need to specify a way to determine how good a possible solution is (with the *fitness function*). The underlying idea is to mimic the natural selection process in a program.
 * __Generic__:
 You can basically use this project for evolving any kind of population regardless of the "thing" you are trying to evolve.
@@ -23,8 +23,8 @@ See LICENSE for legal information.
 We are not sure if external contributions are allowed before the exam (in summer 2017) but we will be happy to look at them just after it.
 
 ## Few words about the TIPE exam
-It is a research project in Mathematics, Physics or Informatics done by all students in preparatory classes around a central theme. This year it is *ìOptimization: choice, constraints, randomnessî*.
-We have to explain what we did individually during the oral admission tests in the ìGrandes …colesî (French engineering schools).
+It is a research project in Mathematics, Physics or Informatics done by all students in preparatory classes around a central theme. This year it is *‚ÄúOptimization: choice, constraints, randomness‚Äù*.
+We have to explain what we did individually during the oral admission tests in the ‚ÄúGrandes √âcoles‚Äù (French engineering schools).
 
 # How to use this program?
 ## Build instructions
