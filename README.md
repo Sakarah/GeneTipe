@@ -29,7 +29,7 @@ We have to explain what we did individually during the oral admission tests in t
 # How to use this program?
 ## Build instructions
 First of all please check that your system has all the project dependencies correctly installed and recognized.
-These dependencies are OCaml (4.01 or higher), ocamlbuild, ocamlfind, yojson. You can probably install all of them with opam or with your distribution packages. Moreover, we recommand you to also install parmap if you are under a UNIX OS to make the program run around 3 times faster.
+These dependencies are OCaml (4.01 or higher), ocamlbuild, ocamlfind, yojson. You can probably install all of them with opam or with your distribution packages. Moreover, we recommand you to also install parmap if you are under a UNIX OS to make the program run around 3 times faster. On Windows, you will need Cygwin for building and executing the project (the version suggested by OCaml should work fine).
 
 Then just execute `$ make` in the project directory and wait for the end of the compilation.
 

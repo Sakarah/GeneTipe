@@ -8,14 +8,20 @@ configure: _tags lib/ArrayIter.ml
 _tags: _tags_vanilla
 	cp _tags_vanilla _tags
 lib/ArrayIter.ml: | _tags
-	@if ocamlfind query parmap; \
+	@if [ $$(uname -o) = "Cygwin" ]; \
 	then \
-		echo "Parmap parallelization enabled"; \
-		ln -s ArrayIter_parmap.ml lib/ArrayIter.ml; \
-		echo "true: package(parmap)" >> _tags; \
+		echo "Parallelization unavailable on Windows (using Cygwin)"; \
+		cp lib/ArrayIter_vanilla.ml lib/ArrayIter.ml; \
 	else \
-		echo "Parallelization unavailable"; \
-		ln -s ArrayIter_vanilla.ml lib/ArrayIter.ml; \
+		if ocamlfind query parmap > /dev/null; \
+		then \
+			echo "Parmap parallelization enabled"; \
+			ln -s ArrayIter_parmap.ml lib/ArrayIter.ml; \
+			echo "true: package(parmap)" >> _tags; \
+		else \
+			echo "Parallelization unavailable (Parmap is not installed on your system)"; \
+			ln -s ArrayIter_vanilla.ml lib/ArrayIter.ml; \
+		fi; \
 	fi
 
 build-all:
