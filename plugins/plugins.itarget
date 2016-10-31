@@ -1,3 +1,4 @@
 random/NormalGen.cmxs
 random/UniformGen.cmxs
+regexp_search/regexp_search.otarget
 symbolic_regression/symbolic_regression.otarget

@@ -1,6 +1,6 @@
 OCAMLBUILD = ocamlbuild -use-ocamlfind -no-links
 SUBDIRS = core plugins tools
-TOOL_SYMLINK = genpts randpts fuzzpts
+TOOL_SYMLINK = genpts randpts fuzzpts regexpfilter
 
 all: configure build-all symlinks
 

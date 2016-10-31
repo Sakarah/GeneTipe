@@ -1,3 +1,4 @@
 genpts.native
 randpts.native
 fuzzpts.native
+regexpfilter.native
