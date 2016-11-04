@@ -8,27 +8,27 @@ exception Error of string
 val load : string -> unit
 
 
-(** Input type for {!MakeHookClass} *)
+(** Input type for {!MakeHookingPoint} *)
 module type HookType =
 sig
-    type t (** Data type of the hook to create *)
+    type t (** Data type of the hooks *)
 end
 
-(** Output type of {!MakeHookClass} *)
-module type HookClass =
+(** Output type of {!MakeHookingPoint} *)
+module type HookingPoint =
 sig
     type t
     val register : string -> t -> unit (** Register a new hook with the specified key *)
     val get : string -> t (** Get the hook corresponding to the given key *)
 end
 
-(** Create a new hook class with the type specified.
-    A hook class creates an interface between a part of code which use the hooks and the plugin which register them.
-    A hook class is associated with the type of the registered hooked values (usually functions). *)
-module MakeHookClass (Type : HookType) : HookClass with type t = Type.t
+(** Create a new hooking point with the type specified.
+    A hooking point creates an interface between a part of code which use the hooks and the plugin which register them.
+    A hooking point only allows hooks with the same type (usually functions). *)
+module MakeHookingPoint (Type : HookType) : HookingPoint with type t = Type.t
 
-(** {2 Standard hook classes } 
-    Many standard hook class are containing functions taking a JSON tree as their first argument. 
+(** {2 Standard hooking points} 
+    Many standard hooking points are containing functions taking a JSON tree as their first argument. 
     This is intended to provide constant parameters usually specified in the configuration file to the hooked function. *)
 
 (** Module type of a fitness evaluator. A fitness evaluator describes how to parse the input data and 
@@ -42,29 +42,29 @@ sig
 end
 
 (** Module type of a genetic type. A genetic type contains an individual module that describes the type of individuals that can be evolved and 
-    a standard set of hooks for registering genetic operators and functions around this type of individuals. *)
+    a standard set of hooking points for registering genetic operators and functions around this type of individuals. *)
 module type GeneticTypeInterface =
 sig
     module Individual : EvolParams.Individual
     
-    (** Hook class for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
-    module Creation : HookClass with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
+    (** Hooking point for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
+    module Creation : HookingPoint with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
 
-    (** Hook class for mutation operations. A mutation operation should modify the given individual to create a slightly different one not exceeding the given max_depth. *)
-    module Mutation : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+    (** Hooking point for mutation operations. A mutation operation should modify the given individual to create a slightly different one not exceeding the given max_depth. *)
+    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
 
-    (** Hook class for crossover operators. Crossovers are suppose to mix the characteristics of two given individual to create a new one. *)
-    module Crossover : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
+    (** Hookint point for crossover operators. Crossovers are suppose to mix the characteristics of two given individual to create a new one. *)
+    module Crossover : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
 
-    (** Hook class for fitness evaluator. See the documentation for FitnessEvaluator for more informations. *)
-    module Fitness : HookClass with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
+    (** Hooking point for fitness evaluator. See the documentation for FitnessEvaluator for more informations. *)
+    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
 
-    (** Hook class for simplification operations. Simplifications are supposed to reduce the complexity of an individual without changing its behavior. *)
-    module Simplification : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+    (** Hooking point for simplification operations. Simplifications are supposed to reduce the complexity of an individual without changing its behavior. *)
+    module Simplification : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
 end
 
-(** Hook class for the genetic types. *)
-module GeneticType : HookClass with type t = (module GeneticTypeInterface)
+(** Hooking point for the genetic types. *)
+module GeneticType : HookingPoint with type t = (module GeneticTypeInterface)
 
-(** Hook class of the random generators. Its functions are taking nothing and must return a random float value. *)
-module RandomGen : HookClass with type t = (Yojson.Basic.json -> unit -> float)
+(** Hooking point of the random generators. The registered functions are taking nothing and must return a random float value. *)
+module RandomGen : HookingPoint with type t = (Yojson.Basic.json -> unit -> float)

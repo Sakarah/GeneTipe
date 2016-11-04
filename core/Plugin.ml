@@ -8,17 +8,17 @@ let load filename =
 
 module type HookType =
 sig
-    type t (** Data type of the hook to create *)
+    type t
 end;;
 
-module type HookClass =
+module type HookingPoint =
 sig
     type t
-    val register : string -> t -> unit (** Register a new hook with the specified key *)
-    val get : string -> t (** Get the hook corresponding to the given key *)
+    val register : string -> t -> unit
+    val get : string -> t
 end;;
 
-module MakeHookClass (Type : HookType) : (HookClass with type t = Type.t) = 
+module MakeHookingPoint (Type : HookType) =
 struct
     type t = Type.t;;
     let registered_values = Hashtbl.create 10;;
@@ -40,12 +40,12 @@ end;;
 module type GeneticTypeInterface =
 sig
     module Individual : EvolParams.Individual
-    module Creation : HookClass with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
-    module Mutation : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
-    module Crossover : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
-    module Fitness : HookClass with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
-    module Simplification : HookClass with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+    module Creation : HookingPoint with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
+    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+    module Crossover : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
+    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
+    module Simplification : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
 end;;
 
-module GeneticType = MakeHookClass (struct type t = (module GeneticTypeInterface) end);;
-module RandomGen = MakeHookClass (struct type t = (Yojson.Basic.json -> unit -> float) end);;
+module GeneticType = MakeHookingPoint (struct type t = (module GeneticTypeInterface) end);;
+module RandomGen = MakeHookingPoint (struct type t = (Yojson.Basic.json -> unit -> float) end);;
