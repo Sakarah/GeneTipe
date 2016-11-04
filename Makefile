@@ -45,4 +45,21 @@ clean:
 	-rm lib/ArrayIter.ml
 	-rm genetipe $(TOOL_SYMLINK)
 
-.PHONY: all configure build-all $(SUBDIRS) symlinks doc clean
+sanitize: clean
+	@echo "Replacing tabs with 4 spaces in OCaml files"
+	@for f in $$(find . -name "*.ml*"); \
+	do \
+		sed -i "s/\t/    /g" $$f ; \
+	done
+	@echo "Removing spaces at end of line"
+	@for f in $$(find . -path './.git' -prune -type f -o -type f); \
+	do \
+		sed -i "s/ \+$$//g" $$f ; \
+	done
+	@echo "Ensure new line at end of file"
+	@for f in $$(find . -path './.git' -prune -type f -o -type f); \
+	do \
+		sed -i '$$a\' $$f ; \
+	done
+
+.PHONY: all configure build-all $(SUBDIRS) symlinks doc clean sanitize

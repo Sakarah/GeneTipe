@@ -16,7 +16,7 @@ let uniform_float (lower_bound,greater_bound) =
 let pregenerated_normal_var = ref None;;
 let normal_float ~mean ~deviation =
     match !pregenerated_normal_var with
-        | Some v -> 
+        | Some v ->
             pregenerated_normal_var := None;
             (deviation *. v) +. mean
         | None ->

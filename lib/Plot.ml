@@ -71,7 +71,7 @@ let plot_fun ?link ?color ?range ?nb_pts func graphic =
         | None -> graphic.width
         | Some n -> n
     in
-    
+
     let step = (x_max-.x_min)/.(float_of_int (nb_pts-1)) in
     let x_array = Array.init nb_pts (fun n -> x_min +. step *. (float_of_int n)) in
     let y_array = Array.map func x_array in

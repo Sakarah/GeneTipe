@@ -1,6 +1,6 @@
 exception Error of string;;
 
-let unary_primitives = 
+let unary_primitives =
   [ ("ln", fun x -> log x);
     ("exp", fun x -> exp x);
     ("sqrt", fun x -> sqrt x);
@@ -16,7 +16,7 @@ let unary_primitives =
     ("tanh", fun x -> tanh x) ]
 ;;
 
-let binary_primitives = 
+let binary_primitives =
   [ ("+", fun a b -> a +. b);
     ("-", fun a b -> a -. b);
     ("*", fun a b -> a *. b);
@@ -35,7 +35,7 @@ let parse_tokens var_array stream =
             raise (Error (var^" is not a variable"))
         with Found i -> i
     in
-    let rec parse_expr () = 
+    let rec parse_expr () =
         let first_part = parse_atom () in
         parse_remainder first_part
     and parse_atom () =
@@ -51,7 +51,7 @@ let parse_tokens var_array stream =
             | Genlex.Kwd var ->
                 let var_index = get_var_index var in
                 (fun vars_val -> vars_val.(var_index))
-            | Genlex.Ident f -> 
+            | Genlex.Ident f ->
             (
                 try
                     let func = List.assoc f unary_primitives in
@@ -92,12 +92,12 @@ let parse_stream ~var_array input =
     parse_tokens var_array stream
 ;;
 
-let parse_x str = 
+let parse_x str =
     let func = parse ~var_array:[|"x"|] str in
     (fun x -> func [|x|])
 ;;
 
-let parse_xy str = 
+let parse_xy str =
     let func = parse ~var_array:[|"x";"y"|] str in
     (fun x y -> func [|x;y|])
 ;;

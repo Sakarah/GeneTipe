@@ -1,5 +1,5 @@
 exception Error of string;;
-let load filename = 
+let load filename =
     try
         Dynlink.loadfile filename
     with Dynlink.Error error -> raise (Error (Dynlink.error_message error))
@@ -30,7 +30,7 @@ struct
     ;;
 end;;
 
-module type FitnessEvaluator = 
+module type FitnessEvaluator =
 sig
     type individual
     module TargetData : EvolParams.TargetData

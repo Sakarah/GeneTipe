@@ -15,7 +15,7 @@ end;;
 module Make (Parameters : EvolParams.S) =
 struct
     let init_population () =
-        let create_random i = 
+        let create_random i =
             let pop_frac = (float_of_int i)/.(float_of_int Parameters.pop_size) in
             (None, RandUtil.from_proba_list Parameters.creation ~pop_frac)
         in
@@ -151,7 +151,7 @@ struct
         done;
         initial_population
     ;;
-    
+
     let evolve target_data initial_population =
         let pop_size = (Array.length initial_population) in
         let child_population = reproduce initial_population in

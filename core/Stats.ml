@@ -68,6 +68,6 @@ struct
         in
         List.iter print_stat Individual.advanced_stats
     ;;
-    
+
     let print_population = Array.iter print_individual;;
 end

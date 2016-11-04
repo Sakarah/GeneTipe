@@ -46,7 +46,7 @@
     {
         "min_depth": 1,
         "max_depth": 5,
-    
+
         "bin_op":
         [
             { "proba":0.25, "name":"+", "op":"math", "params":{"fun":"x+y"} },

@@ -19,7 +19,7 @@ let () =
 
     Arg.parse spec_list (fun reg -> regexp := reg) usage_msg;
     if !regexp = "" then raise (Arg.Bad "No regular expression given");
-    
+
     let regexp_tree = RegexpParser.parse !regexp in
     let regexp_automata = RegexpAutomata.from_tree regexp_tree in
     try

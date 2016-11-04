@@ -27,26 +27,26 @@ end
     A hooking point only allows hooks with the same type (usually functions). *)
 module MakeHookingPoint (Type : HookType) : HookingPoint with type t = Type.t
 
-(** {2 Standard hooking points} 
-    Many standard hooking points are containing functions taking a JSON tree as their first argument. 
+(** {2 Standard hooking points}
+    Many standard hooking points are containing functions taking a JSON tree as their first argument.
     This is intended to provide constant parameters usually specified in the configuration file to the hooked function. *)
 
-(** Module type of a fitness evaluator. A fitness evaluator describes how to parse the input data and 
-    provides a fitness function. The fitness function should tell how well the given individual match the target data. 
+(** Module type of a fitness evaluator. A fitness evaluator describes how to parse the input data and
+    provides a fitness function. The fitness function should tell how well the given individual match the target data.
     Bigger output mean better individuals. *)
-module type FitnessEvaluator = 
+module type FitnessEvaluator =
 sig
     type individual
     module TargetData : EvolParams.TargetData
     val fitness : TargetData.t -> individual -> float
 end
 
-(** Module type of a genetic type. A genetic type contains an individual module that describes the type of individuals that can be evolved and 
+(** Module type of a genetic type. A genetic type contains an individual module that describes the type of individuals that can be evolved and
     a standard set of hooking points for registering genetic operators and functions around this type of individuals. *)
 module type GeneticTypeInterface =
 sig
     module Individual : EvolParams.Individual
-    
+
     (** Hooking point for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
     module Creation : HookingPoint with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
 

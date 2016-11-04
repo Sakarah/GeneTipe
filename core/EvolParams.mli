@@ -18,11 +18,11 @@ sig
 end
 
 (** This module type represents the parameters of a genetic selection process *)
-module type S = 
+module type S =
 sig
     module Individual : Individual (** Individual type used for the evolution *)
     module TargetData : TargetData (** Target data module *)
-    
+
     val pop_size : int (** Number of individuals in the population *)
     val growth_factor : float (** Multiplication factor of the population after a reproduction phase *)
     val mutation_ratio : float (** Ratio of the mutations in the reproduction phase. When not choosing mutation, a crossover is performed. *)

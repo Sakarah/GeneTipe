@@ -51,7 +51,7 @@ let to_evolution_params json =
         (module struct
             module Individual = GeneticType.Individual
             module TargetData = FitnessEvaluator.TargetData
-        
+
             let pop_size = json |> member "pop_size" |> to_int;;
             let growth_factor = json |> member "growth_factor" |> to_number;;
             let mutation_ratio = json |> member "mutation_ratio" |> to_float;;
@@ -94,33 +94,33 @@ let rec override replacement_path new_json base_json =
                 | (k,child_json)::t when k = key -> (k, override path_tail new_json child_json)::t
                 | v::t -> v::(process_assoc_list t)
             in
-            
+
             let rec process_ord_list index = function
                 | [] -> raise (OverridingError ("Index outside bounds"))
                 | child_json::t when index = 0 -> (override path_tail new_json child_json)::t
                 | child_json::t -> child_json::(process_ord_list (index-1) t)
             in
-            
+
             match base_json with
                 | `Assoc assoc_list -> `Assoc (process_assoc_list assoc_list)
-                | `List ord_list -> 
-                    (try 
+                | `List ord_list ->
+                    (try
                         let index = int_of_string key in
                         `List (process_ord_list index ord_list)
                     with Failure "int_of_string" -> raise (OverridingError (key^" must be an integer for matching a list element")))
                 | _ -> raise (OverridingError (key^" cannot be matched as there is a leaf in the original JSON tree"))
 ;;
 
-let is_alpha = function 
-    | 'A'..'Z' | 'a'..'z' -> true 
+let is_alpha = function
+    | 'A'..'Z' | 'a'..'z' -> true
     | _ -> false
 ;;
 
 let apply_overrides =
     let apply_override (key,j) =
-        let new_json = 
+        let new_json =
             if String.length j > 0 && (is_alpha j.[0]) then `String j
-            else Yojson.Basic.from_string ~fname:"<command line overriding>" j 
+            else Yojson.Basic.from_string ~fname:"<command line overriding>" j
         in
         let path = Str.split (Str.regexp "/") key in
         json_tree := Some (override path new_json (get_json ()))

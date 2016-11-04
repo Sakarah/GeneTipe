@@ -1,7 +1,7 @@
 let () =
     let x_fuzz = ref 0. in
     let y_fuzz = ref 0.1 in
-    
+
     let spec_list =
     [
         ("--x-fuzz", Arg.Set_float x_fuzz, "Set how far the abscissae can get from the original point (default is 0)");
@@ -22,7 +22,7 @@ let () =
     in
 
     Arg.parse spec_list (fun _ -> raise (Arg.Bad "Unexpected argument")) usage_msg;
-    
+
     let nb_points = Scanf.scanf "%d\n" (function n -> n) in
     Printf.printf "%d\n" nb_points;
     for i = 0 to nb_points-1 do

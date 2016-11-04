@@ -4,7 +4,7 @@ let () =
     let maxX = ref 10. in
     let minY = ref 0. in
     let maxY = ref 10. in
-    
+
     let spec_list =
     [
         ("--x-range", Arg.Tuple [Arg.Set_float minX ; Arg.Set_float maxX], "Set the range of the abscissae of the generated points (default is [0,10])");
@@ -27,7 +27,7 @@ let () =
     in
 
     Arg.parse spec_list (fun _ -> raise (Arg.Bad "Unexpected argument")) usage_msg;
-    
+
     Printf.printf "%d\n" !nb_points;
     for point = 0 to !nb_points-1 do
         let x = RandUtil.uniform_float (!minX,!maxX) in

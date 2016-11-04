@@ -41,7 +41,7 @@ let () =
     let module Parameters = (val ParamReader.get_evolution_params ()) in
     let module CurrentEvolver = Evolver.Make (Parameters) in
     let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
-    
+
     let target_data = Parameters.TargetData.read () in
 
     if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;

@@ -3,7 +3,7 @@ let () =
     let minX = ref 0. in
     let maxX = ref 10. in
     let funcStr = ref "" in
-    
+
     let spec_list =
     [
         ("--range", Arg.Tuple [Arg.Set_float minX ; Arg.Set_float maxX], "Set the range of the generated points (default is [0,10])");
@@ -23,7 +23,7 @@ let () =
     Arg.parse spec_list (fun anon -> funcStr := anon) usage_msg;
 
     let func = MathParser.parse_x !funcStr in
-    
+
     Printf.printf "%d\n" !nb_points;
     let step = ((!maxX)-.(!minX))/.(float_of_int (!nb_points-1)) in
     for point = 0 to !nb_points-1 do

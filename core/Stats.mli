@@ -20,13 +20,13 @@ val diversity : ('i -> float) -> 'i array -> float
 module type Printer =
 sig
     type individual
-    
+
     (** Print generic statistics about the given population *)
     val print_stats : (float * individual) array -> unit
 
     (** Print more statistics about the given population. The statistics shown depend on the individual type. *)
     val print_advanced_stats : (float * individual) array -> unit
-    
+
     (** Print the entire population *)
     val print_population : (float * individual) array -> unit
 end

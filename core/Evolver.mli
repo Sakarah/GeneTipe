@@ -1,6 +1,6 @@
 (** Evolver contains all the functions related to creation and then evolution
     of a population. It implements natural selection mechanics and manage the
-    population growth by mutation and crossover. 
+    population growth by mutation and crossover.
     You can create a new evolver from any EvolParams module using {!Make}. *)
 
 (** Module signature of an evolver *)
@@ -8,7 +8,7 @@ module type S =
 sig
     (** Type of the evolved individuals *)
     type individual
-    
+
     (** Type of the target data*)
     type target_data
 
