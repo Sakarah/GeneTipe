@@ -32,3 +32,13 @@ let normal_float ~mean ~deviation =
             pregenerated_normal_var := Some (!x*.mul);
             deviation *. (!y *. mul) +. mean
 ;;
+
+let shuffle tab =
+    let size = Array.length tab in
+    for i=0 to (size-2) do
+        let invPos = i + 1 + Random.int (size-i-1) in
+        let switch = tab.(i) in
+        tab.(i) <- tab.(invPos);
+        tab.(invPos) <- switch
+    done
+;;

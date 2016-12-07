@@ -48,12 +48,15 @@ let to_evolution_params json =
     try
         let module GeneticType = (val Plugin.GeneticType.get (json |> member "type" |> to_string)) in
         let module FitnessEvaluator = (val get_method "fitness" GeneticType.Fitness.get json) in
+        let module SelectionFunction = (val get_method "selection" Plugin.Selection.get json) in
+        let module ParentChooserFunction = (val get_method "parent_choice" Plugin.ParentChooser.get json) in
         (module struct
             module Individual = GeneticType.Individual
             module TargetData = FitnessEvaluator.TargetData
 
             let pop_size = json |> member "pop_size" |> to_int;;
             let growth_factor = json |> member "growth_factor" |> to_number;;
+            let crossover_ratio = json |> member "crossover_ratio" |> to_float;;
             let mutation_ratio = json |> member "mutation_ratio" |> to_float;;
 
             let creation = get_proba_pattern_list "creation" GeneticType.Creation.get json;;
@@ -61,6 +64,8 @@ let to_evolution_params json =
             let crossover = get_proba_pattern_list "crossover" GeneticType.Crossover.get json;;
             let fitness = FitnessEvaluator.fitness;;
             let simplifications = get_scheduled_pattern_list "simplifications" GeneticType.Simplification.get json;;
+            let selection = SelectionFunction.f;;
+            let parent_chooser = ParentChooserFunction.f;;
         end : EvolParams.S)
     with Yojson.Basic.Util.Type_error (str,json) ->
         raise (ParsingError ("evolution: "^str^" ("^(Yojson.Basic.to_string json)^")"))

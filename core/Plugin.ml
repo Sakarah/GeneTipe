@@ -48,4 +48,11 @@ sig
 end;;
 
 module GeneticType = MakeHookingPoint (struct type t = (module GeneticTypeInterface) end);;
+
+module type SelectionFunction = sig val f:(float * 'i) array -> target_size:int -> (float * 'i) array end;;
+module Selection = MakeHookingPoint (struct type t = (Yojson.Basic.json -> (module SelectionFunction)) end);;
+
+module type ParentChooserFunction = sig val f:(float * 'i) array -> unit -> 'i end;;
+module ParentChooser = MakeHookingPoint (struct type t = (Yojson.Basic.json -> (module ParentChooserFunction)) end)
+
 module RandomGen = MakeHookingPoint (struct type t = (Yojson.Basic.json -> unit -> float) end);;

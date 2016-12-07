@@ -1,8 +1,8 @@
 {
     "type":"symbolic_regression",
     "pop_size": 1000,
-    "growth_factor": 2.0,
-    "crossover_ratio": 0.85,
+    "growth_factor": 5.0,
+    "crossover_ratio": 0.8,
     "mutation_ratio": 0.1,
 
     "plugin_dir":"_build/plugins/symbolic_regression/",
@@ -10,8 +10,8 @@
     [
         "../random/UniformGen.cmxs",
         "../random/NormalGen.cmxs",
-        "../selection/Tournament.cmxs",
-        "../parent_chooser/ProportionalParentChooser.cmxs",
+        "../selection/TournamentByPacks.cmxs",
+        "../parent_chooser/UniformParentChooser.cmxs",
         "SymbolicRegression.cmxs",
         "MathPrimitives.cmxs",
         "FillGrowCreation.cmxs",
@@ -44,8 +44,8 @@
     [
         { "schedule":10, "method":"eval_const" }
     ],
-    "selection" : { "method":"tournament" },
-    "parent_choice": { "method":"proportional" },
+    "selection" : { "method":"tournament_by_packs" },
+    "parent_choice": { "method":"uniform" },
 
     "random_gen":
     {

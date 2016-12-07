@@ -21,17 +21,11 @@ sig
     (** Simplify all the individuals from the given population *)
     val simplify_individuals : ?generation:int -> (float * individual) array -> (float * individual) array
 
-    (** Organize a fight between functions to discard some of the weakest
-        @param target_size Size of the resulting population, it mustn't be greater than the input population size.
-        Caution: target_size mustn't be less than half the input population size in this tournament *)
-    val tournament : (float * individual) array -> target_size:int -> (float * individual) array
-
-    (** Select the individuals to be copied for the next generation and crossovers by organizing fights between random packs of individuals
-        @param target_size Size of the resulting population, it mustn't be greater than the input population size *)
-    val tournament_by_packs : (float * individual) array -> target_size:int -> (float * individual) array
-
     (** Recombine existing individuals and make mutations to create new functions *)
     val reproduce : (float * individual) array -> (float option * individual) array
+
+    (** Filter the input population to reach the given size by using the selection function *)
+    val select : (float * individual) array -> target_size:int -> (float * individual) array
 
     (** Replace duplicates by new randomly generated individuals *)
     val remove_duplicate : (float option * individual) array -> (float option * individual) array

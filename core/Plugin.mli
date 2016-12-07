@@ -66,5 +66,17 @@ end
 (** Hooking point for the genetic types. *)
 module GeneticType : HookingPoint with type t = (module GeneticTypeInterface)
 
+(** Module containing one selection function. These functions take a population and reduce it by selecting only a fraction of the individuals contained in it. We are forced to use a module here to keep the polymorphism. *)
+module type SelectionFunction = sig val f:(float * 'i) array -> target_size:int -> (float * 'i) array end
+
+(** Hooking point for the selection functions. *)
+module Selection : HookingPoint with type t = (Yojson.Basic.json -> (module SelectionFunction))
+
+(** Module containing one parent chooser function. These functions should select one individual from the given list for beeing used as a parent in the reproduction phase. Note that it enables you to generate more than one parent with a single list to potentially save a precomputing task on the list. Same as above for the reasons of declaring a module. *)
+module type ParentChooserFunction = sig val f:(float * 'i) array -> unit -> 'i end
+
+(** Hooking point for parent choosers. *)
+module ParentChooser : HookingPoint with type t = (Yojson.Basic.json -> (module ParentChooserFunction))
+
 (** Hooking point of the random generators. The registered functions are taking nothing and must return a random float value. *)
 module RandomGen : HookingPoint with type t = (Yojson.Basic.json -> unit -> float)
