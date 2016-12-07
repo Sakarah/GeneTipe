@@ -51,13 +51,13 @@ If you want to extend the possibilities of the program, for instance by adding a
 A plugin is a standard OCaml module compiled into a .cmxs file for being loaded after by another program.
 You have to know how to interact with the rest of the program. This is mostly done through the hook system.
 
-When you create a new function or module in a plugin that you want the rest of the program to know about, you have to register it to the corresponding hook by calling `Hook.register "name" function_or_module`.
-It will have to match the hook type (i.e.: crossover hooks will only accept crossover like functions).
-Doing so you give your function a unique name that can be referred later to retrieve the function with `Hook.get "name"`.
+When you create a new function or module in a plugin that you want the rest of the program to know about, you have to register it to the corresponding hooking point by calling `HookingPoint.register "name" function_or_module`.
+It will have to match the hook type (i.e.: crossover hooking points will only accept crossover like functions).
+Doing so you give your function a unique name that can be referred later to retrieve the function with `HookingPoint.get "name"`.
 This name is usually taken directly from the configuration file to enable the user to choose which function to use.
 
-You can also create your own hooks to make your module extensible itself.
-You found this strategy in genetic type plugins which have to create specific hooks for their individual type.
+You can also create your own hooking points to make your module extensible itself.
+You found this strategy in genetic type plugins which have to create specific hooking points for their individual type.
 
 # Included implementations
 For our researches we have to work with concrete examples of genetic algorithms.
