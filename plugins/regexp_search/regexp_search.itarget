@@ -1,2 +1,4 @@
 RegexpSearch.cmxs
 TakeSubtreeCrossover.cmxs
+RepeatSimplification.cmxs
+GroupCharsSimplification.cmxs
