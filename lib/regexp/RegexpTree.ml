@@ -9,9 +9,8 @@ type t =
     | AnyChar
 ;;
 
-(* == Evaluation and printing == *)
 let rec depth = function
-    | Concatenation (child1,child2) | Alternative (child1,child2) -> 1+ (max (depth child1) (depth child2))
+    | Concatenation (child1,child2) | Alternative (child1,child2) -> 1 + (max (depth child1) (depth child2))
     | Optional child | OneOrMore child | ZeroOrMore child -> 1+(depth child)
     | ExactChar _ | CharRange _ | AnyChar -> 0
 ;;
