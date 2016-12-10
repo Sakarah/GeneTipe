@@ -29,8 +29,8 @@ sig
     val mutation_ratio : float (** Ratio of the mutations in the reproduction phase. *)
     (** When not choosing mutation or crossover a new random individual is generated using a creation function. *)
 
-    val creation : (float * (pop_frac:float -> Individual.t)) list (** List of the creation patterns with their probabilities *)
-    val mutation : (float * (Individual.t -> Individual.t)) list (** List of mutations patterns with their associated probabilities *)
+    val creation : (float * (TargetData.t -> pop_frac:float -> Individual.t)) list (** List of the creation patterns with their probabilities *)
+    val mutation : (float * (TargetData.t -> Individual.t -> Individual.t)) list (** List of mutations patterns with their associated probabilities *)
     val crossover : (float * (Individual.t -> Individual.t -> Individual.t)) list (** List of crossovers patterns with their associated probabilities *)
     val simplifications : (int * (Individual.t -> Individual.t)) list (** List of the simplifications patterns to apply to the population each n turn *)
     val fitness : TargetData.t -> Individual.t -> float (** Fitness function to use *)

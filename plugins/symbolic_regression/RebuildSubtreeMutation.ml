@@ -12,7 +12,7 @@ let rebuild_subtree ~gen_params ~max_depth base =
     mutate 0 base
 ;;
 
-let rebuild_subtree_pattern json =
+let rebuild_subtree_pattern json _ =
     let gen_params = RandGenParams.read json in
     let open Yojson.Basic.Util in
     let max_depth = json |> member "max_depth" |> to_int in

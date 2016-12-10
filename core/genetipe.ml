@@ -45,7 +45,7 @@ let () =
     let target_data = Parameters.TargetData.read () in
 
     if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;
-    let init_pop = CurrentEvolver.init_population () in
+    let init_pop = CurrentEvolver.init_population target_data in
     let pop = ref (CurrentEvolver.compute_fitness target_data init_pop) in
     if !verbosity >= 1 then StatsPrinter.print_population !pop;
 

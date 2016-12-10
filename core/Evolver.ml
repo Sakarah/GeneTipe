@@ -2,21 +2,21 @@ module type S =
 sig
     type individual
     type target_data
-    val init_population : unit -> (float option * individual) array
+    val init_population : target_data -> (float option * individual) array
     val compute_fitness : target_data -> (float option * individual) array -> (float * individual) array
     val simplify_individuals : ?generation:int -> (float * individual) array -> (float * individual) array
-    val reproduce : (float * individual) array -> (float option * individual) array
+    val reproduce : target_data -> (float * individual) array -> (float option * individual) array
     val select : (float * individual) array -> target_size:int -> (float * individual) array
-    val remove_duplicate : (float option * individual) array -> (float option * individual) array
+    val remove_duplicate : target_data -> (float option * individual) array -> (float option * individual) array
     val evolve : target_data -> (float * individual) array -> (float * individual) array
-end;;
+end
 
 module Make (Parameters : EvolParams.S) =
 struct
-    let init_population () =
+    let init_population target_data =
         let create_random i =
             let pop_frac = (float_of_int i)/.(float_of_int Parameters.pop_size) in
-            (None, RandUtil.from_proba_list Parameters.creation ~pop_frac)
+            (None, RandUtil.from_proba_list Parameters.creation target_data ~pop_frac)
         in
         Array.init Parameters.pop_size create_random
     ;;
@@ -38,7 +38,7 @@ struct
         List.fold_left apply_simplification pop Parameters.simplifications
     ;;
 
-    let reproduce initial_population =
+    let reproduce target_data initial_population =
         let pop_size = Array.length initial_population in
 
         let target_size = int_of_float(float_of_int pop_size *. Parameters.growth_factor) in
@@ -63,10 +63,10 @@ struct
             (
                 if Parameters.mutation_ratio +. Parameters.crossover_ratio < rand_op then
                     let parent = parent_chooser () in
-                    target_population.(i) <- (None, RandUtil.from_proba_list Parameters.mutation parent)
+                    target_population.(i) <- (None, RandUtil.from_proba_list Parameters.mutation target_data parent)
                 else
                     let pop_frac = (Random.float 1.) in
-                    target_population.(i) <- (None, RandUtil.from_proba_list Parameters.creation ~pop_frac)
+                    target_population.(i) <- (None, RandUtil.from_proba_list Parameters.creation target_data ~pop_frac)
             )
         done;
         target_population
@@ -74,7 +74,7 @@ struct
 
     let select = Parameters.selection;;
 
-    let remove_duplicate initial_population =
+    let remove_duplicate target_data initial_population =
         let pop_size = Array.length initial_population in
         let table = Hashtbl.create pop_size in
         for i=0 to (pop_size - 1) do
@@ -84,7 +84,7 @@ struct
             else
             (
                 let pop_frac = (Random.float 1.) in
-                initial_population.(i) <- (None, RandUtil.from_proba_list Parameters.creation ~pop_frac)
+                initial_population.(i) <- (None,RandUtil.from_proba_list Parameters.creation target_data ~pop_frac)
             )
         done;
         initial_population
@@ -92,8 +92,8 @@ struct
 
     let evolve target_data initial_population =
         let pop_size = (Array.length initial_population) in
-        let child_population = reproduce initial_population in
-        let filtered_population = remove_duplicate child_population in
+        let child_population = reproduce target_data initial_population in
+        let filtered_population = remove_duplicate target_data child_population in
         let evaluated_population = compute_fitness target_data filtered_population in
         select evaluated_population ~target_size:pop_size
     ;;

@@ -13,7 +13,7 @@ open Yojson.Basic.Util;;
 
 let to_range json = ( json |> member "min" |> to_number, json |> member "max" |> to_number );;
 
-let mutate_const_pattern json =
+let mutate_const_pattern json _ =
     let proba = json |> member "mutation_proba" |> to_float in
     let const_generator_distrib = json |> member "const_generator" |> member "distrib" |> to_string in
     let const_generator = Plugin.RandomGen.get const_generator_distrib (json |> member "const_generator" |> member "params") in

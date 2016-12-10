@@ -31,33 +31,26 @@ module MakeHookingPoint (Type : HookType) : HookingPoint with type t = Type.t
     Many standard hooking points are containing functions taking a JSON tree as their first argument.
     This is intended to provide constant parameters usually specified in the configuration file to the hooked function. *)
 
-(** Module type of a fitness evaluator. A fitness evaluator describes how to parse the input data and
-    provides a fitness function. The fitness function should tell how well the given individual match the target data.
-    Bigger output mean better individuals. *)
-module type FitnessEvaluator =
-sig
-    type individual
-    module TargetData : EvolParams.TargetData
-    val fitness : TargetData.t -> individual -> float
-end
-
-(** Module type of a genetic type. A genetic type contains an individual module that describes the type of individuals that can be evolved and
-    a standard set of hooking points for registering genetic operators and functions around this type of individuals. *)
+(** Module type of a genetic type. A genetic type contains an individual module that describes the type of individuals that can be evolved,
+    a target data module that describes how to parse the input data and a standard set of hooking points for registering genetic operators
+    and functions around this type of individuals. *)
 module type GeneticTypeInterface =
 sig
     module Individual : EvolParams.Individual
+    module TargetData : EvolParams.TargetData
 
     (** Hooking point for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
-    module Creation : HookingPoint with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
+    module Creation : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> pop_frac:float -> Individual.t)
 
     (** Hooking point for mutation operations. A mutation operation should modify the given individual to create a slightly different one not exceeding the given max_depth. *)
-    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> Individual.t -> Individual.t)
 
     (** Hookint point for crossover operators. Crossovers are suppose to mix the characteristics of two given individual to create a new one. *)
     module Crossover : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
 
-    (** Hooking point for fitness evaluator. See the documentation for FitnessEvaluator for more informations. *)
-    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
+    (** Hooking point for fitness functions. The fitness function should tell how well the given individual match the target data.
+    Bigger output mean better individuals. *)
+    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> Individual.t -> float)
 
     (** Hooking point for simplification operations. Simplifications are supposed to reduce the complexity of an individual without changing its behavior. *)
     module Simplification : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)

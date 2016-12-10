@@ -13,7 +13,7 @@ sig
     type target_data
 
     (** Initialize the population with randomly generated individuals *)
-    val init_population : unit -> (float option * individual) array
+    val init_population : target_data -> (float option * individual) array
 
     (** Compute the fitness of all the individuals of a population *)
     val compute_fitness : target_data -> (float option * individual) array -> (float * individual) array
@@ -22,13 +22,13 @@ sig
     val simplify_individuals : ?generation:int -> (float * individual) array -> (float * individual) array
 
     (** Recombine existing individuals and make mutations to create new functions *)
-    val reproduce : (float * individual) array -> (float option * individual) array
+    val reproduce : target_data -> (float * individual) array -> (float option * individual) array
 
     (** Filter the input population to reach the given size by using the selection function *)
     val select : (float * individual) array -> target_size:int -> (float * individual) array
 
     (** Replace duplicates by new randomly generated individuals *)
-    val remove_duplicate : (float option * individual) array -> (float option * individual) array
+    val remove_duplicate : target_data -> (float option * individual) array -> (float option * individual) array
 
     (** Evolve the population with the fixed number of generations *)
     val evolve : target_data -> (float * individual) array -> (float * individual) array

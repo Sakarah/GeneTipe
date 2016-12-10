@@ -30,20 +30,14 @@ struct
     ;;
 end;;
 
-module type FitnessEvaluator =
-sig
-    type individual
-    module TargetData : EvolParams.TargetData
-    val fitness : TargetData.t -> individual -> float
-end;;
-
 module type GeneticTypeInterface =
 sig
     module Individual : EvolParams.Individual
-    module Creation : HookingPoint with type t = (Yojson.Basic.json -> pop_frac:float -> Individual.t)
-    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
+    module TargetData : EvolParams.TargetData
+    module Creation : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> pop_frac:float -> Individual.t)
+    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> Individual.t -> Individual.t)
     module Crossover : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
-    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> (module FitnessEvaluator with type individual = Individual.t))
+    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> Individual.t -> float)
     module Simplification : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
 end;;
 

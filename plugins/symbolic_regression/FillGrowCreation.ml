@@ -94,7 +94,7 @@ let rec create_random_fill gen_params ~max_depth =
 (** Distribute the max_depth value between min and max across the population *)
 let ramped creation_fun min max ~pop_frac = creation_fun ~max_depth:(min+(int_of_float (pop_frac *. float_of_int (max-min))))
 
-let make_pattern creation_fun json =
+let make_pattern creation_fun json _ =
     let params = RandGenParams.read json in
     let open Yojson.Basic.Util in
     let min_depth = json |> member "min_depth" |> to_int in
