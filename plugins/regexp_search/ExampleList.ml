@@ -11,6 +11,10 @@ let read_string_array () =
     str_array
 ;;
 
-let read () = (read_string_array (), read_string_array ());;
+let read () =
+    let positive_examples = read_string_array () in
+    let negative_examples = read_string_array () in
+    (positive_examples, negative_examples)
+;;
 
 let plot _ _ = ();;
