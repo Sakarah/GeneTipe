@@ -2,5 +2,6 @@ RegexpSearch.cmxs
 RandomCreation.cmxs
 TakeSubtreeCrossover.cmxs
 RebuildSubtreeMutation.cmxs
+FullMatchFitness.cmxs
 RepeatSimplification.cmxs
 GroupCharsSimplification.cmxs
