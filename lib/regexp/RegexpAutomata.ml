@@ -5,7 +5,7 @@ type filter_pattern =
 ;;
 
 type state =
-    | Split of (state ref * state ref)
+    | Split of (int * state ref * state ref)
     | Filter of (int * filter_pattern * state ref)
     | Match
 ;;
@@ -18,50 +18,54 @@ let from_tree regexp_tree =
         | end_connection::t -> end_connection := next_state; connect_ends_to next_state t
     in
 
-    let filter_count = ref (-1) in
+    let state_count = ref (-1) in
 
-    let rec make_nfa = function
+    let rec make_ndfa = function
         | RegexpTree.Concatenation (sub1,sub2) ->
-            let (start1,endList1) = make_nfa sub1 in
-            let (start2,endList2) = make_nfa sub2 in
+            let (start1,endList1) = make_ndfa sub1 in
+            let (start2,endList2) = make_ndfa sub2 in
             connect_ends_to start2 endList1;
             (start1,endList2)
         | RegexpTree.Alternative (alt1,alt2) ->
-            let (start1,endList1) = make_nfa alt1 in
-            let (start2,endList2) = make_nfa alt2 in
-            (Split (ref start1, ref start2), endList1@endList2)
+            let (start1,endList1) = make_ndfa alt1 in
+            let (start2,endList2) = make_ndfa alt2 in
+            incr state_count;
+            (Split (!state_count, ref start1, ref start2), endList1@endList2)
         | RegexpTree.Optional sub ->
-            let (start,endList) = make_nfa sub in
+            let (start,endList) = make_ndfa sub in
             let newEnd = ref Match in
-            (Split (ref start, newEnd), newEnd::endList)
+            incr state_count;
+            (Split (!state_count, ref start, newEnd), newEnd::endList)
         | RegexpTree.OneOrMore sub ->
-            let (start,endList) = make_nfa sub in
+            let (start,endList) = make_ndfa sub in
             let newEnd = ref Match in
-            let repeatSplit = Split (ref start, newEnd) in
+            incr state_count;
+            let repeatSplit = Split (!state_count, ref start, newEnd) in
             connect_ends_to repeatSplit endList;
             (start,[newEnd])
         | RegexpTree.ZeroOrMore sub ->
-            let (start,endList) = make_nfa sub in
+            let (start,endList) = make_ndfa sub in
             let newEnd = ref Match in
-            let repeatSplit = Split (ref start, newEnd) in
+            incr state_count;
+            let repeatSplit = Split (!state_count, ref start, newEnd) in
             connect_ends_to repeatSplit endList;
             (repeatSplit,[newEnd])
         | RegexpTree.ExactChar ch ->
             let newEnd = ref Match in
-            filter_count := !filter_count + 1;
-            (Filter (!filter_count, ExactChar ch, newEnd), [newEnd])
+            incr state_count;
+            (Filter (!state_count, ExactChar ch, newEnd), [newEnd])
         | RegexpTree.CharRange range ->
             let newEnd = ref Match in
-            filter_count := !filter_count + 1;
-            (Filter (!filter_count, CharRange range, newEnd), [newEnd])
+            incr state_count;
+            (Filter (!state_count, CharRange range, newEnd), [newEnd])
         | RegexpTree.AnyChar ->
             let newEnd = ref Match in
-            filter_count := !filter_count + 1;
-            (Filter (!filter_count, AnyChar, newEnd), [newEnd])
+            incr state_count;
+            (Filter (!state_count, AnyChar, newEnd), [newEnd])
     in
 
-    let (nfa,_) = make_nfa regexp_tree in
-    (nfa, !filter_count + 1)
+    let (ndfa,_) = make_ndfa regexp_tree in
+    (ndfa, !state_count + 1)
 ;;
 
 let rec in_range ch = function
@@ -77,13 +81,14 @@ let rec in_pattern ch = function
     | _ -> false
 ;;
 
-let is_matching (first_state,nb_filter) str =
-    let filter_visited = Array.make nb_filter false in
+let is_matching (first_state,nb_states) str =
+    let state_visited = Array.make nb_states false in
 
     let rec follow_and_visit = function
-        | Split (s1,s2) -> (follow_and_visit !s1)@(follow_and_visit !s2)
-        | Filter (id,_,_) when filter_visited.(id) -> []
-        | Filter (id,_,_) as state -> filter_visited.(id) <- true; [state]
+        | Split (id,_,_) when state_visited.(id) -> []
+        | Split (id,s1,s2) -> state_visited.(id) <- true; (follow_and_visit !s1)@(follow_and_visit !s2)
+        | Filter (id,_,_) when state_visited.(id) -> []
+        | Filter (id,_,_) as state -> state_visited.(id) <- true; [state]
         | state -> [state]
     in
 
@@ -95,23 +100,26 @@ let is_matching (first_state,nb_filter) str =
 
     let current_states = ref (follow_and_visit first_state) in
     for i = 0 to String.length str - 1 do
-        Array.fill filter_visited 0 nb_filter false;
+        Array.fill state_visited 0 nb_states false;
         current_states := next_states str.[i] !current_states
     done;
     List.mem Match !current_states
 ;;
 
-let matching_substrings (first_state,nb_filter) str =
+let matching_substrings (first_state,nb_states) str =
     let matched_substrings = ref [] in
 
-    let filter_str_start = ref [||] in
-    let next_filter_str_start = ref (Array.make nb_filter (-1)) in
+    let state_str_start = ref [||] in
+    let next_state_str_start = ref (Array.make nb_states (-1)) in
 
     let rec follow_and_visit string_start string_pos = function
-        | Split (s1,s2) -> (follow_and_visit string_start string_pos !s1)@(follow_and_visit string_start string_pos !s2)
-        | Filter (id,_,_) as state when !next_filter_str_start.(id) = -1 -> !next_filter_str_start.(id) <- string_start; [state]
-        | Filter (id,_,_) when !next_filter_str_start.(id) > string_start -> !next_filter_str_start.(id) <- string_start; []
-        | Filter (id,_,_) -> []
+        | Split (id,s1,s2) when !next_state_str_start.(id) = -1 || !next_state_str_start.(id) > string_start ->
+            !next_state_str_start.(id) <- string_start;
+            (follow_and_visit string_start string_pos !s1)@(follow_and_visit string_start string_pos !s2)
+        | Split _ -> []
+        | Filter (id,_,_) as state when !next_state_str_start.(id) = -1 -> !next_state_str_start.(id) <- string_start; [state]
+        | Filter (id,_,_) when !next_state_str_start.(id) > string_start -> !next_state_str_start.(id) <- string_start; []
+        | Filter _ -> []
         | Match when string_pos = string_start -> [] (* We want to avoid empty substrings *)
         | Match -> matched_substrings := (string_start,string_pos)::(!matched_substrings); []
     in
@@ -119,14 +127,14 @@ let matching_substrings (first_state,nb_filter) str =
     let rec next_states string_pos = function
         | [] -> follow_and_visit string_pos string_pos first_state
         | Filter (id,pattern,next_state)::t when in_pattern str.[string_pos-1] pattern ->
-            (follow_and_visit !filter_str_start.(id) string_pos !next_state)@(next_states string_pos t)
+            (follow_and_visit !state_str_start.(id) string_pos !next_state)@(next_states string_pos t)
         | _::t -> next_states string_pos t
     in
 
     let current_states = ref (follow_and_visit 0 0 first_state) in
     for i = 1 to String.length str do
-        filter_str_start := !next_filter_str_start;
-        next_filter_str_start := Array.make nb_filter (-1);
+        state_str_start := !next_state_str_start;
+        next_state_str_start := Array.make nb_states (-1);
         current_states := next_states i !current_states
     done;
 
