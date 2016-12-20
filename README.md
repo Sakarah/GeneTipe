@@ -61,7 +61,7 @@ You found this strategy in genetic type plugins which have to create specific ho
 
 # Included implementations
 For our researches we have to work with concrete examples of genetic algorithms.
-That is why we have implemented some (currently only one) genetic types to evolve.
+That is why we have implemented some (actually only two) genetic types to evolve.
 These examples are demonstrations of what can be possibly evolved and give pertinent results.
 Here we only cover the goal and the basic principles of each case.
 
@@ -75,3 +75,10 @@ To test easily the symbolic regression, we often generate a set of points with a
 You can test that with a simple `$ ./genpts "ln((2*x)+1)" | ./genetipe config/symbolic_regression.json` for example.
 
 Note that the results are not always as simple as expected. You can force simpler expressions by reducing the maximum depth allowed for individuals.
+
+## Regular expression searching
+In regular expression searching, the goal is to find a regular expression (regexp) matching a set of examples and not matching another set of counter-examples. Moreover, we want to avoid over-fitting in order to generalize the pattern as much as possible. For example, if you give email addresses as examples, we expect to give as a result a regexp matching all the email addresses (or at least those looking like the examples) and not only the few ones in the dataset.
+
+Again we use here a tree representation for the regexp then converted into non deterministic finite automata for evaluation.
+
+To test this genetic algorithm, you need to provide a representative set of what kind of strings you want and find appropriate counter-examples. A good counter-example is usually something near what you want but slightly different. Then test against the result other strings not included in the set and see if they are well recognized.
