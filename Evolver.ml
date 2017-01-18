@@ -20,7 +20,8 @@ let fitness points dna =
     else 1. /. (1. +. !difference)
 ;;
 
-(* Creates a function that, from a population of individuals whose fitness can be unknown: (Some fitness or None, function), returns the population of known fitnesses *)
+(* Creates a function that takes as an argument a population of individuals whose fitness can be unknown: (Some fitness or None, function)
+and returns the population of known fitnesses *)
 let compute_fitness points =
     let fillFitness = function
         | (None,dna) -> (fitness points dna, dna)
