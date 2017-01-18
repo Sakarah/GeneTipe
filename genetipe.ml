@@ -52,7 +52,7 @@ let () =
         points.(i) <- Scanf.scanf "%f %f\n" (fun x y -> (x,y))
     done;
 
-    (* initiate the population (cf Dna files) and print stats according to the level of details wished by the user (default verbosity is 2) *)
+    (* initialize the population (cf Dna files) and print stats according to the level of details wished by the user (default verbosity is 2) *)
     if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" pop_size;
     let init_pop = Evolver.init_population ~size:pop_size ~max_depth gen_params in
     let pop = ref (Evolver.compute_fitness points init_pop) in
