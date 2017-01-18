@@ -3,5 +3,6 @@ RandomCreation.cmxs
 TakeSubtreeCrossover.cmxs
 RebuildSubtreeMutation.cmxs
 FullMatchFitness.cmxs
+PartialMatchFitness.cmxs
 RepeatSimplification.cmxs
 GroupCharsSimplification.cmxs
