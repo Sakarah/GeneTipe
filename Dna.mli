@@ -10,6 +10,7 @@ type t =
     | X
 
 (** {2 Random generation} *)
+
 (** Randomly generate a new individual who has a depth below max_depth *)
 val create_random_grow : max_depth:int -> Parameters.randomGen -> t
 
@@ -21,13 +22,14 @@ val create_random : max_depth:int -> Parameters.randomGen -> t
 
 
 (** {2 Gene manipulation} *)
+
 (** Generate a new individual by doing a crossover wich replace some parts of the first dna by elements of the second.
-    The replacement takes place at the exact depth specified or before if we encounter a terminal node *)
+    The replacement takes place at the exact depth specified or before if a terminal node is encountered *)
 val crossover : crossover_depth:int -> t -> t -> t
 
 (** Generate a new individual by modifying an existing individual adding him new randomly generated characteristics.
-    The replacement takes place at the exact depth specified or before if we encounter a terminal node.
-    The new genes added are taken in order to ensure that max_depth is never exceeded. *)
+    The replacement takes place at the exact depth specified or before if a terminal node is encountered.
+    The new genes added are choosen accordingly in order to ensure that max_depth is never exceeded. *)
 val mutation : mutation_depth:int -> max_depth:int -> Parameters.randomGen -> t -> t
 
 (** Generate a new individual by tweaking constants of an already existing one *)
@@ -35,9 +37,10 @@ val mutate_constants : range:(float*float) -> proba:float -> t -> t
 
 
 (** {2 Evaluation and printing} *)
+
 (** Evaluate the function represented by the DNA on the point x.
     By using curryfication, you can get the function without doing the evaluation.
-    This function return nan if the function cannot be evaluated on the point x. *)
+    This function returns nan if the function cannot be evaluated on the point x. *)
 val eval : t -> float -> float
 
 (** Simplifies a function evaluating all constants. 

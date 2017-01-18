@@ -1,3 +1,5 @@
+(* For a global overview of the result of each functions, see the Dna.mli file *)
+
 type t =
     | BinOp of string*(float->float->float)*t*t
     | UnOp of string*(float->float)*t
@@ -15,7 +17,7 @@ let uniform_float (lower_bound,greater_bound) =
 ;;
 
 
-(** Generate a random affin function *)
+(** Generate a random linear function in a tree format *)
 let random_affin const_range =
     BinOp ("+", (fun a b -> a +. b),
         BinOp ("*", (fun a b -> a *. b),
@@ -24,8 +26,9 @@ let random_affin const_range =
         Const (uniform_float const_range))
 ;;
 
-(** Randomly chose an operation within the randomGenParams *)
+(** Randomly chooses an operation within the randomGenParams *)
 let random_op op_params =
+(* op_params is an array containing binary or unary operators with their associated probability as a tuple (probability, function_name, function) of type float*str*fun *)
     let n = Array.length op_params in
     let probs = Array.make n 0. in
 
@@ -48,8 +51,10 @@ let random_op op_params =
         Found i -> op op_params.(i)
 ;;
 
+(* The grow method creates an individual by randomly choosing for each node an operator, constant or variable according to the probabilities given in the Parameters file *)
+let rec create_random_grow ~max_depth gen_params = 
+(* gen_params is a type containing all parameters concerning the random generation of an individual (cf Parameters.mli file) *)
 
-let rec create_random_grow ~max_depth gen_params =
     (* If max_depth is reached, then there is a constant or a variable *)
     if max_depth = 0 then
     (
@@ -66,6 +71,7 @@ let rec create_random_grow ~max_depth gen_params =
         let p_const = p_un +. gen_params.const_proba in
 
         let p = Random.float 1. in
+        (* the value of p will determine how to complete the current node *)
 
         if p < p_bin then
             let name, operation = random_op gen_params.bin_op in
@@ -80,8 +86,10 @@ let rec create_random_grow ~max_depth gen_params =
     )
 ;;
 
-
+(* The fill method creates an individual by randomly choosing for each inner node an operator and for each terminal node a constant or variable
+according to the probabilities given in the Parameters file *)
 let rec create_random_fill ~max_depth gen_params =
+
     if max_depth = 0 then
     (
         let p = Random.float (gen_params.const_proba +. gen_params.var_proba) in
@@ -107,6 +115,7 @@ let create_random ~max_depth gen_params =
     else create_random_grow ~max_depth gen_params
 ;;
 
+(* Randomly chooses a subtree from the selected individual at the given depth (or before if a terminal node is encountered) *)
 let rec take_graft depth = function
     | dna when depth = 0 -> dna
     | BinOp (_,_,child1,_) when Random.bool () -> take_graft (depth-1) child1
@@ -115,6 +124,7 @@ let rec take_graft depth = function
     | dna -> dna
 ;;
 
+(* Replaces a random subtree from the "base" individual by a random subtree from the "giver" individual at the same given depth for both *)
 let crossover ~crossover_depth base giver =
     let rec crossov depth = function
         | _ when depth = crossover_depth -> take_graft depth giver
@@ -126,9 +136,10 @@ let crossover ~crossover_depth base giver =
     crossov 0 base
 ;;
 
+(* Replaces a random subtree from the selected individual with a randomly generated subtree using grow or fill method *)
 let mutation ~mutation_depth ~max_depth gen_params base =
     let rec mutate depth = function
-        | _ when depth = mutation_depth -> create_random ~max_depth:(max_depth-mutation_depth) gen_params
+        | _ when depth = mutation_depth -> create_random ~max_depth:(max_depth - mutation_depth) gen_params
         | BinOp (n,f,child1,child2) when Random.bool () -> BinOp (n,f,mutate (depth+1) child1,child2)
         | BinOp (n,f,child1,child2) -> BinOp (n,f,child1,mutate (depth+1) child2)
         | UnOp (n,f,child) -> UnOp (n,f,mutate (depth+1) child)
@@ -137,6 +148,8 @@ let mutation ~mutation_depth ~max_depth gen_params base =
     mutate 0 base
 ;;
 
+(* Modifies the value of every constant of the selected individual within the given range with a given probability.
+Constants need to be modified more often than subtrees in order to improve a solution of an acceptable form. *)
 let mutate_constants ~range ~proba base =
     let rec mutate = function
         | BinOp (name,func,child1,child2) -> BinOp (name, func, mutate child1, mutate child2)
@@ -147,6 +160,8 @@ let mutate_constants ~range ~proba base =
     mutate base
 ;;
 
+(* returns the value of the selected individual when applied to x.
+If the function cannot be evaluated (i.e the result is nan or infinite), then the function returns nan. *)
 let rec eval dna x =
     match dna with
         | UnOp (_,op,t) -> 
@@ -161,6 +176,8 @@ let rec eval dna x =
         | X -> x
 ;;
 
+(* Replaces operators that are function only of known constants by their approximate value.
+Note: This fonction does not do formal caclulation *)
 let rec simplify = function
     | UnOp (name,op,child) -> 
     (
@@ -181,6 +198,8 @@ let rec simplify = function
     | Const(a) -> Const(a)
 ;;  
 
+(* Converts the selected individual into a string.
+To avoid ambiguity, parenthesis are surrounding the sons of unary and binary operators. *)
 let rec to_string ?(bracket=false) = function
     | Const a -> Printf.sprintf "%.2f" a
     | X -> "x"

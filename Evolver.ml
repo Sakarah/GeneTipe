@@ -1,9 +1,13 @@
+(* For a global overview of the result of each functions, see the Evolver.mli file *)
+
 open Parameters;;
 
 let init_population ~size ~max_depth rand_gen_params =
     Array.init size (function i -> (None, Dna.create_random ~max_depth:((max_depth*i)/size) rand_gen_params))
 ;;
 
+(* evaluate the fitness of an individual, indicating how good a solution it is.
+This evaluation method computes the sum of the square of the differences between the ordinate of the points and the fonction evaluated on the abscissa of the point. *)
 let fitness points dna =
     let n = Array.length points in
     let difference = ref 0. in
@@ -16,6 +20,7 @@ let fitness points dna =
     else 1. /. (1. +. !difference)
 ;;
 
+(* Creates a function that, from a population of individuals whose fitness can be unknown: (Some fitness or None, function), returns the population of known fitnesses *)
 let compute_fitness points =
     let fillFitness = function
         | (None,dna) -> (fitness points dna, dna)
@@ -23,8 +28,11 @@ let compute_fitness points =
     in Array.map fillFitness
 ;;
 
+(* Applies the individual simplification from Dna file to each individual in the format (fitness, function) *)
 let simplify_individuals = Array.map (function (fit,dna) -> (fit,Dna.simplify dna));;
 
+(* Give each individual a random position in the array so they are randomly matched in the tournament functions.
+Each individual is switched with another random individual that is situated after it in the array. *)
 let shuffle initial_population =
     let size = Array.length initial_population in
     for i=0 to (size-2) do
@@ -35,11 +43,17 @@ let shuffle initial_population =
     done
 ;;
 
+(* Select the given number of individuals by comparing pairs of individuals and keeping the best,
+and complete the winners array with left individuals if the ratio of kept individuals exceeds half the size of the intitial population.
+Note: target_size must not be greater than the input population size *)
 let tournament initial_population ~target_size =
     let size = Array.length initial_population in
     let winners = Array.make target_size initial_population.(0) in
     let n_fill_in = 2* target_size - size in
     shuffle initial_population;
+    
+    (* fill the beginning of the winners Array with the first (randomly chosen) individual until the number of slots left in the winners array are 
+    exactly a half of the number of individuals left in the initial population array. *)
     for i = 0 to (n_fill_in - 1) do
         winners.(i) <- initial_population.(i)
     done;
@@ -51,34 +65,37 @@ let tournament initial_population ~target_size =
     winners
 ;;
 
+
+(* Groups the individuals in packs of optimized number in which only the best individual is kept.
+Note: This tournament is unused in this version of the GeneTipe project/ *)
 let tournament_by_packs population ~target_size =
     let pop_size = Array.length population in
     let pack_size = int_of_float(ceil (float_of_int(pop_size)/.float_of_int(target_size))) in
-    let selected_dna = Array.make target_size population.(0) in
+    let winners = Array.make target_size population.(0) in
     shuffle population;
-    for i = 0 to (target_size - 2) do
+    for i = 0 to (target_size - 2) do (* the last pack might be uncomplete hence target_size - 2 *)
         let index = pack_size * i in
         let selected_index = ref index in
-        for j = 1 to pack_size do
+        for j = 1 to pack_size do (* find the best individual in the pack *)
             if fst population.(index + j) > fst population.(!selected_index) then
-            (
                 selected_index := index + j
-            )
         done;
-        selected_dna.(i) <- population.(!selected_index)
+        winners.(i) <- population.(!selected_index)
     done;
+    (* dealing with the last potentially uncomplete pack *)
     let index = pack_size * (target_size - 1) in
     let selected_index = ref index in
     for j = 0 to (pop_size - pack_size * (target_size - 1) - 1)  do
         if fst population.(index + j) > fst population.(!selected_index) then
-            (
                 selected_index := index + j
-            )
     done;
-    selected_dna.(target_size - 1) <- population.(!selected_index);
-    selected_dna
+    winners.(target_size - 1) <- population.(!selected_index);
+    winners
 ;;
 
+(* Grow the existing population by copying individuals and creating new ones from mutations and crossovers, increasing the size of the population.
+Individuals used for crossover or mutation are chosen with a probability proportionnal to their fitness.
+The depth of crossover/mutation is chosen randomly. The ration of mutation over crossover is given in the Parameters (evolution type) *)
 let reproduce initial_population evolution_params =
     let pop_size = Array.length initial_population in
     let fitness_total = ref 0. in
@@ -123,6 +140,7 @@ let reproduce initial_population evolution_params =
     target_population
 ;;
 
+(* Create a new generation from the existing one by reproducing it and bringing its size back to the initial one with a tournament, and evaluate the fitnesses *)
 let evolve points evolution_params initial_population =
     let pop_size = Array.length initial_population in
     let child_population = reproduce initial_population evolution_params in

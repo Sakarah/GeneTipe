@@ -1,4 +1,5 @@
 let () =
+    (* default values *)
     let pop_size = ref None in
     let max_depth = ref None in
     let generations = ref 100 in
@@ -6,6 +7,7 @@ let () =
     let show_graph = ref false in
     let config_filename = ref "" in
 
+    (* all options available to the user *)
     let spec_list =
     [
         ("--pop", Arg.Int (function p -> pop_size := Some p), "Set the population size (override the config file)");
@@ -24,6 +26,7 @@ let () =
     ]
     in
 
+    (* this message is shown while using the algorithm *)
     let usage_msg =
         "GeneTipe is a symbolic regression tool.\n" ^
         "It automatically build a function matching the points given using a genetic algorithm.\n" ^
@@ -35,11 +38,13 @@ let () =
     Arg.parse spec_list (fun cfg_file -> config_filename := cfg_file) usage_msg;
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
+    (* the values of the parameters, read from the json file *)
     let evo_params = Parameters.read_params ?pop_size:!pop_size ?max_depth:!max_depth ~filename:!config_filename in
     let gen_params = evo_params.Parameters.random_gen_params in
     let pop_size = evo_params.Parameters.pop_size in
     let max_depth = evo_params.Parameters.max_depth in
 
+    (*this part analyses the points given as an input to the algorithm *)
     let nb_points = Scanf.scanf "%d\n" (function n -> n) in
 
     let points = Array.make nb_points (0.,0.) in
@@ -47,11 +52,13 @@ let () =
         points.(i) <- Scanf.scanf "%f %f\n" (fun x y -> (x,y))
     done;
 
+    (* initiate the population (cf Dna files) and print stats according to the level of details wished by the user (default verbosity is 2) *)
     if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" pop_size;
     let init_pop = Evolver.init_population ~size:pop_size ~max_depth gen_params in
     let pop = ref (Evolver.compute_fitness points init_pop) in
     if !verbosity >= 1 then Stats.print_population !pop;
 
+    (* Evolve the population (cf Evolver files) as many times as there is generations *)
     Sys.catch_break true; (* If you do a Ctrl+C you still have the results *)
     (try
         for g = 1 to !generations do
@@ -62,6 +69,7 @@ let () =
         done
     with Sys.Break -> ());
 
+    (* print the final results, with the wished level of details *)
     pop := Evolver.simplify_individuals !pop;
     if !verbosity >= 1 then
     (
@@ -77,6 +85,7 @@ let () =
         Printf.printf "%f\n%s" bestFitness (Dna.to_string bestDna)
     );
 
+    (* make the graph of the best individual if a graph was demanded by the user *)
     if !show_graph then
     (
         Printf.printf "%!";

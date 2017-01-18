@@ -1,3 +1,5 @@
+(* For the meaning of the types and parameters below, see the Parameters.mli file *)
+
 type randomGen =
 {
     fill_proba: float;
@@ -18,6 +20,10 @@ type evolution =
     growth_factor : float ;
     mutation_ratio : float
 };;
+
+
+(* The following functions analyse the parameters given in the yojson file and fill in the randomGen and evolution types *)
+
 
 exception Error of string;;
 

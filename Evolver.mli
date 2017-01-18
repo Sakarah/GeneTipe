@@ -14,13 +14,13 @@ val compute_fitness : (float*float) array -> (float option * Dna.t) array -> (fl
 (** Simplify all the individuals from the given population (see Dna.simplify) *)
 val simplify_individuals : (float * Dna.t) array -> (float * Dna.t) array
 
-(** Organize a fight between functions to discard some of the weakest 
-    target_size is the size of the resulting population, it mustn't be greater than the input population size 
-    caution: target_size mustn't be less than half the input population size in this tournament *)
+(** Organize a fight between functions to discard some of the weakest.
+    target_size is the size of the resulting population, it mustn't be greater than the input population size.
+    Note: target_size must not be less than half the input population size in this version of tournament. *)
 val tournament : (float * Dna.t) array -> target_size:int -> (float * Dna.t) array
 
-(** Select the individuals to be copied for the next generation and crossovers by organizing fights between random packs of individuals 
-    target_size is the size of the resulting population, it mustn't be greater than the input population size *)
+(** Select the individuals to be copied for the next generation and used for crossovers by organizing fights between random packs of individuals.
+    target_size is the size of the resulting population, it must not be greater than the input population size *)
 val tournament_by_packs : (float * Dna.t) array -> target_size:int -> (float * Dna.t) array
 
 (** Recombine existing individuals and make mutations to create new functions *)
