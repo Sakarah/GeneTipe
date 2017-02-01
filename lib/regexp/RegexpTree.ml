@@ -15,6 +15,12 @@ let rec depth = function
     | ExactChar _ | CharRange _ | AnyChar -> 0
 ;;
 
+let rec size = function
+    | Concatenation (child1,child2) | Alternative (child1,child2) -> 1 + size child1 + size child2
+    | Optional child | OneOrMore child | ZeroOrMore child -> 1 + size child
+    | ExactChar _ | CharRange _ | AnyChar -> 1
+;;
+
 type bracket_level =
     | NoBracket
     | InsideConcat

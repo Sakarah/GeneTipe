@@ -13,8 +13,11 @@ type t =
     | CharRange of (char*char) list (** A matching string is a single character in the specified ranges *)
     | AnyChar (** This match any one character long string *)
 
-(** Retrurn the depth of the regexp tree *)
+(** Return the depth of the regexp tree *)
 val depth : t -> int
+
+(** Return the total number of nodes in the regexp tree *)
+val size : t -> int
 
 (** Give a string representation of the regular expression.
     The format of the returned string is very similar to the one described in {!Str.regexp} except that '(', ')' and '|' do not need a \ to be  considered as operators and will be escaped when used litterally. *)

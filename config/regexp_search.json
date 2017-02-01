@@ -9,12 +9,12 @@
     "plugins":
     [
         "../selection/Tournament.cmxs",
-        "../parent_chooser/ProportionalParentChooser.cmxs",
+        "../parent_chooser/UniformParentChooser.cmxs",
         "RegexpSearch.cmxs",
         "RandomCreation.cmxs",
         "RebuildSubtreeMutation.cmxs",
         "TakeSubtreeCrossover.cmxs",
-        "FullMatchFitness.cmxs",
+        "MultiobjectiveFitness.cmxs",
         "RepeatSimplification.cmxs",
         "GroupCharsSimplification.cmxs"
     ],
@@ -32,14 +32,18 @@
     [
         { "proba":1.0, "method":"take_subtree" }
     ],
-    "fitness": { "method":"full_match" },
+    "fitness":
+    {
+        "method":"multiobjective",
+        "params": { "full_match_factor":1.0, "partial_match_factor":1.0, "size_factor":0.5 }
+    },
     "simplifications":
     [
         { "schedule":5, "method":"repeat_simplification" },
         { "schedule":10, "method":"group_chars" }
     ],
     "selection" : { "method":"tournament" },
-    "parent_choice": { "method":"proportional" },
+    "parent_choice": { "method":"uniform" },
 
     "random_gen":
     {

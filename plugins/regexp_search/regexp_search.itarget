@@ -4,5 +4,6 @@ TakeSubtreeCrossover.cmxs
 RebuildSubtreeMutation.cmxs
 FullMatchFitness.cmxs
 PartialMatchFitness.cmxs
+MultiobjectiveFitness.cmxs
 RepeatSimplification.cmxs
 GroupCharsSimplification.cmxs
