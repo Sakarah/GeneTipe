@@ -18,18 +18,19 @@ let () =
             "Override a configuration value (for accessing a subkey use / separator) by a new given json tree. (Takes 2 parameters)");
         ("-c", Arg.Tuple [Arg.Set_string next_overriden_key; Arg.String (function json -> config_overrides := (!next_overriden_key,json)::(!config_overrides))],
             "Shorthand for --config-override");
-        ("--quiet", Arg.Unit (fun () -> verbosity := 0), "Do not show anything else than the result (equivalent to -v 0)");
+        ("--quiet", Arg.Unit (fun () -> verbosity := 0), "Do not print anything else than the best individual at the end of the evolution process (equivalent to -v 0)");
         ("--no-stats", Arg.Unit (fun () -> verbosity := 1), "No intermediate statistics about the currently generated population (equivalent to -v 1)");
-        ("--full-stats", Arg.Unit (fun () -> verbosity := 3), "Print full statistics about the currently generated population (equivalent to -v 3)");
+        ("--full-stats", Arg.Unit (fun () -> verbosity := 3), "Print full intermediate statistics about the currently generated population (equivalent to -v 3)");
         ("-v", Arg.Set_int verbosity, "Set the verbosity level (default is 2). Lower values speed up the process");
-        ("--graph", Arg.Set show_graph, "Show a graph with the point set and the best computed function at the end")
+        ("--graph", Arg.Set show_graph, "Show a graph with the target data and the best computed individual at the end of the evolution process. This is only relevant for some genetic types providing plot functions for the target data and the individuals.")
     ]
     in
 
     let usage_msg =
-        "GeneTipe is a symbolic regression tool.\n" ^
-        "It automatically build a function matching the points given using a genetic algorithm.\n" ^
-        "The program waits as input the number of sampling points on the first line and then on each line the x and y coordinates of a point separated by a space.\n"^
+        "GeneTipe is a generic evolver tool.\n" ^
+        "It creates individuals with high fitness value using a genetic algorithm.\n" ^
+        "It reads a configuration file specifying the population type and the parameters of the evolution process, loading all the required plugins.\n" ^
+        "The program waits as input the target data in a format described by the genetic type plugin.\n" ^
         "Usage : genetipe [options] configFilename\n\n" ^
         "Options available:"
     in
@@ -49,7 +50,7 @@ let () =
     let pop = ref (CurrentEvolver.compute_fitness target_data init_pop) in
     if !verbosity >= 1 then StatsPrinter.print_population !pop;
 
-    Sys.catch_break true; (* If you do a Ctrl+C you still have the results *)
+    Sys.catch_break true; (* Handle SIGINT (Ctrl+C in a Linux shell) to still show the results after an interuption. *)
     (try
         for generation = 1 to !generations do
             if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" generation;
