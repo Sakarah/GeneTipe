@@ -28,6 +28,7 @@ sig
     val crossover_ratio : float (** Ratio of the crossovers in the reproduction phase. *)
     val mutation_ratio : float (** Ratio of the mutations in the reproduction phase. *)
     (** When not choosing mutation or crossover a new random individual is generated using a creation function. *)
+    val remove_duplicates : bool (** If this is set to true, replace duplicates by new randomly generated individuals after each reproduction. *)
 
     val creation : (float * (TargetData.t -> pop_frac:float -> Individual.t)) list (** List of the creation patterns with their probabilities *)
     val mutation : (float * (TargetData.t -> Individual.t -> Individual.t)) list (** List of mutations patterns with their associated probabilities *)

@@ -4,6 +4,7 @@
     "growth_factor": 2.0,
     "crossover_ratio": 0.85,
     "mutation_ratio": 0.1,
+    "remove_duplicates": true,
 
     "plugin_dir":"_build/plugins/regexp_search/",
     "plugins":

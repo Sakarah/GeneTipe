@@ -4,6 +4,7 @@
     "growth_factor": 5.0,
     "crossover_ratio": 0.8,
     "mutation_ratio": 0.1,
+    "remove_duplicates": true,
 
     "plugin_dir":"_build/plugins/symbolic_regression/",
     "plugins":

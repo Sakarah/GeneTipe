@@ -57,6 +57,7 @@ let to_evolution_params json =
             let growth_factor = json |> member "growth_factor" |> to_number;;
             let crossover_ratio = json |> member "crossover_ratio" |> to_float;;
             let mutation_ratio = json |> member "mutation_ratio" |> to_float;;
+            let remove_duplicates = json |> member "remove_duplicates" |> to_bool;;
 
             let creation = get_proba_pattern_list "creation" GeneticType.Creation.get json;;
             let mutation = get_proba_pattern_list "mutation" GeneticType.Mutation.get json;;

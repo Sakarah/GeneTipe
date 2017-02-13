@@ -28,7 +28,7 @@ sig
     val select : (float * individual) array -> target_size:int -> (float * individual) array
 
     (** Replace duplicates by new randomly generated individuals *)
-    val remove_duplicate : target_data -> (float option * individual) array -> (float option * individual) array
+    val remove_duplicates : target_data -> (float option * individual) array -> (float option * individual) array
 
     (** Evolve the population with the fixed number of generations *)
     val evolve : target_data -> (float * individual) array -> (float * individual) array
