@@ -44,35 +44,19 @@ let () =
     let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
 
     let target_data = Parameters.TargetData.read () in
+    let pop = CurrentEvolver.evolve ~verbosity:!verbosity ~nb_gen:!generations target_data in
 
-    if !verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;
-    let init_pop = CurrentEvolver.init_population target_data in
-    let pop = ref (CurrentEvolver.compute_fitness target_data init_pop) in
-    if !verbosity >= 1 then StatsPrinter.print_population !pop;
-
-    Sys.catch_break true; (* Handle SIGINT (Ctrl+C in a Linux shell) to still show the results after an interuption. *)
-    (try
-        for generation = 1 to !generations do
-            if !verbosity >= 1 then Printf.printf "- Generation %d -\n%!" generation;
-            pop := CurrentEvolver.evolve target_data !pop;
-            pop := CurrentEvolver.simplify_individuals ~generation !pop;
-            if !verbosity >= 2 then StatsPrinter.print_stats !pop;
-            if !verbosity >= 3 then StatsPrinter.print_advanced_stats !pop
-        done
-    with Sys.Break -> ());
-
-    pop := CurrentEvolver.simplify_individuals !pop;
     if !verbosity >= 1 then
     (
         Printf.printf "= End of evolution =\n";
-        StatsPrinter.print_population !pop;
+        StatsPrinter.print_population pop;
         Printf.printf "= Final stats =\n";
-        StatsPrinter.print_stats !pop;
-        StatsPrinter.print_advanced_stats !pop
+        StatsPrinter.print_stats pop;
+        StatsPrinter.print_advanced_stats pop
     )
     else
     (
-        let bestFitness, bestDna = Stats.best_individual !pop in
+        let bestFitness, bestDna = Stats.best_individual pop in
         Printf.printf "%f\n%s" bestFitness (Parameters.Individual.to_string bestDna)
     );
 
@@ -83,7 +67,7 @@ let () =
         try
             let graph = Plot.init ~size:(600,600) ~border:25 ~title:"GeneTipe" in
             Parameters.TargetData.plot target_data graph;
-            Parameters.Individual.plot (!pop |> Stats.best_individual |> snd) graph;
+            Parameters.Individual.plot (pop |> Stats.best_individual |> snd) graph;
             Plot.show graph;
             while true do
                 ignore (Graphics.wait_next_event [])

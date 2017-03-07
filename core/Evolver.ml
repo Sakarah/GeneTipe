@@ -8,7 +8,8 @@ sig
     val reproduce : target_data -> (float * individual) array -> (float option * individual) array
     val select : (float * individual) array -> target_size:int -> (float * individual) array
     val remove_duplicates : target_data -> (float option * individual) array -> (float option * individual) array
-    val evolve : target_data -> (float * individual) array -> (float * individual) array
+    val next_generation : target_data -> (float * individual) array -> (float * individual) array
+    val evolve : ?init_pop:(float option * individual) array -> nb_gen:int -> ?verbosity:int -> target_data -> (float * individual) array
 end
 
 module Make (Parameters : EvolParams.S) =
@@ -90,7 +91,7 @@ struct
         initial_population
     ;;
 
-    let evolve target_data initial_population =
+    let next_generation target_data initial_population =
         let pop_size = (Array.length initial_population) in
         let child_population = reproduce target_data initial_population in
         let filtered_population =
@@ -99,5 +100,29 @@ struct
         in
         let evaluated_population = compute_fitness target_data filtered_population in
         select evaluated_population ~target_size:pop_size
+    ;;
+
+    let evolve ?init_pop ~nb_gen ?(verbosity=0) target_data =
+        let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
+        let pop = ref (match init_pop with
+            | Some init_pop -> compute_fitness target_data init_pop
+            | None ->
+                if verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;
+                let init_pop = init_population target_data in
+                let evaluated_init_pop = compute_fitness target_data init_pop in
+                if verbosity >= 2 then StatsPrinter.print_population evaluated_init_pop;
+                evaluated_init_pop
+            )
+        in
+
+        for generation = 1 to nb_gen do
+            if verbosity >= 1 then Printf.printf "- Generation %d -\n%!" generation;
+            pop := next_generation target_data !pop;
+            pop := simplify_individuals ~generation !pop;
+            if verbosity >= 2 then StatsPrinter.print_stats !pop;
+            if verbosity >= 3 then StatsPrinter.print_advanced_stats !pop
+        done;
+
+        !pop
     ;;
 end;;
