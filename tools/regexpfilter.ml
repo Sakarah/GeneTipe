@@ -4,17 +4,18 @@ let () =
 
     let spec_list =
     [
-        ("--substr", Arg.Set substr, "Print all the substring that are matching for each string");
-        ("-s", Arg.Set substr, "Shorthand for --substr");
+        ("--substr", Arg.Set substr, " Print all the substring that are matching for each string");
+        ("-s", Arg.Set substr, " Shorthand for --substr");
     ]
     in
 
     let usage_msg =
-        "Prints all the strings of the input that are matching the regular expression on the command line.\n" ^
-        "The program treats each line as an independent string.\n" ^
-        "It only stops when reaching end of file (by reading EOF).\n" ^
-        "Usage : regexpfilter [options] regexp\n\n" ^
-        "Options available:"
+        "Prints all the strings of the input that are matching the regular expression on the command line.\n\
+        The program treats each line as an independent string.\n\
+        It only stops when reaching end of file (by reading EOF).\n\
+        Usage : regexpfilter [options] regexp\n\
+        \n\
+        Options available:"
     in
 
     Arg.parse spec_list (fun reg -> regexp := reg) usage_msg;

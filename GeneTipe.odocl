@@ -3,6 +3,9 @@ core/Evolver
 core/ParamReader
 core/Plugin
 core/Stats
-lib/MathParser
-lib/Plot
 lib/RandUtil
+lib/math/MathParser
+lib/math/Plot
+lib/regexp/RegexpTree
+lib/regexp/RegexpParser
+lib/regexp/RegexpAutomata
