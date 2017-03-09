@@ -1,6 +1,5 @@
 type t = RegexpTree.t;;
 let to_string = RegexpTree.to_string;;
-let plot _ _ = ();;
 
 (* == Advanced stats == *)
 let rec branch_number = function

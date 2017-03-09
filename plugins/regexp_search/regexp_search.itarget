@@ -1,4 +1,3 @@
-RegexpSearch.cmxs
 RandomCreation.cmxs
 TakeSubtreeCrossover.cmxs
 RebuildSubtreeMutation.cmxs

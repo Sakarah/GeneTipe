@@ -40,4 +40,4 @@ sig
 end
 
 (** Create a new Evolver from the given parameters *)
-module Make : functor (Parameters : EvolParams.S) -> S with type individual := Parameters.Individual.t and type target_data := Parameters.TargetData.t
+module Make : functor (Parameters : EvolParams.S) -> S with type individual := Parameters.Individual.t and type target_data := Parameters.target_data

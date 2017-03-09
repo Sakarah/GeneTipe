@@ -21,27 +21,27 @@ end;;
 module MakeHookingPoint (Type : HookType) =
 struct
     type t = Type.t;;
-    let registered_values = Hashtbl.create 10;;
-    let register = Hashtbl.add registered_values;;
+    let registered_values = ref [];;
+    let register hook_name hook =
+        registered_values := (hook_name,hook)::!registered_values;
+    ;;
     let get hook_name =
         try
-            Hashtbl.find registered_values hook_name
+            List.assoc hook_name !registered_values
         with Not_found -> raise (Error (hook_name^" is not registered by any loaded plugin"))
     ;;
 end;;
 
-module type GeneticTypeInterface =
+module type GeneticHooks =
 sig
     module Individual : EvolParams.Individual
-    module TargetData : EvolParams.TargetData
-    module Creation : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> pop_frac:float -> Individual.t)
-    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> Individual.t -> Individual.t)
+    type target_data
+    module Creation : HookingPoint with type t = (Yojson.Basic.json -> target_data -> pop_frac:float -> Individual.t)
+    module Mutation : HookingPoint with type t = (Yojson.Basic.json -> target_data -> Individual.t -> Individual.t)
     module Crossover : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
-    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> TargetData.t -> Individual.t -> float)
+    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> target_data -> Individual.t -> float)
     module Simplification : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
-end;;
-
-module GeneticType = MakeHookingPoint (struct type t = (module GeneticTypeInterface) end);;
+end
 
 module type SelectionFunction = sig val f:(float * 'i) array -> target_size:int -> (float * 'i) array end;;
 module Selection = MakeHookingPoint (struct type t = (Yojson.Basic.json -> (module SelectionFunction)) end);;

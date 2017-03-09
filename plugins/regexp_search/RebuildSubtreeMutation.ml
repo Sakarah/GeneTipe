@@ -24,5 +24,5 @@ let rebuild_subtree_pattern json data =
 ;;
 
 let () =
-    RegexpSearch.Mutation.register "rebuild_subtree" rebuild_subtree_pattern
+    RegexpSearchHooks.Mutation.register "rebuild_subtree" rebuild_subtree_pattern
 ;;

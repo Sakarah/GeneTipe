@@ -32,6 +32,6 @@ let make_fitness json =
 ;;
 
 let () =
-    RegexpSearch.Fitness.register "multiobjective" make_fitness
+    RegexpSearchHooks.Fitness.register "multiobjective" make_fitness
 ;;
 

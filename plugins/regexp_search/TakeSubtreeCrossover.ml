@@ -34,5 +34,5 @@ let take_subtree_crossover _ base giver =
 ;;
 
 let () =
-    RegexpSearch.Crossover.register "take_subtree" take_subtree_crossover
+    RegexpSearchHooks.Crossover.register "take_subtree" take_subtree_crossover
 ;;

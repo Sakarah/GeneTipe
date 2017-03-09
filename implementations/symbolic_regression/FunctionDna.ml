@@ -40,8 +40,6 @@ let to_string dna =
 
 let print ppf dna = Format.fprintf ppf "%s" (to_string dna);;
 
-let plot dna = Plot.plot_fun ~color:Graphics.blue (eval dna)
-
 (* == Advanced stats == *)
 let rec branch_number = function
     | BinOp (_,_,child1,child2) -> branch_number child1 + branch_number child2

@@ -106,6 +106,6 @@ let grow_pattern = make_pattern create_random_grow;;
 let fill_pattern = make_pattern create_random_fill;;
 
 let () =
-    SymbolicRegression.Creation.register "grow" grow_pattern;
-    SymbolicRegression.Creation.register "fill" fill_pattern
+    SymbolicRegressionHooks.Creation.register "grow" grow_pattern;
+    SymbolicRegressionHooks.Creation.register "fill" fill_pattern
 ;;

@@ -20,5 +20,5 @@ let fitness _ (examples,counter_examples) regexp =
 ;;
 
 let () =
-    RegexpSearch.Fitness.register "full_match" fitness
+    RegexpSearchHooks.Fitness.register "full_match" fitness
 ;;

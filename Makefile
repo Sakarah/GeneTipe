@@ -1,28 +1,9 @@
-OCAMLBUILD = ocamlbuild -use-ocamlfind -no-links
-SUBDIRS = core plugins tools
+OCAMLBUILD = ocamlbuild
+SUBDIRS = lib core implementations plugins tools
+IMPLEMENTATION_SYMLINK = regexp-search symbolic-regression
 TOOL_SYMLINK = genpts randpts fuzzpts regexpfilter
 
-all: configure build-all symlinks
-
-configure: _tags lib/ArrayIter.ml
-_tags: _tags_vanilla
-	cp _tags_vanilla _tags
-lib/ArrayIter.ml: | _tags
-	@if [ $$(uname -o) = "Cygwin" ]; \
-	then \
-		echo "Parallelization unavailable on Windows (using Cygwin)"; \
-		cp lib/ArrayIter_vanilla.ml lib/ArrayIter.ml; \
-	else \
-		if ocamlfind query parmap > /dev/null; \
-		then \
-			echo "Parmap parallelization enabled"; \
-			ln -s ArrayIter_parmap.ml lib/ArrayIter.ml; \
-			echo "true: package(parmap)" >> _tags; \
-		else \
-			echo "Parallelization unavailable (Parmap is not installed on your system)"; \
-			ln -s ArrayIter_vanilla.ml lib/ArrayIter.ml; \
-		fi; \
-	fi
+all: build-all symlinks
 
 build-all:
 	$(OCAMLBUILD) all.otarget
@@ -30,9 +11,9 @@ build-all:
 $(SUBDIRS): %:
 	$(OCAMLBUILD) $@/$@.otarget
 
-symlinks: genetipe $(TOOL_SYMLINK)
-genetipe:
-	ln -s _build/core/genetipe.native genetipe
+symlinks: $(IMPLEMENTATION_SYMLINK) $(TOOL_SYMLINK)
+$(IMPLEMENTATION_SYMLINK): %:
+	ln -s _build/implementations/$(subst -,_,$@)/$(subst -,_,$@).native $@
 $(TOOL_SYMLINK): %:
 	ln -s _build/tools/$@.native $@
 
@@ -41,9 +22,8 @@ doc:
 
 clean:
 	-rm -r _build
-	-rm _tags
-	-rm lib/ArrayIter.ml
-	-rm genetipe $(TOOL_SYMLINK)
+	-rm $(IMPLEMENTATION_SYMLINK)
+	-rm $(TOOL_SYMLINK)
 
 sanitize: clean
 	@echo "Replacing tabs with 4 spaces in OCaml files"
@@ -62,4 +42,4 @@ sanitize: clean
 		sed -i '$$a\' $$f ; \
 	done
 
-.PHONY: all configure build-all $(SUBDIRS) symlinks doc clean sanitize
+.PHONY: all build-all $(SUBDIRS) symlinks doc clean sanitize

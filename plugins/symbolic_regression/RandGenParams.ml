@@ -19,8 +19,8 @@ let to_op get_method json =
     let params = json |> member "params" in
     (proba, name, op params)
 ;;
-let to_bin_op = to_op SymbolicRegression.BinOp.get;;
-let to_un_op = to_op SymbolicRegression.UnOp.get;;
+let to_bin_op = to_op SymbolicRegressionHooks.BinOp.get;;
+let to_un_op = to_op SymbolicRegressionHooks.UnOp.get;;
 
 let to_generator json =
     let const_generator_distrib = json |> member "distrib" |> to_string in

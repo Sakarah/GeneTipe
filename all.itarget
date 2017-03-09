@@ -1,3 +1,5 @@
+lib/lib.otarget
 core/core.otarget
+implementations/implementations.otarget
 plugins/plugins.otarget
 tools/tools.otarget

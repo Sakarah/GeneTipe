@@ -1,5 +1,4 @@
 {
-    "type":"regexp_search",
     "pop_size": 1000,
     "growth_factor": 2.0,
     "crossover_ratio": 0.85,
@@ -11,7 +10,6 @@
     [
         "../selection/Tournament.cmxs",
         "../parent_chooser/UniformParentChooser.cmxs",
-        "RegexpSearch.cmxs",
         "RandomCreation.cmxs",
         "RebuildSubtreeMutation.cmxs",
         "TakeSubtreeCrossover.cmxs",

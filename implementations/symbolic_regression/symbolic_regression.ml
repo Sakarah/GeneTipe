@@ -18,33 +18,39 @@ let () =
             "Override a configuration value (for accessing a subkey use / separator) by a new given json tree. (Takes 2 parameters)");
         ("-c", Arg.Tuple [Arg.Set_string next_overriden_key; Arg.String (function json -> config_overrides := (!next_overriden_key,json)::(!config_overrides))],
             "Shorthand for --config-override");
-        ("--quiet", Arg.Unit (fun () -> verbosity := 0), "Do not print anything else than the best individual at the end of the evolution process (equivalent to -v 0)");
+        ("--quiet", Arg.Unit (fun () -> verbosity := 0), "Do not print anything else than the best function at the end of the evolution process (equivalent to -v 0)");
         ("--no-stats", Arg.Unit (fun () -> verbosity := 1), "No intermediate statistics about the currently generated population (equivalent to -v 1)");
         ("--full-stats", Arg.Unit (fun () -> verbosity := 3), "Print full intermediate statistics about the currently generated population (equivalent to -v 3)");
         ("-v", Arg.Set_int verbosity, "Set the verbosity level (default is 2). Lower values speed up the process");
-        ("--graph", Arg.Set show_graph, "Show a graph with the target data and the best computed individual at the end of the evolution process. This is only relevant for some genetic types providing plot functions for the target data and the individuals.")
+        ("--graph", Arg.Set show_graph, "Show a graph with the point set and the best computed function at the end")
     ]
     in
 
     let usage_msg =
-        "GeneTipe is a generic evolver tool.\n" ^
-        "It creates individuals with high fitness value using a genetic algorithm.\n" ^
-        "It reads a configuration file specifying the population type and the parameters of the evolution process, loading all the required plugins.\n" ^
-        "The program waits as input the target data in a format described by the genetic type plugin.\n" ^
-        "Usage : genetipe [options] configFilename\n\n" ^
-        "Options available:"
+        "Symbolic regression tool of the GeneTipe project.\n\
+        It automatically build a function matching the points given using a genetic algorithm.\n\
+        The program waits as input the number of sampling points on the first line and then on each line the x and y coordinates of a point separated by a space.\n\
+        You need to provide it a configuration file specifying the required plugins and the parameters of the evolution process.\n\
+        Usage: symbolic-regression [options] configFilename\n\
+        \n\
+        Options available:"
     in
 
     Arg.parse spec_list (fun cfg_file -> config_filename := cfg_file) usage_msg;
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
-    ParamReader.read ~config_overrides:!config_overrides ~filename:!config_filename;
-    let module Parameters = (val ParamReader.get_evolution_params ()) in
-    let module CurrentEvolver = Evolver.Make (Parameters) in
+    let module ParamJson = (val ParamReader.read_json_tree ~config_overrides:!config_overrides ~filename:!config_filename) in
+    let module Parameters = ParamReader.ReadConfig (SymbolicRegressionHooks) (ParamJson) in
+    let module FunctionEvolver = Evolver.Make (Parameters) in
     let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
 
-    let target_data = Parameters.TargetData.read () in
-    let pop = CurrentEvolver.evolve ~verbosity:!verbosity ~nb_gen:!generations target_data in
+    let nb_points = Scanf.scanf "%d\n" (function n -> n) in
+    let target_points = Array.make nb_points (0.,0.) in
+    for i = 0 to nb_points-1 do
+        target_points.(i) <- Scanf.scanf "%f %f\n" (fun x y -> (x,y))
+    done;
+
+    let pop = FunctionEvolver.evolve ~verbosity:!verbosity ~nb_gen:!generations target_points in
 
     if !verbosity >= 1 then
     (
@@ -57,7 +63,7 @@ let () =
     else
     (
         let bestFitness, bestDna = Stats.best_individual pop in
-        Printf.printf "%f\n%s" bestFitness (Parameters.Individual.to_string bestDna)
+        Printf.printf "%f\n%s" bestFitness (FunctionDna.to_string bestDna)
     );
 
     if !show_graph then
@@ -66,8 +72,8 @@ let () =
 
         try
             let graph = Plot.init ~size:(600,600) ~border:25 ~title:"GeneTipe" in
-            Parameters.TargetData.plot target_data graph;
-            Parameters.Individual.plot (pop |> Stats.best_individual |> snd) graph;
+            Plot.plot ~color:Graphics.red ~link:false (Array.map fst target_points) (Array.map snd target_points) graph;
+            Plot.plot_fun ~color:Graphics.blue (FunctionDna.eval (pop |> Stats.best_individual |> snd)) graph;
             Plot.show graph;
             while true do
                 ignore (Graphics.wait_next_event [])

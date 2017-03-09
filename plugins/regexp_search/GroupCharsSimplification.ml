@@ -56,5 +56,5 @@ let rec simplify_tree = function
 let group_chars_simplification _ = simplify_tree;;
 
 let () =
-    RegexpSearch.Simplification.register "group_chars" group_chars_simplification
+    RegexpSearchHooks.Simplification.register "group_chars" group_chars_simplification
 ;;

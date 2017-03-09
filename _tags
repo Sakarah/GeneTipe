@@ -1,0 +1,8 @@
+<core/**>: searchdir(lib), package(str), package(yojson), package(dynlink)
+<implementations/**>: linkall, use_randutil, package(str), package(yojson), package(dynlink), use_genetipe
+<implementations/regexp_search/**>: use_regexp
+<implementations/symbolic_regression/**>: use_mathutil, package(graphics)
+<plugins/**>: package(yojson), searchdir(core), searchdir(lib)
+<plugins/regexp_search/**>: searchdir(lib/regexp), searchdir(implementations/regexp_search)
+<plugins/symbolic_regression/**>: searchdir(lib/math), searchdir(implementations/symbolic_regression)
+<tools/**>: use_randutil, use_mathutil, use_regexp

@@ -20,6 +20,6 @@ let fitness _ (examples,counter_examples) regexp =
 ;;
 
 let () =
-    RegexpSearch.Fitness.register "partial_match" fitness
+    RegexpSearchHooks.Fitness.register "partial_match" fitness
 ;;
 

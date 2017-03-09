@@ -101,6 +101,6 @@ let grow_pattern = make_pattern create_random_grow;;
 let fill_pattern = make_pattern create_random_fill;;
 
 let () =
-    RegexpSearch.Creation.register "grow" grow_pattern;
-    RegexpSearch.Creation.register "fill" fill_pattern
+    RegexpSearchHooks.Creation.register "grow" grow_pattern;
+    RegexpSearchHooks.Creation.register "fill" fill_pattern
 ;;

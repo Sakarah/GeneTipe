@@ -6,22 +6,13 @@ sig
     type t (** Type of the genetically modifiable individual *)
     val to_string : t -> string (** Function for getting the string representation of an individual. *)
     val advanced_stats : (string * ((float*t) array -> float)) list (** List of the advanced stats functions for a population of individuals *)
-    val plot : t -> Plot.graph -> unit (** Plot the individual on the given graph. *)
-end
-
-(** Module type to carry the representation of the target data *)
-module type TargetData =
-sig
-    type t (** Type of the target data *)
-    val read : unit -> t (** Read the target data from the given channel *)
-    val plot : t -> Plot.graph -> unit (** Plot the target data on the given graph. *)
 end
 
 (** This module type represents the parameters of a genetic selection process *)
 module type S =
 sig
     module Individual : Individual (** Individual type used for the evolution *)
-    module TargetData : TargetData (** Target data module *)
+    type target_data (** Target data type *)
 
     val pop_size : int (** Number of individuals in the population *)
     val growth_factor : float (** Multiplication factor of the population after a reproduction phase *)
@@ -30,11 +21,11 @@ sig
     (** When not choosing mutation or crossover a new random individual is generated using a creation function. *)
     val remove_duplicates : bool (** If this is set to true, replace duplicates by new randomly generated individuals after each reproduction. *)
 
-    val creation : (float * (TargetData.t -> pop_frac:float -> Individual.t)) list (** List of the creation patterns with their probabilities *)
-    val mutation : (float * (TargetData.t -> Individual.t -> Individual.t)) list (** List of mutations patterns with their associated probabilities *)
+    val creation : (float * (target_data -> pop_frac:float -> Individual.t)) list (** List of the creation patterns with their probabilities *)
+    val mutation : (float * (target_data -> Individual.t -> Individual.t)) list (** List of mutations patterns with their associated probabilities *)
     val crossover : (float * (Individual.t -> Individual.t -> Individual.t)) list (** List of crossovers patterns with their associated probabilities *)
     val simplifications : (int * (Individual.t -> Individual.t)) list (** List of the simplifications patterns to apply to the population each n turn *)
-    val fitness : TargetData.t -> Individual.t -> float (** Fitness function to use *)
+    val fitness : target_data -> Individual.t -> float (** Fitness function to use *)
     val selection : (float * Individual.t) array -> target_size:int -> (float * Individual.t) array (** Function for selecting the individuals to be copied for the next generation *)
     val parent_chooser : (float * Individual.t) array -> unit -> Individual.t (** Function used to randomly pick one individual for beeing a parent in the reproduction phase. *)
 end

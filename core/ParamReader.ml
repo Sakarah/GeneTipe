@@ -44,33 +44,6 @@ let get_scheduled_pattern_list type_name method_getter json =
         raise (ParsingError (type_name^": "^str^" ("^(Yojson.Basic.to_string json)^")"))
 ;;
 
-let to_evolution_params json =
-    try
-        let module GeneticType = (val Plugin.GeneticType.get (json |> member "type" |> to_string)) in
-        let module SelectionFunction = (val get_method "selection" Plugin.Selection.get json) in
-        let module ParentChooserFunction = (val get_method "parent_choice" Plugin.ParentChooser.get json) in
-        (module struct
-            module Individual = GeneticType.Individual
-            module TargetData = GeneticType.TargetData
-
-            let pop_size = json |> member "pop_size" |> to_int;;
-            let growth_factor = json |> member "growth_factor" |> to_number;;
-            let crossover_ratio = json |> member "crossover_ratio" |> to_float;;
-            let mutation_ratio = json |> member "mutation_ratio" |> to_float;;
-            let remove_duplicates = json |> member "remove_duplicates" |> to_bool;;
-
-            let creation = get_proba_pattern_list "creation" GeneticType.Creation.get json;;
-            let mutation = get_proba_pattern_list "mutation" GeneticType.Mutation.get json;;
-            let crossover = get_proba_pattern_list "crossover" GeneticType.Crossover.get json;;
-            let fitness = get_method "fitness" GeneticType.Fitness.get json;;
-            let simplifications = get_scheduled_pattern_list "simplifications" GeneticType.Simplification.get json;;
-            let selection = SelectionFunction.f;;
-            let parent_chooser = ParentChooserFunction.f;;
-        end : EvolParams.S)
-    with Yojson.Basic.Util.Type_error (str,json) ->
-        raise (ParsingError ("evolution: "^str^" ("^(Yojson.Basic.to_string json)^")"))
-;;
-
 let load_plugins json =
     try
         let plugin_dir = json |> member "plugin_dir" |> to_string in
@@ -79,16 +52,6 @@ let load_plugins json =
     with Yojson.Basic.Util.Type_error (str,json) ->
         raise (ParsingError ("plugins: "^str^" ("^(Yojson.Basic.to_string json)^")"))
 ;;
-
-let json_tree = ref None;;
-let evol_params = ref None;;
-
-let get_ref v = match !v with
-    | Some var -> var
-    | None -> failwith "Not loaded configuration file"
-;;
-let get_json () = get_ref json_tree;;
-let get_evolution_params () = get_ref evol_params;;
 
 let rec override replacement_path new_json base_json =
     match replacement_path with
@@ -121,21 +84,49 @@ let is_alpha = function
     | _ -> false
 ;;
 
-let apply_overrides =
-    let apply_override (key,j) =
+let apply_overrides json =
+    let apply_override json (key,j) =
         let new_json =
             if String.length j > 0 && (is_alpha j.[0]) then `String j
             else Yojson.Basic.from_string ~fname:"<command line overriding>" j
         in
         let path = Str.split (Str.regexp "/") key in
-        json_tree := Some (override path new_json (get_json ()))
+        override path new_json json
     in
-    List.iter apply_override
+    List.fold_left apply_override json
 ;;
 
-let read ?(config_overrides=[]) ~filename =
-    json_tree := Some (Yojson.Basic.from_file filename);
-    apply_overrides config_overrides;
-    load_plugins (get_json ());
-    evol_params := Some (to_evolution_params (get_json ()))
+module type JsonTree = sig val json : Yojson.Basic.json end;;
+let read_json_tree ?(config_overrides=[]) ~filename =
+    let json_tree = apply_overrides (Yojson.Basic.from_file filename) config_overrides in
+    load_plugins json_tree;
+    (module struct let json = json_tree end : JsonTree)
 ;;
+
+module ReadConfig (GeneticHooks : Plugin.GeneticHooks) (ConfigJson : JsonTree) =
+struct
+    module Individual = GeneticHooks.Individual;;
+    type target_data = GeneticHooks.target_data;;
+
+    let pop_size = ConfigJson.json |> member "pop_size" |> to_int;;
+    let growth_factor = ConfigJson.json |> member "growth_factor" |> to_number;;
+    let crossover_ratio = ConfigJson.json |> member "crossover_ratio" |> to_float;;
+    let mutation_ratio = ConfigJson.json |> member "mutation_ratio" |> to_float;;
+    let remove_duplicates = ConfigJson.json |> member "remove_duplicates" |> to_bool;;
+
+    let creation = get_proba_pattern_list "creation" GeneticHooks.Creation.get ConfigJson.json;;
+    let mutation = get_proba_pattern_list "mutation" GeneticHooks.Mutation.get ConfigJson.json;;
+    let crossover = get_proba_pattern_list "crossover" GeneticHooks.Crossover.get ConfigJson.json;;
+    let fitness = get_method "fitness" GeneticHooks.Fitness.get ConfigJson.json;;
+    let simplifications = get_scheduled_pattern_list "simplifications" GeneticHooks.Simplification.get ConfigJson.json;;
+
+    let selection =
+        let module SelectionFunction = (val get_method "selection" Plugin.Selection.get ConfigJson.json) in
+        SelectionFunction.f
+    ;;
+
+    let parent_chooser =
+        let module ParentChooserFunction = (val get_method "parent_choice" Plugin.ParentChooser.get ConfigJson.json) in
+        ParentChooserFunction.f
+    ;;
+end;;

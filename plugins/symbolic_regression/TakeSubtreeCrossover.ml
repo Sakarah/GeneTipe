@@ -20,5 +20,5 @@ let take_subtree_crossover _ base giver =
 ;;
 
 let () =
-    SymbolicRegression.Crossover.register "take_subtree" take_subtree_crossover
+    SymbolicRegressionHooks.Crossover.register "take_subtree" take_subtree_crossover
 ;;

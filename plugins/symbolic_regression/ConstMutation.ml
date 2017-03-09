@@ -21,5 +21,5 @@ let mutate_const_pattern json _ =
 ;;
 
 let () =
-    SymbolicRegression.Mutation.register "mutate_const" mutate_const_pattern
+    SymbolicRegressionHooks.Mutation.register "mutate_const" mutate_const_pattern
 ;;

@@ -31,5 +31,5 @@ let rec simplify = function
 let repeat_simplification _ = simplify;;
 
 let () =
-    RegexpSearch.Simplification.register "repeat_simplification" repeat_simplification
+    RegexpSearchHooks.Simplification.register "repeat_simplification" repeat_simplification
 ;;

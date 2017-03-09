@@ -17,5 +17,3 @@ let read () =
     let negative_examples = read_string_array () in
     (positive_examples, negative_examples)
 ;;
-
-let plot _ _ = ();;

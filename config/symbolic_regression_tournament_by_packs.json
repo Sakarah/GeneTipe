@@ -1,5 +1,4 @@
 {
-    "type":"symbolic_regression",
     "pop_size": 1000,
     "growth_factor": 5.0,
     "crossover_ratio": 0.8,
@@ -13,7 +12,6 @@
         "../random/NormalGen.cmxs",
         "../selection/TournamentByPacks.cmxs",
         "../parent_chooser/UniformParentChooser.cmxs",
-        "SymbolicRegression.cmxs",
         "MathPrimitives.cmxs",
         "FillGrowCreation.cmxs",
         "ConstMutation.cmxs",

@@ -20,5 +20,5 @@ let rebuild_subtree_pattern json _ =
 ;;
 
 let () =
-    SymbolicRegression.Mutation.register "rebuild_subtree" rebuild_subtree_pattern
+    SymbolicRegressionHooks.Mutation.register "rebuild_subtree" rebuild_subtree_pattern
 ;;

@@ -23,5 +23,5 @@ let rec simplify = function
 let eval_const _ = simplify;;
 
 let () =
-    SymbolicRegression.Simplification.register "eval_const" eval_const
+    SymbolicRegressionHooks.Simplification.register "eval_const" eval_const
 ;;

@@ -12,5 +12,5 @@ let fitness _ points dna =
 ;;
 
 let () =
-    SymbolicRegression.Fitness.register "squared_diff" fitness
+    SymbolicRegressionHooks.Fitness.register "squared_diff" fitness
 ;;

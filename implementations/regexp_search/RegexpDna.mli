@@ -8,9 +8,6 @@ type t = RegexpTree.t
 (** Direct call to {!RegexpTree.to_string} to satisfy {!EvolParams.Individual} requirements. *)
 val to_string : t -> string
 
-(** As plotting is meaningless for a regular expression this function does nothing. It is here only to satisfy {!EvolParams.Individual} requirements. *)
-val plot : t -> Plot.graph -> unit
-
 
 (** {2 Advanced stats} *)
 (** Return the average depth of a population of regexp *)
