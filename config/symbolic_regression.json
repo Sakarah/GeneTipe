@@ -23,12 +23,12 @@
 
     "creation":
     [
-        { "proba":0.5, "method":"fill", "params":"random_gen" },
-        { "proba":0.5, "method":"grow", "params":"random_gen" }
+        { "proba":0.5, "method":"fill", "params":"&random_gen" },
+        { "proba":0.5, "method":"grow", "params":"&random_gen" }
     ],
     "mutation":
     [
-        { "proba":0.1, "method":"rebuild_subtree", "params":"random_gen" },
+        { "proba":0.1, "method":"rebuild_subtree", "params":"&random_gen" },
         {
             "proba":0.9, "method":"mutate_const",
             "params": { "mutation_proba":0.2, "const_generator": { "distrib":"normal", "params":{"mean":0.0, "deviation":1.0} } }
@@ -46,7 +46,7 @@
     "selection" : { "method":"tournament" },
     "parent_choice": { "method":"proportional" },
 
-    "random_gen":
+    "&random_gen":
     {
         "min_depth": 1,
         "max_depth": 5,

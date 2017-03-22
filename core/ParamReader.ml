@@ -4,7 +4,7 @@ exception OverridingError of string;;
 open Yojson.Basic.Util;;
 
 let get_params global_json = function
-    | `String name -> member name global_json
+    | `String name when name.[0] = '&' -> member name global_json
     | json -> json
 ;;
 
