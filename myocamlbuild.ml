@@ -35,4 +35,4 @@ let () = dispatch (function
         ocaml_lib ~dir:"lib/math" ~tag_name:"use_mathutil" "lib/math/MathUtil";
 
     | _ -> ()
-)
+);;

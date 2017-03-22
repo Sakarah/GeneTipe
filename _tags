@@ -4,5 +4,7 @@
 <implementations/symbolic_regression/**>: use_mathutil, package(graphics)
 <plugins/**>: package(yojson), searchdir(core), searchdir(lib)
 <plugins/regexp_search/**>: searchdir(lib/regexp), searchdir(implementations/regexp_search)
+<plugins/regexp_search/mutation/**>: searchdir(plugins/regexp_search/creation)
 <plugins/symbolic_regression/**>: searchdir(lib/math), searchdir(implementations/symbolic_regression)
+<plugins/symbolic_regression/mutation/**>: searchdir(plugins/symbolic_regression/creation)
 <tools/**>: use_randutil, use_mathutil, use_regexp

@@ -10,12 +10,12 @@
     [
         "../selection/Tournament.cmxs",
         "../parent_chooser/UniformParentChooser.cmxs",
-        "RandomCreation.cmxs",
-        "RebuildSubtreeMutation.cmxs",
-        "TakeSubtreeCrossover.cmxs",
-        "MultiobjectiveFitness.cmxs",
-        "RepeatSimplification.cmxs",
-        "GroupCharsSimplification.cmxs"
+        "creation/RandomCreation.cmxs",
+        "mutation/RebuildSubtreeMutation.cmxs",
+        "crossover/TakeSubtreeCrossover.cmxs",
+        "fitness/MultiobjectiveFitness.cmxs",
+        "simplification/RepeatSimplification.cmxs",
+        "simplification/GroupChars.cmxs"
     ],
 
     "creation":

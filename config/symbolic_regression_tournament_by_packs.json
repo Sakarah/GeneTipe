@@ -12,13 +12,13 @@
         "../random/NormalGen.cmxs",
         "../selection/TournamentByPacks.cmxs",
         "../parent_chooser/UniformParentChooser.cmxs",
-        "MathPrimitives.cmxs",
-        "FillGrowCreation.cmxs",
-        "ConstMutation.cmxs",
-        "RebuildSubtreeMutation.cmxs",
-        "TakeSubtreeCrossover.cmxs",
-        "SquaredDiffFitness.cmxs",
-        "ConstEvalSimplification.cmxs"
+        "primitives/MathPrimitives.cmxs",
+        "creation/FillGrowCreation.cmxs",
+        "mutation/ConstMutation.cmxs",
+        "mutation/RebuildSubtreeMutation.cmxs",
+        "crossover/TakeSubtreeCrossover.cmxs",
+        "fitness/SquaredDiffFitness.cmxs",
+        "simplification/ConstEvalSimplification.cmxs"
     ],
 
     "creation":

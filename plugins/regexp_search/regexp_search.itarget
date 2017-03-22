@@ -1,8 +1,8 @@
-RandomCreation.cmxs
-TakeSubtreeCrossover.cmxs
-RebuildSubtreeMutation.cmxs
-FullMatchFitness.cmxs
-PartialMatchFitness.cmxs
-MultiobjectiveFitness.cmxs
-RepeatSimplification.cmxs
-GroupCharsSimplification.cmxs
+creation/RandomCreation.cmxs
+crossover/TakeSubtreeCrossover.cmxs
+mutation/RebuildSubtreeMutation.cmxs
+fitness/FullMatchFitness.cmxs
+fitness/PartialMatchFitness.cmxs
+fitness/MultiobjectiveFitness.cmxs
+simplification/RepeatSimplification.cmxs
+simplification/GroupChars.cmxs
