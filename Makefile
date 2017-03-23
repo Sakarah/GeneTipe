@@ -1,7 +1,7 @@
 OCAMLBUILD = ocamlbuild
 SUBDIRS = lib core implementations plugins tools
 IMPLEMENTATION_SYMLINK = regexp-search symbolic-regression
-TOOL_SYMLINK = genpts randpts fuzzpts regexpfilter
+TOOL_SYMLINK = genpts randpts fuzzpts regexp-classify
 
 all: build-all symlinks
 
@@ -15,7 +15,7 @@ symlinks: $(IMPLEMENTATION_SYMLINK) $(TOOL_SYMLINK)
 $(IMPLEMENTATION_SYMLINK): %:
 	ln -s _build/implementations/$(subst -,_,$@)/$(subst -,_,$@).native $@
 $(TOOL_SYMLINK): %:
-	ln -s _build/tools/$@.native $@
+	ln -s _build/tools/$(subst -,_,$@).native $@
 
 doc:
 	$(OCAMLBUILD) GeneTipe.docdir/index.html

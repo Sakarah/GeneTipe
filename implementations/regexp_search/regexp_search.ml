@@ -27,10 +27,11 @@ let () =
 
     let usage_msg =
         "Regular expression searching tool of the GeneTipe project.\n\
-        This program waits as input a list of examples followed by a list of counter examples of strings that should be used to infer a regular expression.\n\
-        It creates and evolve a population of candidate regular expressions with an genetic algorithm.\n\
+        This program waits as input a list of examples and counter-examples of strings that should be used to infer a regular expression.\n\
+        Each line is treated as a single example if it starts with a '+' and as a counter-example if it starts with a '-'. Without any '+' or '-', a line is ignored. The example must immediately follow the sign without space.\n\
+        It creates and evolve a population of candidate regular expressions with a genetic algorithm.\n\
         All the genetic operators on the population must be provided through plugins loaded dynamically.\n\
-        You need to provide it a configuration file specifying the required plugins and the parameters of the evolution process.\n\
+        You need to provide a configuration file specifying the required plugins and the parameters of the evolution process.\n\
         Usage: regexp-search [options] configFilename\n\
         \n\
         Options available:"
@@ -53,7 +54,9 @@ let () =
         StatsPrinter.print_population pop;
         Printf.printf "= Final stats =\n";
         StatsPrinter.print_stats pop;
-        StatsPrinter.print_advanced_stats pop
+        StatsPrinter.print_advanced_stats pop;
+        let (ex, cex) = target_data in
+        Printf.printf "(Extracted from %d examples and %d counter-examples)\n" (Array.length ex) (Array.length cex)
     )
     else
     (

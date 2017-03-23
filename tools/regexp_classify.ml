@@ -1,24 +1,28 @@
 let () =
     let regexp = ref "" in
     let substr = ref false in
+    let filter = ref false in
 
     let spec_list =
     [
+        ("--filter", Arg.Set filter, " Remove all the non matching strings instead of adding +/-");
+        ("-f", Arg.Set filter, " Shorthand for --filter");
         ("--substr", Arg.Set substr, " Print all the substring that are matching for each string");
         ("-s", Arg.Set substr, " Shorthand for --substr");
     ]
     in
 
     let usage_msg =
-        "Prints all the strings of the input that are matching the regular expression on the command line.\n\
+        "Classify input string according to the given regexp.\n\
+        By default, it prepends a '+' to the matching strings and a '-' to the non-matching ones.\n\
         The program treats each line as an independent string.\n\
         It only stops when reaching end of file (by reading EOF).\n\
-        Usage : regexpfilter [options] regexp\n\
+        Usage : regexp-classify [options] regexp\n\
         \n\
         Options available:"
     in
 
-    Arg.parse spec_list (fun reg -> regexp := reg) usage_msg;
+    Arg.parse (Arg.align spec_list) (fun reg -> regexp := reg) usage_msg;
     if !regexp = "" then raise (Arg.Bad "No regular expression given");
 
     let regexp_tree = RegexpParser.parse !regexp in
@@ -36,8 +40,13 @@ let () =
             )
             else
             (
-                if RegexpAutomata.is_matching regexp_automata str then
-                    Printf.printf "%s\n" str
+                let matching = RegexpAutomata.is_matching regexp_automata str in
+                if not(!filter) then
+                (
+                    if matching then Printf.printf "+%s\n" str
+                    else Printf.printf "-%s\n" str
+                )
+                else if matching then Printf.printf "%s\n" str
             )
         done
     with End_of_file -> ()

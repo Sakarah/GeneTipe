@@ -1,19 +1,23 @@
 type t = string array * string array;;
 
-let id x = x;;
-
-let read_string_array () =
-    let nb_str = Scanf.sscanf (read_line ()) "%d" id in
-    let str_array = Array.make nb_str "" in
-    for i = 0 to nb_str-1 do
-        str_array.(i) <- read_line ();
-        if str_array.(i) = "" then failwith "An example cannot be empty"
-    done;
-    str_array
-;;
+let remove_first_char str = String.sub str 1 (String.length str - 1);;
 
 let read () =
-    let positive_examples = read_string_array () in
-    let negative_examples = read_string_array () in
-    (positive_examples, negative_examples)
+    let positive_examples = ref [] in
+    let negative_examples = ref [] in
+
+    (try
+        while true do
+            let str = read_line () in
+            if String.length str >= 2 then
+            (
+                if str.[0] = '+' then
+                    positive_examples := (remove_first_char str)::(!positive_examples)
+                else if str.[0] = '-' then
+                    negative_examples := (remove_first_char str)::(!negative_examples)
+            )
+        done
+    with End_of_file -> ());
+
+    (Array.of_list !positive_examples, Array.of_list !negative_examples)
 ;;
