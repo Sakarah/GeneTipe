@@ -1,4 +1,5 @@
 genpts.native
 randpts.native
 fuzzpts.native
+randstr.native
 regexp_classify.native
