@@ -19,7 +19,7 @@ sig
     val compute_fitness : target_data -> (float option * individual) array -> (float * individual) array
 
     (** Simplify all the individuals from the given population *)
-    val simplify_individuals : ?generation:int -> (float * individual) array -> (float * individual) array
+    val simplify_individuals : ?generation:int -> (float option * individual) array -> (float option * individual) array
 
     (** Recombine existing individuals and make mutations to create new functions *)
     val reproduce : target_data -> (float * individual) array -> (float option * individual) array
@@ -31,7 +31,7 @@ sig
     val remove_duplicates : target_data -> (float option * individual) array -> (float option * individual) array
 
     (** Evolve the population to the next generation *)
-    val next_generation : target_data -> (float * individual) array -> (float * individual) array
+    val next_generation : target_data -> ?generation:int -> (float * individual) array -> (float * individual) array
 
     (** Evolve a population through nb_gen generations toward the highest fitness on the given target data.
         If init_pop is not given, the population is randomly initialized (with {!init_population}).

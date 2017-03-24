@@ -4,11 +4,11 @@ sig
     type target_data
     val init_population : target_data -> (float option * individual) array
     val compute_fitness : target_data -> (float option * individual) array -> (float * individual) array
-    val simplify_individuals : ?generation:int -> (float * individual) array -> (float * individual) array
+    val simplify_individuals : ?generation:int -> (float option * individual) array -> (float option * individual) array
     val reproduce : target_data -> (float * individual) array -> (float option * individual) array
     val select : (float * individual) array -> target_size:int -> (float * individual) array
     val remove_duplicates : target_data -> (float option * individual) array -> (float option * individual) array
-    val next_generation : target_data -> (float * individual) array -> (float * individual) array
+    val next_generation : target_data -> ?generation:int -> (float * individual) array -> (float * individual) array
     val evolve : ?init_pop:(float option * individual) array -> nb_gen:int -> ?verbosity:int -> target_data -> (float * individual) array
 end
 
@@ -33,8 +33,8 @@ struct
     let simplify_individuals ?generation pop =
         let apply_simplification pop (schedule,simpl) =
             match generation with
-            | Some g when schedule mod g <> 0 -> pop
-            | _ -> ArrayIter.map (function (fit,dna) -> (fit,simpl dna)) pop
+            | Some g when (g mod schedule) <> 0 -> pop
+            | _ -> ArrayIter.map (function (_,dna) -> (None,simpl dna)) pop
         in
         List.fold_left apply_simplification pop Parameters.simplifications
     ;;
@@ -91,14 +91,15 @@ struct
         initial_population
     ;;
 
-    let next_generation target_data initial_population =
+    let next_generation target_data ?generation initial_population =
         let pop_size = (Array.length initial_population) in
         let child_population = reproduce target_data initial_population in
         let filtered_population =
             if Parameters.remove_duplicates then remove_duplicates target_data child_population
             else child_population
         in
-        let evaluated_population = compute_fitness target_data filtered_population in
+        let simplified_population = simplify_individuals ?generation filtered_population in
+        let evaluated_population = compute_fitness target_data simplified_population in
         select evaluated_population ~target_size:pop_size
     ;;
 
@@ -115,13 +116,15 @@ struct
             )
         in
 
-        for generation = 1 to nb_gen do
-            if verbosity >= 1 then Printf.printf "- Generation %d -\n%!" generation;
-            pop := next_generation target_data !pop;
-            pop := simplify_individuals ~generation !pop;
-            if verbosity >= 2 then StatsPrinter.print_stats !pop;
-            if verbosity >= 3 then StatsPrinter.print_advanced_stats !pop
-        done;
+        Sys.catch_break true; (* Handle SIGINT (Ctrl+C in a Linux shell) to still show the results after an interuption. *)
+        (try
+            for generation = 1 to nb_gen do
+                if verbosity >= 1 then Printf.printf "- Generation %d -\n%!" generation;
+                pop := next_generation target_data ~generation !pop;
+                if verbosity >= 2 then StatsPrinter.print_stats !pop;
+                if verbosity >= 3 then StatsPrinter.print_advanced_stats !pop
+            done;
+        with Sys.Break -> ());
 
         !pop
     ;;
