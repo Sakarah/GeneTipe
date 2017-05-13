@@ -1,14 +1,25 @@
 let () =
     let regexp = ref "" in
     let substr = ref false in
-    let filter = ref false in
+    let limit_pos = ref (-1) in
+    let limit_neg = ref (-1) in
+    let char_pos = ref "+" in
+    let char_neg = ref "-" in
 
     let spec_list =
     [
-        ("--filter", Arg.Set filter, " Remove all the non matching strings instead of adding +/-");
-        ("-f", Arg.Set filter, " Shorthand for --filter");
-        ("--substr", Arg.Set substr, " Print all the substring that are matching for each string");
+        ("--filter", Arg.Unit (function () -> char_pos := ""; limit_neg := 0), " Remove all the non matching strings instead of adding +/- (Same as -l 0 -C '')");
+        ("-f", Arg.Unit (function () -> char_pos := ""; limit_neg := 0), " Shorthand for --filter");
+        ("--substr", Arg.Set substr, " Print all the substring that are matching for each string. All other options are ignored if this one is selected");
         ("-s", Arg.Set substr, " Shorthand for --substr");
+        ("--limit-pos", Arg.Set_int limit_pos, "l Limit the number of matching strings printed to l");
+        ("-L", Arg.Set_int limit_pos, "l Shorthand for --limit-pos");
+        ("--limit-neg", Arg.Set_int limit_neg, "l Limit the number of non-matching strings printed to l");
+        ("-l", Arg.Set_int limit_neg, "l Shorthand for --limit-neg");
+        ("--char-pos", Arg.Set_string char_pos, "c Set the character (or character group) prepended to matching strings");
+        ("-C", Arg.Set_string char_pos, "l Shorthand for --char-pos");
+        ("--char-neg", Arg.Set_string char_neg, "c Set the character (or character group) prepended to non-matching strings");
+        ("-c", Arg.Set_string char_neg, "l Shorthand for --char-neg");
     ]
     in
 
@@ -28,7 +39,7 @@ let () =
     let regexp_tree = RegexpParser.parse !regexp in
     let regexp_automata = RegexpAutomata.from_tree regexp_tree in
     try
-        while true do
+        while !limit_pos != 0 || !limit_neg != 0 do
             let str = read_line () in
             if !substr then
             (
@@ -41,12 +52,16 @@ let () =
             else
             (
                 let matching = RegexpAutomata.is_matching regexp_automata str in
-                if not(!filter) then
+                if matching && !limit_pos != 0 then
                 (
-                    if matching then Printf.printf "+%s\n" str
-                    else Printf.printf "-%s\n" str
+                    decr limit_pos;
+                    Printf.printf "%s\n" (!char_pos^str)
                 )
-                else if matching then Printf.printf "%s\n" str
+                else if !limit_neg != 0 then
+                (
+                    decr limit_neg;
+                    Printf.printf "%s\n" (!char_neg^str)
+                )
             )
         done
     with End_of_file -> ()
