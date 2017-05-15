@@ -27,10 +27,10 @@ let () =
 
     for i = 1 to !nb_str do
         let size = !min_length + Random.int (!max_length - !min_length) in
-        let str = String.make size '@' in
+        let str = Bytes.create size in
         for i = 0 to size-1 do
-            str.[i] <- !alphabet.[Random.int (String.length !alphabet)]
+            Bytes.set str i !alphabet.[Random.int (String.length !alphabet)]
         done;
-        Printf.printf "%s\n" str
+        Printf.printf "%s\n" (Bytes.to_string str)
     done;
 ;;

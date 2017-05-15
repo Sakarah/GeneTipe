@@ -1,3 +1,4 @@
+true: safe_string, optimize(3)
 <core/**>: searchdir(lib), package(str), package(yojson), package(dynlink)
 <implementations/**>: linkall, use_randutil, package(str), package(yojson), package(dynlink), use_genetipe
 <implementations/regexp_search/**>: use_regexp

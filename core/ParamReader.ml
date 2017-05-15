@@ -75,7 +75,7 @@ let rec override replacement_path new_json base_json =
                     (try
                         let index = int_of_string key in
                         `List (process_ord_list index ord_list)
-                    with Failure "int_of_string" -> raise (OverridingError (key^" must be an integer for matching a list element")))
+                    with Failure _ -> raise (OverridingError (key^" must be an integer for matching a list element")))
                 | _ -> raise (OverridingError (key^" cannot be matched as there is a leaf in the original JSON tree"))
 ;;
 
