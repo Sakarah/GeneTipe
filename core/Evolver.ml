@@ -10,7 +10,7 @@ sig
     val select : (fitness * individual) array -> target_size:int -> (fitness * individual) array
     val remove_duplicates : target_data -> (fitness option * individual) array -> (fitness option * individual) array
     val next_generation : target_data -> ?generation:int -> (fitness * individual) array -> (fitness * individual) array
-    val evolve : ?init_pop:(fitness option * individual) array -> nb_gen:int -> ?verbosity:int -> target_data -> (fitness * individual) array
+    val evolve : ?init_pop:(fitness * individual) array -> nb_gen:int -> ?verbosity:int -> target_data -> (fitness * individual) array
 end
 
 module Make (Parameters : EvolParams.S) =
@@ -107,7 +107,7 @@ struct
     let evolve ?init_pop ~nb_gen ?(verbosity=0) target_data =
         let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) (Parameters.Fitness) in
         let pop = ref (match init_pop with
-            | Some init_pop -> compute_fitness target_data init_pop
+            | Some init_pop -> init_pop
             | None ->
                 if verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;
                 let init_pop = init_population target_data in

@@ -1,8 +1,11 @@
 let () =
+    (* Command line parsing *)
     let generations = ref 100 in
     let config_overrides = ref [] in
     let next_overriden_key = ref "" in
     let verbosity = ref 2 in
+    let dump_filename = ref "" in
+    let load_filename = ref "" in
     let config_filename = ref "" in
 
     let spec_list =
@@ -22,6 +25,10 @@ let () =
         ("--no-stats", Arg.Unit (fun () -> verbosity := 1), " No intermediate statistics about the currently generated population (equivalent to -v 1)");
         ("--full-stats", Arg.Unit (fun () -> verbosity := 3), " Print full intermediate statistics about the currently generated population (equivalent to -v 3)");
         ("-v", Arg.Set_int verbosity, "verbLevel Set the verbosity level (default is 2). Lower values speed up the process");
+        ("--dump-pop", Arg.Set_string dump_filename, "filename Dump the final population into the given file (creating or replacing it) for future reuse with the --load-pop command");
+        ("-d", Arg.Set_string dump_filename, "filename Shorthand for --dump-pop");
+        ("--load-pop", Arg.Set_string load_filename, "filename Load the dumped population in the given file as the initial population of the genetic evolution");
+        ("-l", Arg.Set_string load_filename, "filename Shorthand for --load-pop");
     ]
     in
 
@@ -40,14 +47,25 @@ let () =
     Arg.parse (Arg.align spec_list) (fun cfg_file -> config_filename := cfg_file) usage_msg;
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
+    (* Load the configuration file and create the evolver module from the parameters *)
     let module ParamJson = (val ParamReader.read_json_tree ~config_overrides:!config_overrides ~filename:!config_filename) in
     let module Parameters = ParamReader.ReadConfig (RegexpSearchHooks) (ParamJson) () in
     let module RegexpEvolver = Evolver.Make (Parameters) in
     let module StatsPrinter = Stats.MakePrinter (RegexpDna) (Parameters.Fitness) in
 
-    let target_data = ExampleList.read () in
-    let pop = RegexpEvolver.evolve ~verbosity:!verbosity ~nb_gen:!generations target_data in
+    (* Load the initial population if a file is given *)
+    let init_pop = match !load_filename with
+        | "" -> None
+        | file ->
+            let pop_file = open_in_bin file in
+            Some (Marshal.from_channel pop_file)
+    in
 
+    (* Read the target data and evolve the population *)
+    let target_data = ExampleList.read () in
+    let pop = RegexpEvolver.evolve ?init_pop ~verbosity:!verbosity ~nb_gen:!generations target_data in
+
+    (* Print final statistics about the last generation (or just the best individual if the verbosity is null) *)
     if !verbosity >= 1 then
     (
         Printf.printf "= End of evolution =\n";
@@ -63,4 +81,11 @@ let () =
         let bestFitness, bestDna = Stats.best_individual Parameters.Fitness.compare pop in
         Printf.printf "%s\n%s" (Parameters.Fitness.to_string bestFitness) (RegexpDna.to_string bestDna)
     );
+
+    (* Dump the final population if required *)
+    if !dump_filename <> "" then
+    (
+        let out_file = open_out_bin !dump_filename in
+        Marshal.to_channel out_file pop []
+    )
 ;;
