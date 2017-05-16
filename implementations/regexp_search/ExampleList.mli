@@ -6,3 +6,6 @@ type t = string array * string array
 (** Read the examples from standard input channel. Read the number of positive examples first, then all the positive examples
     and do the same for the negative examples.*)
 val read : unit -> t
+
+(** Return a new example list without all the examples and counter-examples matched by the regexp. *)
+val remove_matching : t -> RegexpTree.t -> t

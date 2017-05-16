@@ -1,6 +1,6 @@
 OCAMLBUILD = ocamlbuild
 SUBDIRS = lib core implementations plugins tools
-IMPLEMENTATION_SYMLINK = regexp-search symbolic-regression
+IMPLEMENTATION_SYMLINK = regexp-search regexp-search+alt-div symbolic-regression
 TOOL_SYMLINK = genpts randpts fuzzpts randstr regexp-classify regexp-eval
 
 all: build-all symlinks
@@ -13,7 +13,7 @@ $(SUBDIRS): %:
 
 symlinks: $(IMPLEMENTATION_SYMLINK) $(TOOL_SYMLINK)
 $(IMPLEMENTATION_SYMLINK): %:
-	ln -s _build/implementations/$(subst -,_,$@)/$(subst -,_,$@).native $@
+	ln -s _build/implementations/$(firstword $(subst +, ,$(subst -,_,$@)))/$(subst +,_,$(subst -,_,$@)).native $@
 $(TOOL_SYMLINK): %:
 	ln -s _build/tools/$(subst -,_,$@).native $@
 

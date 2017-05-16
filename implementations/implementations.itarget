@@ -1,2 +1,3 @@
 regexp_search/regexp_search.native
+regexp_search/regexp_search_alt_div.native
 symbolic_regression/symbolic_regression.native
