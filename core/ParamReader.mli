@@ -28,4 +28,4 @@ val read_json_tree : ?config_overrides:(string*string) list -> filename:string -
 
 (** Read the parameters from the specified JSON tree.
     GeneticHooks are used to match the genetic operator names with their associated function. *)
-module ReadConfig : functor (GeneticHooks : Plugin.GeneticHooks) -> functor (ConfigJson : JsonTree) -> EvolParams.S with module Individual = GeneticHooks.Individual and type target_data = GeneticHooks.target_data
+module ReadConfig (GeneticHooks : Plugin.GeneticHooks) (ConfigJson : JsonTree) () : EvolParams.S with module Individual = GeneticHooks.Individual and type target_data = GeneticHooks.target_data

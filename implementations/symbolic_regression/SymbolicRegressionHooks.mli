@@ -8,5 +8,5 @@ module UnOp : Plugin.HookingPoint with type t = (Yojson.Basic.json -> float -> f
 module Creation : Plugin.HookingPoint with type t = (Yojson.Basic.json -> target_data -> pop_frac:float -> FunctionDna.t)
 module Mutation : Plugin.HookingPoint with type t = (Yojson.Basic.json -> target_data -> FunctionDna.t -> FunctionDna.t)
 module Crossover : Plugin.HookingPoint with type t = (Yojson.Basic.json -> FunctionDna.t -> FunctionDna.t -> FunctionDna.t)
-module Fitness : Plugin.HookingPoint with type t = (Yojson.Basic.json -> target_data -> FunctionDna.t -> float)
+module Fitness : Plugin.HookingPoint with type t = (Yojson.Basic.json -> (module EvolParams.Fitness with type individual = FunctionDna.t and type target_data = (float*float) array))
 module Simplification : Plugin.HookingPoint with type t = (Yojson.Basic.json -> FunctionDna.t -> FunctionDna.t)

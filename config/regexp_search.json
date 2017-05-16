@@ -34,7 +34,14 @@
     "fitness":
     {
         "method":"multiobjective",
-        "params": { "full_match_factor":1.0, "partial_match_factor":1.0, "size_factor":0.5 }
+        "params":
+        {
+            "full_example_score":20.0,
+            "full_counter_example_score":10.0,
+            "partial_example_score":5.0,
+            "partial_counter_example_score":0.1,
+            "size_score":1.0
+        }
     },
     "simplifications":
     [

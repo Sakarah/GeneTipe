@@ -103,10 +103,11 @@ let read_json_tree ?(config_overrides=[]) ~filename =
     (module struct let json = json_tree end : JsonTree)
 ;;
 
-module ReadConfig (GeneticHooks : Plugin.GeneticHooks) (ConfigJson : JsonTree) =
+module ReadConfig (GeneticHooks : Plugin.GeneticHooks) (ConfigJson : JsonTree) () =
 struct
     module Individual = GeneticHooks.Individual;;
     type target_data = GeneticHooks.target_data;;
+    module Fitness = (val get_method "fitness" GeneticHooks.Fitness.get ConfigJson.json);;
 
     let pop_size = ConfigJson.json |> member "pop_size" |> to_int;;
     let growth_factor = ConfigJson.json |> member "growth_factor" |> to_number;;
@@ -117,16 +118,17 @@ struct
     let creation = get_proba_pattern_list "creation" GeneticHooks.Creation.get ConfigJson.json;;
     let mutation = get_proba_pattern_list "mutation" GeneticHooks.Mutation.get ConfigJson.json;;
     let crossover = get_proba_pattern_list "crossover" GeneticHooks.Crossover.get ConfigJson.json;;
-    let fitness = get_method "fitness" GeneticHooks.Fitness.get ConfigJson.json;;
     let simplifications = get_scheduled_pattern_list "simplifications" GeneticHooks.Simplification.get ConfigJson.json;;
 
     let selection =
-        let module SelectionFunction = (val get_method "selection" Plugin.Selection.get ConfigJson.json) in
+        let module SelectionMethod = (val get_method "selection" Plugin.Selection.get ConfigJson.json) in
+        let module SelectionFunction = SelectionMethod (Fitness) in
         SelectionFunction.f
     ;;
 
     let parent_chooser =
-        let module ParentChooserFunction = (val get_method "parent_choice" Plugin.ParentChooser.get ConfigJson.json) in
+        let module ParentChooserMethod = (val get_method "parent_choice" Plugin.ParentChooser.get ConfigJson.json) in
+        let module ParentChooserFunction = ParentChooserMethod (Fitness) in
         ParentChooserFunction.f
     ;;
 end;;

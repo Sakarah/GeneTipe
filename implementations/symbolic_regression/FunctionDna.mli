@@ -25,15 +25,15 @@ val print : Format.formatter -> t -> unit
 
 (** {2 Advanced stats} *)
 (** Return the average depth of the population *)
-val average_depth : (float * t) array -> float
+val average_depth : t array -> float
 
 (** Return the diversity of depth in the population and return a percentage *)
-val depth_diversity : (float * t) array -> float
+val depth_diversity : t array -> float
 
 (** Return a measurement of the genetic diversity of the population
     computes the variance of number of each operator in the population and add them
     Return a percentage *)
-val operator_diversity : (float * t) array -> float
+val operator_diversity : t array -> float
 
 (** List of the advanced stats functions for a function tree *)
-val advanced_stats : (string * ((float*t) array -> float)) list
+val advanced_stats : (string * (t array -> float)) list

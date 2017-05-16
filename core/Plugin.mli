@@ -47,25 +47,24 @@ sig
     (** Hookint point for crossover operators. Crossovers are suppose to mix the characteristics of two given individual to create a new one. *)
     module Crossover : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
 
-    (** Hooking point for fitness functions. The fitness function should tell how well the given individual match the target data.
-    Bigger output mean better individuals. *)
-    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> target_data -> Individual.t -> float)
+    (** Hooking point for fitness evaluators. The fitness module defines how to compare individuals to see how they match the target data. *)
+    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> (module EvolParams.Fitness with type individual = Individual.t and type target_data = target_data))
 
     (** Hooking point for simplification operations. Simplifications are supposed to reduce the complexity of an individual without changing its behavior. *)
     module Simplification : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
 end
 
-(** Module containing one selection function. These functions take a population and reduce it by selecting only a fraction of the individuals contained in it. We are forced to use a module here to keep the polymorphism. *)
-module type SelectionFunction = sig val f:(float * 'i) array -> target_size:int -> (float * 'i) array end
+(** Functor returning a selection function from a fitness module. These functions take a population and reduce it by selecting only a fraction of the individuals contained in it. We are forced to use a functor here to keep the polymorphism. *)
+module type SelectionMethod = functor (Fitness : EvolParams.Fitness) -> sig val f:(Fitness.t * 'i) array -> target_size:int -> (Fitness.t * 'i) array end
 
-(** Hooking point for the selection functions. *)
-module Selection : HookingPoint with type t = (Yojson.Basic.json -> (module SelectionFunction))
+(** Hooking point for the selection methods. *)
+module Selection : HookingPoint with type t = (Yojson.Basic.json -> (module SelectionMethod))
 
-(** Module containing one parent chooser function. These functions should select one individual from the given list for beeing used as a parent in the reproduction phase. Note that it enables you to generate more than one parent with a single list to potentially save a precomputing task on the list. Same as above for the reasons of declaring a module. *)
-module type ParentChooserFunction = sig val f:(float * 'i) array -> unit -> 'i end
+(** Functor returning a parent chooser function from a fitness module. These functions should select one individual from the given list for beeing used as a parent in the reproduction phase. Note that it enables you to generate more than one parent with a single list to potentially save a precomputing task on the list. Same as above for the reasons of declaring a module. *)
+module type ParentChooserMethod = functor (Fitness : EvolParams.Fitness) -> sig val f:(Fitness.t * 'i) array -> unit -> 'i end
 
 (** Hooking point for parent choosers. *)
-module ParentChooser : HookingPoint with type t = (Yojson.Basic.json -> (module ParentChooserFunction))
+module ParentChooser : HookingPoint with type t = (Yojson.Basic.json -> (module ParentChooserMethod))
 
 (** Hooking point of the random generators. The registered functions are taking nothing and must return a random float value. *)
 module RandomGen : HookingPoint with type t = (Yojson.Basic.json -> unit -> float)

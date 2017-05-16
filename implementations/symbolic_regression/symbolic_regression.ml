@@ -40,9 +40,9 @@ let () =
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
     let module ParamJson = (val ParamReader.read_json_tree ~config_overrides:!config_overrides ~filename:!config_filename) in
-    let module Parameters = ParamReader.ReadConfig (SymbolicRegressionHooks) (ParamJson) in
+    let module Parameters = ParamReader.ReadConfig (SymbolicRegressionHooks) (ParamJson) () in
     let module FunctionEvolver = Evolver.Make (Parameters) in
-    let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
+    let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) (Parameters.Fitness) in
 
     let nb_points = Scanf.scanf "%d\n" (function n -> n) in
     let target_points = Array.make nb_points (0.,0.) in
@@ -62,8 +62,8 @@ let () =
     )
     else
     (
-        let bestFitness, bestDna = Stats.best_individual pop in
-        Printf.printf "%f\n%s" bestFitness (FunctionDna.to_string bestDna)
+        let bestFitness, bestDna = Stats.best_individual Parameters.Fitness.compare pop in
+        Printf.printf "%s\n%s" (Parameters.Fitness.to_string bestFitness) (FunctionDna.to_string bestDna)
     );
 
     if !show_graph then
@@ -73,7 +73,7 @@ let () =
         try
             let graph = Plot.init ~size:(600,600) ~border:25 ~title:"GeneTipe" in
             Plot.plot ~color:Graphics.red ~link:false (Array.map fst target_points) (Array.map snd target_points) graph;
-            Plot.plot_fun ~color:Graphics.blue (FunctionDna.eval (pop |> Stats.best_individual |> snd)) graph;
+            Plot.plot_fun ~color:Graphics.blue (FunctionDna.eval (pop |> Stats.best_individual Parameters.Fitness.compare |> snd)) graph;
             Plot.show graph;
             while true do
                 ignore (Graphics.wait_next_event [])

@@ -11,10 +11,10 @@ val to_string : t -> string
 
 (** {2 Advanced stats} *)
 (** Return the average depth of a population of regexp *)
-val average_depth : (float * t) array -> float
+val average_depth : t array -> float
 
 (** Return the diversity of depth in the population and return a percentage *)
-val depth_diversity : (float * t) array -> float
+val depth_diversity : t array -> float
 
 (** List of the advanced stats functions for a regexp population *)
-val advanced_stats : (string * ((float*t) array -> float)) list
+val advanced_stats : (string * (t array -> float)) list

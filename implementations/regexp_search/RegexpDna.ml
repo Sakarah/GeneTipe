@@ -1,5 +1,5 @@
 type t = RegexpTree.t;;
-let to_string dna = "\"" ^ (String.escaped (RegexpTree.to_string dna)) ^ "\"";;
+let to_string dna = String.escaped (RegexpTree.to_string dna);;
 
 (* == Advanced stats == *)
 let rec branch_number = function
@@ -20,8 +20,8 @@ let rec individual_avg_depth = function
     | _ -> 1.
 ;;
 
-let average_depth = Stats.average (function (fit,dna) -> individual_avg_depth dna);;
-let depth_diversity = Stats.diversity (function (fit,dna) -> individual_avg_depth dna);;
+let average_depth = Stats.average individual_avg_depth;;
+let depth_diversity = Stats.diversity individual_avg_depth;;
 
 
 let advanced_stats =

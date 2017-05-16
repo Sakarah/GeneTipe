@@ -1,6 +1,6 @@
 (** Select the individuals to be copied for the next generation by organizing fights between random packs of individuals *)
 
-module TournamentByPacksFunction =
+module TournamentByPacksMethod (Fitness : EvolParams.Fitness) =
 struct
     let f population ~target_size =
         let pop_size = Array.length population in
@@ -12,7 +12,7 @@ struct
             let index = pack_size * i in
             let selected_index = ref index in
             for j = 1 to pack_size do (* find the best individual in the pack *)
-                if fst population.(index + j) > fst population.(!selected_index) then
+                if Fitness.compare (fst population.(index + j)) (fst population.(!selected_index)) > 0 then
                 (
                     selected_index := index + j
                 )
@@ -24,7 +24,7 @@ struct
         let index = pack_size * (target_size - 1) in
         let selected_index = ref index in
         for j = 0 to (pop_size - pack_size * (target_size - 1) - 1)  do
-            if fst population.(index + j) > fst population.(!selected_index) then
+            if Fitness.compare (fst population.(index + j)) (fst population.(!selected_index)) > 0 then
             (
                 selected_index := index + j
             )
@@ -36,5 +36,5 @@ struct
 end
 
 let () =
-    Plugin.Selection.register "tournament_by_packs" (function _ -> (module TournamentByPacksFunction))
+    Plugin.Selection.register "tournament_by_packs" (function _ -> (module TournamentByPacksMethod))
 ;;

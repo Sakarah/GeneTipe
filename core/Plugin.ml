@@ -39,14 +39,14 @@ sig
     module Creation : HookingPoint with type t = (Yojson.Basic.json -> target_data -> pop_frac:float -> Individual.t)
     module Mutation : HookingPoint with type t = (Yojson.Basic.json -> target_data -> Individual.t -> Individual.t)
     module Crossover : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t -> Individual.t)
-    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> target_data -> Individual.t -> float)
+    module Fitness : HookingPoint with type t = (Yojson.Basic.json -> (module EvolParams.Fitness with type individual = Individual.t and type target_data = target_data))
     module Simplification : HookingPoint with type t = (Yojson.Basic.json -> Individual.t -> Individual.t)
 end
 
-module type SelectionFunction = sig val f:(float * 'i) array -> target_size:int -> (float * 'i) array end;;
-module Selection = MakeHookingPoint (struct type t = (Yojson.Basic.json -> (module SelectionFunction)) end);;
+module type SelectionMethod = functor (Fitness : EvolParams.Fitness) -> sig val f:(Fitness.t * 'i) array -> target_size:int -> (Fitness.t * 'i) array end;;
+module Selection = MakeHookingPoint (struct type t = (Yojson.Basic.json -> (module SelectionMethod)) end);;
 
-module type ParentChooserFunction = sig val f:(float * 'i) array -> unit -> 'i end;;
-module ParentChooser = MakeHookingPoint (struct type t = (Yojson.Basic.json -> (module ParentChooserFunction)) end)
+module type ParentChooserMethod = functor (Fitness : EvolParams.Fitness) -> sig val f:(Fitness.t * 'i) array -> unit -> 'i end
+module ParentChooser = MakeHookingPoint (struct type t = (Yojson.Basic.json -> (module ParentChooserMethod)) end)
 
 module RandomGen = MakeHookingPoint (struct type t = (Yojson.Basic.json -> unit -> float) end);;

@@ -56,8 +56,8 @@ let rec individual_avg_depth = function
     | _ -> 1.
 ;;
 
-let average_depth = Stats.average (function (fit,dna) -> individual_avg_depth dna);;
-let depth_diversity = Stats.diversity (function (fit,dna) -> individual_avg_depth dna);;
+let average_depth = Stats.average individual_avg_depth;;
+let depth_diversity = Stats.diversity individual_avg_depth;;
 
 exception Found of int;;
 
@@ -74,7 +74,7 @@ let operator_diversity population =
             | _ -> []
         in
         for i = 0 to (pop_size - 1) do
-            operators_list := (!operators_list)@(find_op (snd population.(i)) [])
+            operators_list := (!operators_list)@(find_op population.(i) [])
         done;
     in
     build_op population;
@@ -116,7 +116,7 @@ let operator_diversity population =
             | _ -> ()
         in
 
-        counter (snd population.(i));
+        counter population.(i);
         for j = 0 to (operator_number - 1) do
         (
             let add_number = count_operator.(j) in

@@ -1,10 +1,10 @@
 (** Selection method that randomly pick a parent with a probability proportional with its fitness. *)
-module ProportionalParentChooserFunction =
+module ProportionalParentChooserMethod (Fitness : EvolParams.Fitness) =
 struct
     let f population =
         let pop_size = Array.length population in
         let fitness_total = ref 0. in
-        let fitness_cumul = Array.init pop_size (function i -> fitness_total := !fitness_total +. (fst population.(i)); !fitness_total) in
+        let fitness_cumul = Array.init pop_size (function i -> fitness_total := !fitness_total +. Fitness.to_float (fst population.(i)); !fitness_total) in
 
         (* Return the individual matching with the random number according to their fitness (more chances to get better graded ones) *)
         let individual_from_rand value =
@@ -28,5 +28,5 @@ struct
 end
 
 let () =
-    Plugin.ParentChooser.register "proportional" (function _ -> (module ProportionalParentChooserFunction))
+    Plugin.ParentChooser.register "proportional" (function _ -> (module ProportionalParentChooserMethod))
 ;;

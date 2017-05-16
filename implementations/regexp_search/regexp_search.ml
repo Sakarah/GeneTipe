@@ -41,9 +41,9 @@ let () =
     if !config_filename = "" then raise (Arg.Bad "No config file given");
 
     let module ParamJson = (val ParamReader.read_json_tree ~config_overrides:!config_overrides ~filename:!config_filename) in
-    let module Parameters = ParamReader.ReadConfig (RegexpSearchHooks) (ParamJson) in
+    let module Parameters = ParamReader.ReadConfig (RegexpSearchHooks) (ParamJson) () in
     let module RegexpEvolver = Evolver.Make (Parameters) in
-    let module StatsPrinter = Stats.MakePrinter (RegexpDna) in
+    let module StatsPrinter = Stats.MakePrinter (RegexpDna) (Parameters.Fitness) in
 
     let target_data = ExampleList.read () in
     let pop = RegexpEvolver.evolve ~verbosity:!verbosity ~nb_gen:!generations target_data in
@@ -60,7 +60,7 @@ let () =
     )
     else
     (
-        let bestFitness, bestDna = Stats.best_individual pop in
-        Printf.printf "%f\n%s" bestFitness (RegexpDna.to_string bestDna)
+        let bestFitness, bestDna = Stats.best_individual Parameters.Fitness.compare pop in
+        Printf.printf "%s\n%s" (Parameters.Fitness.to_string bestFitness) (RegexpDna.to_string bestDna)
     );
 ;;

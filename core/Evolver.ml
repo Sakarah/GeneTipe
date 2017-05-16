@@ -1,15 +1,16 @@
 module type S =
 sig
     type individual
+    type fitness
     type target_data
-    val init_population : target_data -> (float option * individual) array
-    val compute_fitness : target_data -> (float option * individual) array -> (float * individual) array
-    val simplify_individuals : ?generation:int -> (float option * individual) array -> (float option * individual) array
-    val reproduce : target_data -> (float * individual) array -> (float option * individual) array
-    val select : (float * individual) array -> target_size:int -> (float * individual) array
-    val remove_duplicates : target_data -> (float option * individual) array -> (float option * individual) array
-    val next_generation : target_data -> ?generation:int -> (float * individual) array -> (float * individual) array
-    val evolve : ?init_pop:(float option * individual) array -> nb_gen:int -> ?verbosity:int -> target_data -> (float * individual) array
+    val init_population : target_data -> (fitness option * individual) array
+    val compute_fitness : target_data -> (fitness option * individual) array -> (fitness * individual) array
+    val simplify_individuals : ?generation:int -> (fitness option * individual) array -> (fitness option * individual) array
+    val reproduce : target_data -> (fitness * individual) array -> (fitness option * individual) array
+    val select : (fitness * individual) array -> target_size:int -> (fitness * individual) array
+    val remove_duplicates : target_data -> (fitness option * individual) array -> (fitness option * individual) array
+    val next_generation : target_data -> ?generation:int -> (fitness * individual) array -> (fitness * individual) array
+    val evolve : ?init_pop:(fitness option * individual) array -> nb_gen:int -> ?verbosity:int -> target_data -> (fitness * individual) array
 end
 
 module Make (Parameters : EvolParams.S) =
@@ -24,8 +25,8 @@ struct
 
     let compute_fitness target_data =
         let fillFitness = function
-            | (None,dna) -> (Parameters.fitness target_data dna, dna)
-            | (Some fitness,dna) -> (fitness, dna)
+            | (None,ind) -> (Parameters.Fitness.compute target_data ind, ind)
+            | (Some fitness,ind) -> (fitness, ind)
         in
         ArrayIter.map fillFitness
     ;;
@@ -34,7 +35,7 @@ struct
         let apply_simplification pop (schedule,simpl) =
             match generation with
             | Some g when (g mod schedule) <> 0 -> pop
-            | _ -> ArrayIter.map (function (_,dna) -> (None,simpl dna)) pop
+            | _ -> ArrayIter.map (function (_,ind) -> (None,simpl ind)) pop
         in
         List.fold_left apply_simplification pop Parameters.simplifications
     ;;
@@ -47,8 +48,8 @@ struct
 
         (* Copy the previous individuals in the target population *)
         for i = 0 to pop_size-1 do
-            let (fitness,dna) = initial_population.(i) in
-            target_population.(i) <- (Some fitness, dna)
+            let (fitness,ind) = initial_population.(i) in
+            target_population.(i) <- (Some fitness, ind)
         done;
 
         let parent_chooser = Parameters.parent_chooser initial_population in
@@ -104,7 +105,7 @@ struct
     ;;
 
     let evolve ?init_pop ~nb_gen ?(verbosity=0) target_data =
-        let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) in
+        let module StatsPrinter = Stats.MakePrinter (Parameters.Individual) (Parameters.Fitness) in
         let pop = ref (match init_pop with
             | Some init_pop -> compute_fitness target_data init_pop
             | None ->

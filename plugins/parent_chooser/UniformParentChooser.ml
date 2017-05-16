@@ -1,5 +1,5 @@
 (** Selection method that randomly picks a parent without using the fitness information. *)
-module UniformParentChooserFunction =
+module UniformParentChooserMethod (Fitness : EvolParams.Fitness) =
 struct
     let f population () =
         let pop_size = Array.length population in
@@ -8,6 +8,6 @@ struct
 end
 
 let () =
-    Plugin.ParentChooser.register "uniform" (function _ -> (module UniformParentChooserFunction))
+    Plugin.ParentChooser.register "uniform" (function _ -> (module UniformParentChooserMethod))
 ;;
 
