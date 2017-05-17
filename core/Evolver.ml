@@ -57,13 +57,13 @@ struct
         (* The rest of the array is filled with generated offsprings *)
         for i = pop_size to target_size - 1 do
             let rand_op = Random.float 1. in
-            if Parameters.crossover_ratio < rand_op then
+            if rand_op < Parameters.crossover_ratio then
                 let parent1 = parent_chooser () in
                 let parent2 = parent_chooser () in
                 target_population.(i) <- (None, RandUtil.from_proba_list Parameters.crossover parent1 parent2)
             else
             (
-                if Parameters.mutation_ratio +. Parameters.crossover_ratio < rand_op then
+                if rand_op < Parameters.mutation_ratio +. Parameters.crossover_ratio then
                     let parent = parent_chooser () in
                     target_population.(i) <- (None, RandUtil.from_proba_list Parameters.mutation target_data parent)
                 else

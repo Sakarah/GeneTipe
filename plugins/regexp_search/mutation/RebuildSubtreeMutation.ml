@@ -1,7 +1,7 @@
 (** Generate a new individual by modifying an existing individual adding him new randomly generated characteristics.
     The new genes added are taken in order to ensure that max_depth is never exceeded. *)
 let rebuild_subtree ~gen_params data ~max_depth base =
-    let mutation_depth = Random.int ((RegexpTree.depth base)+1) in
+    let mutation_depth = min (Random.int ((RegexpTree.depth base)+1)) max_depth in
     let rec mutate depth = function
         | _ when depth = mutation_depth -> RandomCreation.create_random_grow gen_params data ~max_depth:(max_depth-mutation_depth)
         | RegexpTree.Concatenation (child1,child2) when Random.bool () -> RegexpTree.Concatenation (mutate (depth+1) child1,child2)
