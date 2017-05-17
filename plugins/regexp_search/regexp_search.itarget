@@ -1,5 +1,6 @@
 creation/RandomCreation.cmxs
 crossover/TakeSubtreeCrossover.cmxs
+crossover/CombineCrossover.cmxs
 mutation/RebuildSubtreeMutation.cmxs
 fitness/FullMatchFitness.cmxs
 fitness/PartialMatchFitness.cmxs
