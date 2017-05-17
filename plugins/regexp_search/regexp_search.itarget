@@ -2,6 +2,7 @@ creation/RandomCreation.cmxs
 crossover/TakeSubtreeCrossover.cmxs
 crossover/CombineCrossover.cmxs
 mutation/RebuildSubtreeMutation.cmxs
+mutation/ReduceMutation.cmxs
 fitness/FullMatchFitness.cmxs
 fitness/PartialMatchFitness.cmxs
 fitness/MultiobjectiveFitness.cmxs
