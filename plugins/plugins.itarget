@@ -4,5 +4,6 @@ random/NormalGen.cmxs
 random/UniformGen.cmxs
 selection/Tournament.cmxs
 selection/TournamentByPacks.cmxs
+selection/Elitist.cmxs
 regexp_search/regexp_search.otarget
 symbolic_regression/symbolic_regression.otarget
