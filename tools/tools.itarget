@@ -3,3 +3,4 @@ randpts.native
 fuzzpts.native
 randstr.native
 regexp_classify.native
+regexp_eval.native

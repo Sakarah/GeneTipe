@@ -1,5 +1,5 @@
 type t = RegexpTree.t;;
-let to_string dna = String.escaped (RegexpTree.to_string dna);;
+let to_string = RegexpTree.to_string;;
 
 (* == Advanced stats == *)
 let rec branch_number = function

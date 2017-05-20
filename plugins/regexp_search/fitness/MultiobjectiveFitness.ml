@@ -9,6 +9,7 @@ let build_multiobjective_fitness json =
     let partial_example_score = json |> member "partial_example_score" |> to_float in
     let partial_counter_example_score = json |> member "partial_counter_example_score" |> to_float in
     let size_score = json |> member "size_score" |> to_float in
+    let elim_size = json |> member "elim_size" |> to_int in
 
     (module struct
         type t = int*int*float*float*int;; (** The fitness value contains in order, the number of true positive, the number of true negative, the partial match value of the positive examples, the partial match value of the negative examples and the size of the regexp. *)
@@ -17,8 +18,10 @@ let build_multiobjective_fitness json =
         type target_data = ExampleList.t
 
         let to_float (fullpos,fullneg,parpos,parneg,len) =
-            (float_of_int fullpos *. full_example_score) +. (float_of_int fullneg *. full_counter_example_score) +.
-            (parpos *. partial_example_score) +. (parneg *. partial_counter_example_score) +. (size_score /. (float_of_int len))
+            if len > elim_size then 0.
+            else
+                (float_of_int fullpos *. full_example_score) +. (float_of_int fullneg *. full_counter_example_score) +.
+                (parpos *. partial_example_score) +. (parneg *. partial_counter_example_score) +. (size_score /. (float_of_int len))
         ;;
 
         let to_string ((fullpos,fullneg,parpos,parneg,len) as f) =
