@@ -1,0 +1,78 @@
+{
+    "pop_size": 1000,
+    "growth_factor": 2.0,
+    "crossover_ratio": 0.85,
+    "mutation_ratio": 0.1,
+    "remove_duplicates": true,
+
+    "plugin_dir":"_build/plugins/symbolic_regression/",
+    "plugins":
+    [
+        "../random/UniformGen.cmxs",
+        "../random/NormalGen.cmxs",
+        "../selection/Proportional.cmxs",
+        "../parent_chooser/ProportionalParentChooser.cmxs",
+        "primitives/MathPrimitives.cmxs",
+        "creation/FillGrowCreation.cmxs",
+        "mutation/ConstMutation.cmxs",
+        "mutation/RebuildSubtreeMutation.cmxs",
+        "crossover/TakeSubtreeCrossover.cmxs",
+        "fitness/SquaredDiffFitness.cmxs",
+        "simplification/ConstEvalSimplification.cmxs"
+    ],
+
+    "creation":
+    [
+        { "proba":0.5, "method":"fill", "params":"&random_gen" },
+        { "proba":0.5, "method":"grow", "params":"&random_gen" }
+    ],
+    "mutation":
+    [
+        { "proba":0.1, "method":"rebuild_subtree", "params":"&random_gen" },
+        {
+            "proba":0.9, "method":"mutate_const",
+            "params": { "mutation_proba":0.2, "const_generator": { "distrib":"normal", "params":{"mean":0.0, "deviation":1.0} } }
+        }
+    ],
+    "crossover":
+    [
+        { "proba":1.0, "method":"take_subtree" }
+    ],
+    "fitness": { "method":"squared_diff" },
+    "simplifications":
+    [
+        { "schedule":10, "method":"eval_const" }
+    ],
+    "selection" : { "method":"proportional" },
+    "parent_choice": { "method":"proportional" },
+
+    "&random_gen":
+    {
+        "min_depth": 1,
+        "max_depth": 5,
+
+        "bin_op":
+        [
+            { "proba":0.25, "name":"+", "op":"math", "params":{"fun":"x+y"} },
+            { "proba":0.20, "name":"-", "op":"math", "params":{"fun":"x-y"} },
+            { "proba":0.25, "name":"*", "op":"math", "params":{"fun":"x*y"} },
+            { "proba":0.20, "name":"/", "op":"math", "params":{"fun":"x/y"} },
+            { "proba":0.10, "name":"^", "op":"math", "params":{"fun":"x^y"} }
+        ],
+        "bin_proba": 0.80,
+
+        "un_op":
+        [
+            { "proba":0.2, "name":"cos", "op":"math", "params":{"fun":"cos(x)"} },
+            { "proba":0.2, "name":"sin", "op":"math", "params":{"fun":"sin(x)"} },
+            { "proba":0.2, "name":"tan", "op":"math", "params":{"fun":"tan(x)"} },
+            { "proba":0.2, "name":"ln", "op":"math", "params":{"fun":"ln(x)"} },
+            { "proba":0.2, "name":"exp", "op":"math", "params":{"fun":"exp(x)"} }
+        ],
+        "un_proba": 0.10,
+
+        "const_generator": { "distrib":"uniform", "params":{"min":-5.0, "max":5.0} },
+        "const_proba": 0.05,
+        "var_proba": 0.05
+    }
+}
