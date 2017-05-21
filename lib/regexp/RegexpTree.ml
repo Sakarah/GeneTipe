@@ -37,7 +37,7 @@ let to_string dna =
 
     (* Return a string representing the given character escaping it if necessary *)
     let quoted_char ch = match ch with
-        | '\\' | '.' | '*' | '+' | '?' | '[' | ']' | '(' | ')' | '|' -> "\\"^(String.make 1 ch)
+        | '\\' | '.' | '*' | '+' | '?' | '[' | ']' | '(' | ')' | '|' | '-' -> "\\"^(String.make 1 ch)
         | _ -> String.make 1 ch
     in
 
