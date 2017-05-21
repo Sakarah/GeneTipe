@@ -66,16 +66,14 @@
         "opt_proba": 0.05,
         "plus_proba": 0.05,
         "star_proba": 0.05,
-        "rand_char_proba": 0.25,
-        "predefined_proba": 0.05,
+        "rand_char_proba": 0.0,
+        "predefined_proba": 0.30,
         "predefined_list":
         [
-            { "proba":0.2, "regexp":"." },
-            { "proba":0.3, "regexp":"[A-Za-z]" },
-            { "proba":0.1, "regexp":"[A-Z]" },
-            { "proba":0.1, "regexp":"[a-z]" },
+            { "proba":0.4, "regexp":"[a-z0-9\\-_.]" },
+            { "proba":0.3, "regexp":"[a-z]" },
             { "proba":0.2, "regexp":"[0-9]" },
-            { "proba":0.1, "regexp":"[ \t]" }
+            { "proba":0.1, "regexp":"@" }
         ]
     }
 }
