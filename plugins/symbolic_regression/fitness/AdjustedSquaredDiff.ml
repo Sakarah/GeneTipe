@@ -4,7 +4,7 @@ It also takes the depth of the functions into consideration. *)
 let build_AdjustedSquaredDiffFitness json =
     let open Yojson.Basic.Util in
     let dim = json |> member "lessen_depth_impact" |> to_float in
-    
+
     (module struct
     type t = float
     type individual = FunctionDna.t
@@ -15,7 +15,7 @@ let build_AdjustedSquaredDiffFitness json =
     let compare = Pervasives.compare;;
 
     open Yojson.Basic.Util;;
-    
+
     let compute points dna =
         let n = Array.length points in
         let difference = ref 0. in
