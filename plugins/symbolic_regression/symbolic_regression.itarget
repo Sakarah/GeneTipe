@@ -4,4 +4,5 @@ mutation/ConstMutation.cmxs
 mutation/RebuildSubtreeMutation.cmxs
 crossover/TakeSubtreeCrossover.cmxs
 fitness/SquaredDiffFitness.cmxs
+fitness/AdjustedSquaredDiff.cmxs
 simplification/ConstEvalSimplification.cmxs
