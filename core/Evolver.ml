@@ -109,7 +109,7 @@ struct
         let pop = ref (match init_pop with
             | Some init_pop -> init_pop
             | None ->
-                if verbosity >= 1 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;
+                if verbosity >= 2 then Printf.printf "Initialize the population with %d individuals\n" Parameters.pop_size;
                 let init_pop = init_population target_data in
                 let evaluated_init_pop = compute_fitness target_data init_pop in
                 if verbosity >= 2 then StatsPrinter.print_population evaluated_init_pop;
@@ -120,8 +120,9 @@ struct
         Sys.catch_break true; (* Handle SIGINT (Ctrl+C in a Linux shell) to still show the results after an interuption. *)
         (try
             for generation = 1 to nb_gen do
-                if verbosity >= 1 then Printf.printf "- Generation %d -\n%!" generation;
+                if verbosity >= 2 then Printf.printf "- Generation %d -\n%!" generation;
                 pop := next_generation target_data ~generation !pop;
+                if verbosity = 1 then StatsPrinter.print_best !pop;
                 if verbosity >= 2 then StatsPrinter.print_stats !pop;
                 if verbosity >= 3 then StatsPrinter.print_advanced_stats !pop
             done;

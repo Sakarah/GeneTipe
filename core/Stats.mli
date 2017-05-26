@@ -19,6 +19,9 @@ sig
     type individual
     type fitness
 
+    (** Print the best individual of the population *)
+    val print_best : (fitness * individual) array -> unit
+
     (** Print generic statistics about the given population *)
     val print_stats : (fitness * individual) array -> unit
 

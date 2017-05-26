@@ -43,6 +43,7 @@ module type Printer =
 sig
     type individual
     type fitness
+    val print_best : (fitness * individual) array -> unit
     val print_stats : (fitness * individual) array -> unit
     val print_advanced_stats : (fitness * individual) array -> unit
     val print_population : (fitness * individual) array -> unit
@@ -54,13 +55,15 @@ struct
         Printf.printf "%s ~ %s\n" (Fitness.to_string fitness) (Individual.to_string individual)
     ;;
 
+    let print_best population = print_individual (best_individual Fitness.compare population);;
+
     let print_stats population =
         (try
             let average_fitness = average (function (fit,_) -> Fitness.to_float fit) population in
             Printf.printf "Average fitness : %e\n" average_fitness
         with Invalid_argument _ -> ());
         Printf.printf "Best individual :\n";
-        print_individual (best_individual Fitness.compare population);
+        print_best population;
     ;;
 
     let print_advanced_stats population =

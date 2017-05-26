@@ -22,7 +22,7 @@ let () =
         ("-c", Arg.Tuple [Arg.Set_string next_overriden_key; Arg.String (function json -> config_overrides := (!next_overriden_key,json)::(!config_overrides))],
             " Shorthand for --config-override");
         ("--quiet", Arg.Unit (fun () -> verbosity := 0), " Do not print anything else than the best individual at the end of the evolution process (equivalent to -v 0)");
-        ("--no-stats", Arg.Unit (fun () -> verbosity := 1), " No intermediate statistics about the currently generated population (equivalent to -v 1)");
+        ("--no-stats", Arg.Unit (fun () -> verbosity := 1), " Only print the best individual each generation (equivalent to -v 1)");
         ("--full-stats", Arg.Unit (fun () -> verbosity := 3), " Print full intermediate statistics about the currently generated population (equivalent to -v 3)");
         ("-v", Arg.Set_int verbosity, "verbLevel Set the verbosity level (default is 2). Lower values speed up the process");
         ("--dump-pop", Arg.Set_string dump_filename, "filename Dump the final population into the given file (creating or replacing it) for future reuse with the --load-pop command");
@@ -66,7 +66,7 @@ let () =
     let pop = RegexpEvolver.evolve ?init_pop ~verbosity:!verbosity ~nb_gen:!generations target_data in
 
     (* Print final statistics about the last generation (or just the best individual if the verbosity is null) *)
-    if !verbosity >= 1 then
+    if !verbosity >= 2 then
     (
         Printf.printf "= End of evolution =\n";
         StatsPrinter.print_population pop;
@@ -76,7 +76,7 @@ let () =
         let (ex, cex) = target_data in
         Printf.printf "(Extracted from %d examples and %d counter-examples)\n" (Array.length ex) (Array.length cex)
     )
-    else
+    else if !verbosity = 0 then
     (
         let bestFitness, bestDna = Stats.best_individual Parameters.Fitness.compare pop in
         Printf.printf "%s\n%s" (Parameters.Fitness.to_string bestFitness) (RegexpDna.to_string bestDna)
