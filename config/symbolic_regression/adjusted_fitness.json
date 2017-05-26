@@ -17,7 +17,7 @@
         "mutation/ConstMutation.cmxs",
         "mutation/RebuildSubtreeMutation.cmxs",
         "crossover/TakeSubtreeCrossover.cmxs",
-        "fitness/SquaredDiffFitness.cmxs",
+        "fitness/AdjustedSquaredDiff.cmxs",
         "simplification/ConstEvalSimplification.cmxs"
     ],
 
@@ -38,7 +38,7 @@
     [
         { "proba":1.0, "method":"take_subtree" }
     ],
-    "fitness": { "method":"squared_diff" },
+    "fitness": { "method":"adjusted_squared_diff", "params":{"lessen_depth_impact": 7.0} },
     "simplifications":
     [
         { "schedule":10, "method":"eval_const" }
@@ -49,7 +49,7 @@
     "&random_gen":
     {
         "min_depth": 1,
-        "max_depth": 4,
+        "max_depth": 5,
 
         "bin_op":
         [
