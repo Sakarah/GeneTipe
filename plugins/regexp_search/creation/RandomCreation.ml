@@ -92,8 +92,8 @@ let read_params json =
 let make_pattern creation_fun json data =
     let params = read_params json in
     let open Yojson.Basic.Util in
-    let min_depth = json |> member "min_depth" |> to_int in
-    let max_depth = json |> member "max_depth" |> to_int in
+    let min_depth = json |> member "min_init_depth" |> to_int in
+    let max_depth = json |> member "max_init_depth" |> to_int in
     ramped (creation_fun params data) min_depth max_depth
 ;;
 

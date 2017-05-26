@@ -58,8 +58,9 @@
 
     "&random_gen":
     {
-        "min_depth": 3,
-        "max_depth": 10,
+        "min_init_depth": 3,
+        "max_init_depth": 10,
+        "max_depth": 7,
 
         "concat_proba": 0.5,
         "alt_proba": 0.05,
