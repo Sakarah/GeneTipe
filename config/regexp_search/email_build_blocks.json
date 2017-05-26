@@ -40,10 +40,10 @@
         "method":"multiobjective",
         "params":
         {
-            "full_example_score":20.0,
-            "full_counter_example_score":10.0,
+            "full_example_score":10.0,
+            "full_counter_example_score":50.0,
             "partial_example_score":5.0,
-            "partial_counter_example_score":0.1,
+            "partial_counter_example_score":0.0,
             "size_score":1.0,
             "elim_size":150
         }
@@ -66,16 +66,14 @@
         "opt_proba": 0.05,
         "plus_proba": 0.05,
         "star_proba": 0.05,
-        "rand_char_proba": 0.25,
-        "predefined_proba": 0.05,
+        "rand_char_proba": 0.0,
+        "predefined_proba": 0.30,
         "predefined_list":
         [
-            { "proba":0.2, "regexp":"." },
-            { "proba":0.3, "regexp":"[A-Za-z]" },
-            { "proba":0.1, "regexp":"[A-Z]" },
-            { "proba":0.1, "regexp":"[a-z]" },
+            { "proba":0.4, "regexp":"[a-z0-9\\-_.]" },
+            { "proba":0.3, "regexp":"[a-z]" },
             { "proba":0.2, "regexp":"[0-9]" },
-            { "proba":0.1, "regexp":"[ \t]" }
+            { "proba":0.1, "regexp":"@" }
         ]
     }
 }
