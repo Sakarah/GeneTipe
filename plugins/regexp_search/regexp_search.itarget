@@ -1,4 +1,5 @@
 creation/RandomCreation.cmxs
+creation/CreationFromExample.cmxs
 crossover/TakeSubtreeCrossover.cmxs
 crossover/CombineCrossover.cmxs
 mutation/RebuildSubtreeMutation.cmxs

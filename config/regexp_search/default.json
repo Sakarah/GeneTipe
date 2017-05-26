@@ -11,6 +11,7 @@
         "../selection/Tournament.cmxs",
         "../parent_chooser/UniformParentChooser.cmxs",
         "creation/RandomCreation.cmxs",
+        "creation/CreationFromExample.cmxs",
         "mutation/RebuildSubtreeMutation.cmxs",
         "mutation/ReduceMutation.cmxs",
         "crossover/TakeSubtreeCrossover.cmxs",
@@ -22,7 +23,22 @@
 
     "creation":
     [
-        { "proba":0.5, "method":"fill", "params":"&random_gen" },
+        {
+            "proba":0.1, "method":"from_example",
+            "params":
+            {
+                "replacement_patterns":
+                [
+                    { "proba":0.5, "regexp":"[A-Z]" },
+                    { "proba":0.5, "regexp":"[a-z]" },
+                    { "proba":0.7, "regexp":"[0-9]" },
+                    { "proba":0.5, "regexp":"[ \t]" },
+                    { "proba":0.8, "regexp":"[A-Za-z]" },
+                    { "proba":0.2, "regexp":"." }
+                ]
+            }
+        },
+        { "proba":0.4, "method":"fill", "params":"&random_gen" },
         { "proba":0.5, "method":"grow", "params":"&random_gen" }
     ],
     "mutation":

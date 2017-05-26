@@ -38,7 +38,7 @@ sig
     module Individual : EvolParams.Individual
     type target_data
 
-    (** Hooking point for creation methods. A creation method should build a entirely new individual from scratch not exceeding the given max_depth. *)
+    (** Hooking point for creation methods. A creation method should build a entirely new individual from scratch using eventually the target data. pop_frac is a float number indicating the proportion of the already generated population. *)
     module Creation : HookingPoint with type t = (Yojson.Basic.json -> target_data -> pop_frac:float -> Individual.t)
 
     (** Hooking point for mutation operations. A mutation operation should modify the given individual to create a slightly different one not exceeding the given max_depth. *)
