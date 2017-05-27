@@ -1,0 +1,96 @@
+{
+    "pop_size": 1000,
+    "growth_factor": 2.0,
+    "crossover_ratio": 0.5,
+    "mutation_ratio": 0.45,
+    "remove_duplicates": true,
+
+    "plugin_dir":"_build/plugins/regexp_search/",
+    "plugins":
+    [
+        "../selection/Tournament.cmxs",
+        "../parent_chooser/UniformParentChooser.cmxs",
+        "creation/RandomCreation.cmxs",
+        "creation/CreationFromExample.cmxs",
+        "mutation/RebuildSubtreeMutation.cmxs",
+        "mutation/ReduceMutation.cmxs",
+        "crossover/TakeSubtreeCrossover.cmxs",
+        "crossover/CombineCrossover.cmxs",
+        "fitness/MultiobjectiveFitness.cmxs",
+        "simplification/RepeatSimplification.cmxs",
+        "simplification/GroupChars.cmxs"
+    ],
+
+    "creation":
+    [
+        {
+            "proba":0.1, "method":"from_example",
+            "params":
+            {
+                "replacement_patterns":
+                [
+                    { "proba":0.5, "regexp":"[A-Z]" },
+                    { "proba":0.5, "regexp":"[a-z]" },
+                    { "proba":0.7, "regexp":"[0-9]" },
+                    { "proba":0.5, "regexp":"[ \t]" },
+                    { "proba":0.8, "regexp":"[A-Za-z]" },
+                    { "proba":0.2, "regexp":"." }
+                ]
+            }
+        }
+    ],
+    "mutation":
+    [
+        { "proba":0.7, "method":"rebuild_subtree", "params":"&random_gen" },
+        { "proba":0.3, "method":"reduce" }
+    ],
+    "crossover":
+    [
+        { "proba":0.9, "method":"take_subtree" },
+        { "proba":0.1, "method":"combine", "params":{"alt_proba":0.1} }
+    ],
+    "fitness":
+    {
+        "method":"multiobjective",
+        "params":
+        {
+            "full_example_score":10.0,
+            "full_counter_example_score":50.0,
+            "partial_example_score":5.0,
+            "partial_counter_example_score":0.0,
+            "size_score":1.0,
+            "elim_size":150
+        }
+    },
+    "simplifications":
+    [
+        { "schedule":5, "method":"repeat_simplification" },
+        { "schedule":10, "method":"group_chars" }
+    ],
+    "selection" : { "method":"tournament" },
+    "parent_choice": { "method":"uniform" },
+
+    "&random_gen":
+    {
+        "min_init_depth": 3,
+        "max_init_depth": 7,
+        "max_depth": 10,
+
+        "concat_proba": 0.5,
+        "alt_proba": 0.05,
+        "opt_proba": 0.05,
+        "plus_proba": 0.05,
+        "star_proba": 0.05,
+        "rand_char_proba": 0.25,
+        "predefined_proba": 0.05,
+        "predefined_list":
+        [
+            { "proba":0.2, "regexp":"." },
+            { "proba":0.3, "regexp":"[A-Za-z]" },
+            { "proba":0.1, "regexp":"[A-Z]" },
+            { "proba":0.1, "regexp":"[a-z]" },
+            { "proba":0.2, "regexp":"[0-9]" },
+            { "proba":0.1, "regexp":"[ \t]" }
+        ]
+    }
+}
