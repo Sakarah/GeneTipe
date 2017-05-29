@@ -7,8 +7,14 @@ struct
         let size = Array.length initial_population in
         let winners = Array.make target_size initial_population.(0) in
 
+        let fitness_min = ref (Fitness.to_float(fst initial_population.(0))) in
+        for i = 1 to (size - 1) do
+            if Fitness.to_float(fst initial_population.(i)) < !fitness_min then
+                fitness_min := Fitness.to_float(fst initial_population.(i))
+        done;
+
         let fitness_total = ref 0. in
-        let fitness_cumul = Array.init size (function i -> fitness_total := !fitness_total +. Fitness.to_float (fst initial_population.(i)); !fitness_total) in
+        let fitness_cumul = Array.init size (function i -> fitness_total := !fitness_total +. Fitness.to_float (fst initial_population.(i)); !fitness_total -. !fitness_min) in
 
         let rec first_above value i j = (* i included j excluded convention *)
             if i=j then i
@@ -23,7 +29,7 @@ struct
         in
 
         for i = 0 to (target_size - 1) do
-            let random_selection = Random.float !fitness_total in
+            let random_selection = Random.float (!fitness_total -. !fitness_min) in
             let selected = first_above random_selection 0 size in
 
             winners.(i) <- initial_population.(selected);
