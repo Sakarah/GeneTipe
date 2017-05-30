@@ -36,7 +36,7 @@ let () =
         It creates and evolve a population of candidate regular expressions with a genetic algorithm.\n\
         All the genetic operators on the population must be provided through plugins loaded dynamically.\n\
         You need to provide a configuration file specifying the required plugins and the parameters of the evolution process.\n\
-        Usage: regexp-search-alt-d&c [options] configFilename\n\
+        Usage: regexp-search-alt-div [options] configFilename\n\
         \n\
         Options available:"
     in
