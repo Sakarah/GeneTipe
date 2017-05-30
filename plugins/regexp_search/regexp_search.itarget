@@ -7,5 +7,6 @@ mutation/ReduceMutation.cmxs
 fitness/FullMatchFitness.cmxs
 fitness/PartialMatchFitness.cmxs
 fitness/MultiobjectiveFitness.cmxs
+fitness/DynamicSizeLimitFitness.cmxs
 simplification/RepeatSimplification.cmxs
 simplification/GroupChars.cmxs
